@@ -1,3 +1,7 @@
+if(process.env.NODE_ENV !== "production") {
+require("dotenv").config();
+}
+
 const express  = require("express");
 const app = express();
 const path = require("path");
@@ -6,6 +10,9 @@ const mongoose = require("mongoose");
 const Business = require("./models/Business");
 const MethodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const multer = require('multer');
+const{storage}= require('./cloudconfig');
+const upload = multer({ storage });
 
 const dbUrl = "mongodb://127.0.0.1:27017/localbuisness";
 
@@ -22,8 +29,8 @@ app.engine("ejs",ejsMate);
 app.get("/",async(req,res)=>{ 
     let business = await Business.find();
     res.render("index.ejs",{business});
-    
-  
+
+   
 });
 
 //new form get request
@@ -32,9 +39,10 @@ app.get("/new",(req,res)=>{
 });
 
 //new form post request 
-app.post("/new",async(req,res)=>{
-    let {Name ,Owner,Category,description,Contact,address} = req.body;
-    let business = new Business({Name,Owner,Category,description,Contact,address});
+app.post("/new", upload.single('image'),async(req,res)=>{
+    let {Name, Owner, username, Category, description, Contact, address,email} = req.body;
+    let image = { url: req.file.path, filename: req.file.filename };
+    let business = new Business({Name, Owner, username, Category, description, Contact, address,email, Image: image});
     await business.save();
     res.redirect("/");
 });
@@ -55,10 +63,14 @@ app.post("/edit/:id",async(req,res)=>{
 });
 
 //(edit + update )
-app.put("/edit/:id",async(req,res)=>{
+app.put("/edit/:id",upload.single("image"),async(req,res)=>{
     let{id}=req.params;
-    let{Name,Owner,Category,description,Contact,address} = req.body;
-    let updatedBusiness = await Business.findOneAndUpdate({_id:id},{Name,Owner,Category,description,Contact,address});
+    let {Name, Owner, username, Category, description, Contact, address} = req.body;
+    let image = {url:req.file.path, filename:req.file.filename};
+    let updatedBusiness = await Business.findByIdAndUpdate(
+        id,
+        {Name, Owner, username, Category, description, Contact, address, Image: image},
+    );
     console.log(updatedBusiness);
     res.redirect("/");
 });

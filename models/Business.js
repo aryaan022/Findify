@@ -28,8 +28,8 @@ const businessSchema = new mongoose.Schema({
     },
     Contact:{
         type:String,
-        min:10,
-        max:10,
+        minlength:10,
+        maxlength:10,
         required:true
     },
     address:{
@@ -37,13 +37,8 @@ const businessSchema = new mongoose.Schema({
         required:true
     },
     Image:{
-        url:{
-            type:String,
-            required:true
-        },
-        filename:{
-            type:String,
-        }
+        url:String,
+        filename:String
     }
 
 })
