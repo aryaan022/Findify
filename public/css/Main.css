@@ -1,0 +1,32 @@
+.card-container{
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    margin-left: 1rem;
+}
+a{
+    text-decoration: none!important;
+    color: inherit!important;
+}
+
+.card{
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.nav-container{
+    margin-left: 0.3rem !important;
+    margin-right: 0.3rem !important;
+    margin-top: 0.3rem !important;
+}
+
+
+/* Show page */
+.show-page{
+    display: flex !important;
+}
+
+.image-container{
+    height: 100%;
+    width: 50%;
+}

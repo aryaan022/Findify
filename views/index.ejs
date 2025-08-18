@@ -1,0 +1,17 @@
+<%= layout("layouts/boilerplate") %>
+<div class="card-container">
+    
+    <% for(let bus of business){ %>
+        <div class="card" style="width: 18rem;">
+                <a href="/show/<%=bus.id%>">
+                <img src="<%=bus.Image.url%>" class="card-img-top" alt="...">
+                <div class="card-body">
+                 <h5 class="card-title"><%=bus.Name %></h5>
+                 <p class="card-text"><b><%=bus.Category %></b></p>
+                <p class="card-text"><%=bus.description %></p>
+                 </div>
+                </a>
+            </div>
+    <% } %>
+</div>
+
