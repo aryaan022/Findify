@@ -1,0 +1,53 @@
+.show-page {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  margin: 40px auto;
+  max-width: 900px;
+}
+.image-container {
+  flex: 0 0 320px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.image-container img {
+  width: 320px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.business-details {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 32px 24px;
+}
+.business-details h1 {
+  font-size: 2rem;
+  margin-bottom: 18px;
+}
+.business-details p {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+.delete-btn, .edit-btn {
+  margin-top: 24px;
+}
+.delete-btn form, .edit-btn form {
+  display: inline-block;
+}
+.delete-btn button, .edit-btn button {
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: none;
+  background: #dc3545;
+  color: #fff;
+  font-weight: 500;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.edit-btn button {
+  background: #007bff;
+}

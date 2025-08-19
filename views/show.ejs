@@ -6,15 +6,15 @@
     </div>
 
     <div class="business-details">
-        <h1><%= business.Name %></h1>
-        <p><strong>Owner:</strong> <%= business.Owner %></p>
-        <p><strong>Owner:</strong> <%= business.username %></p>
-        <p><strong>Category:</strong> <%= business.Category %></p>
-        <p><strong>Description:</strong> <%= business.description %></p>
-        <p><strong>Contact:</strong> <%= business.Contact %></p>
-        <p><strong>Address:</strong> <%= business.address %></p>
+    <h1><%= business.Name %></h1>
+    <p><strong>Username:</strong> <%= business.Owner.username %></p>
+    <p><strong>Category:</strong> <%= business.Category %></p>
+    <p><strong>Description:</strong> <%= business.description %></p>
+    <p><strong>Email:</strong> <%= business.Owner.email %></p>
+    <p><strong>Contact:</strong> <%= business.Contact %></p>
+    <p><strong>Address:</strong> <%= business.address %></p>
     </div>
-    
+    <% if (currentUser && business.Owner._id.toString() === currentUser._id.toString()) { %>
     <div class="delete-btn">
         <form action="/delete/<%= business.id %>?_method=DELETE" method="POST">
             <button>delete</button>
@@ -25,4 +25,5 @@
             <button>Edit</button>
         </form>
     </div>
+    <%}%>
 </div>

@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const businessSchema = new mongoose.Schema({
+const businessSchema = new Schema({
     Owner:{
-        type:String,
+        type:Schema.Types.ObjectId,
+        ref:"User",
         required:true
     },
     Name:{
@@ -15,14 +17,6 @@ const businessSchema = new mongoose.Schema({
         required:true
     },
     description:{
-        type:String,
-        required:true
-    },
-    email:{
-        type:String,
-        required:true
-    },
-    username:{
         type:String,
         required:true
     },
@@ -40,8 +34,8 @@ const businessSchema = new mongoose.Schema({
         url:String,
         filename:String
     }
+},{timestamps:true}) // adds createdAt & updatedAt automatically
 
-})
 
 const Business = mongoose.model("Business",businessSchema);
 module.exports = Business;

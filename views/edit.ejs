@@ -6,10 +6,6 @@
         <input type="text" id="name" name="Name" class="form-control" value="<%= business.Name %>" required>
     </div>
     <div class="form-group">
-        <label for="owner">Owner Name</label>
-        <input type="text" id="owner" name="Owner" class="form-control" value="<%= business.Owner %>" required>
-    </div>
-    <div class="form-group">
         <label for="category">Category</label>
         <select id="category" name="Category" class="form-control" required>
             <option value="Restaurant" <%= business.Category === 'Restaurant' ? 'selected' : '' %>>Restaurant</option>
@@ -26,10 +22,6 @@
     <div class="form-group">
         <label for="email">Email</label>
         <input type="email" id="email" name="email" class="form-control" value="<%= business.email %>" required>
-    </div>
-    <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" class="form-control" value="<%= business.username %>" required>
     </div>
     <div class="form-group">
         <label for="Contact">Contact</label>

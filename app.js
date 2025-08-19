@@ -8,11 +8,17 @@ const path = require("path");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const Business = require("./models/Business");
+const user = require("./models/User");
+const session = require("express-session");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const flash = require("connect-flash");
 const MethodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const multer = require('multer');
-const{storage}= require('./cloudconfig');
+const{storage, cloudinary}= require('./cloudconfig');
 const upload = multer({ storage });
+const {isLoggedIn,isOwner,isVendor}= require("./middleware");
 
 const dbUrl = "mongodb://127.0.0.1:27017/localbuisness";
 
@@ -26,58 +32,167 @@ app.engine("ejs",ejsMate);
 
 
 
-app.get("/",async(req,res)=>{ 
-    let business = await Business.find();
-    res.render("index.ejs",{business});
+app.use(flash());
+app.use(session({
+    secret:"YourScevretKEy",
+    resave: false,
+    saveUninitialized: true,
+    cookie:{
+        expires: Date.now() + 7*24*60*60*1000,// 7 days 24hours 60 min 60 sec 1000 millisecond
+        maxAge: 7*24*60*60*1000, // 7 days in milliseconds
+        httpOnly:true, // prevents client-side JavaScript from accessing the cookie
+    }
+}));
 
-   
+
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(user.authenticate()));
+
+passport.serializeUser(user.serializeUser()); //user ki info session me save kraneka mtlb hai serialized user and unstore krane ka mtlb hai deserialized user.
+passport.deserializeUser(user.deserializeUser());
+
+
+//local storage
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.currentUser = req.user;
+  next();
 });
 
+
+
+//home route
+app.get("/",async(req,res)=>{ 
+    let business = await Business.find();
+    res.render("index.ejs",{business});  
+});
+
+//regiter route
+app.get("/register",async(req,res)=>{
+    res.render("register.ejs");
+
+});
+//register route
+app.post("/register",async(req,res,next)=>{
+    try{
+        let{username,email,role,password} = req.body;
+        let newuser =  new user({email,username,role});
+        const registeredUser = await user.register(newuser,password);
+        console.log(registeredUser);
+        req.login(registeredUser,(err)=>{
+            if(err) {return next(err);}
+            else{
+                req.flash("success","Welcome to Local Business Finder!");
+                res.redirect("/");
+            }
+        });
+    }catch(e){
+        res.redirect("/register");
+    }
+});
+
+//login route
+app.get("/login",(req,res)=>{
+    res.render("login.ejs");
+});
+
+app.post("/login",passport.authenticate("local",
+    {failureRedirect:"/login",
+    failureFlash:true
+}),
+(req,res)=>{
+    req.flash("success", `Welcome back, ${req.user.username}!`);
+    res.redirect("/"); // or vendor dashboard
+})
+//logout
+
+app.get("/logout",(req,res)=>{
+    req.logout((err)=>{
+        if(err) {
+            return next(err);
+        }
+        req.flash("success", "Goodbye!");
+        res.redirect("/");
+    })
+});
+
+
 //new form get request
-app.get("/new",(req,res)=>{
+app.get("/new", isLoggedIn,isVendor, (req, res) => {
     res.render("new.ejs");
 });
 
-//new form post request 
-app.post("/new", upload.single('image'),async(req,res)=>{
-    let {Name, Owner, username, Category, description, Contact, address,email} = req.body;
+//new form post request
+app.post("/new", isLoggedIn,isVendor, upload.single('image'), async (req, res) =>{
+    let {Name,Category, description, Contact, address} = req.body;
     let image = { url: req.file.path, filename: req.file.filename };
-    let business = new Business({Name, Owner, username, Category, description, Contact, address,email, Image: image});
+    let business = new Business({Name, Owner:req.user._id, Category, description, Contact, address, Image: image});
     await business.save();
+    req.flash("success", "Business registered successfully!")
     res.redirect("/");
 });
 
 //delete route
-app.delete("/delete/:id",async(req,res)=>{
-    let{id}= req.params;
-    let deletedBusiness = await Business.findByIdAndDelete(id);
-    console.log(deletedBusiness);
-    res.redirect("/");
-})
+app.delete("/delete/:id",isLoggedIn,isOwner,async(req,res)=>{
+    try{
+        let{id}= req.params;
+        let business =  await Business.findById(id);
+        if(business.Image && business.Image.filename){
+            for(let img of business.Image.filename){
+                await cloudinary.uploader.destroy(img);
+            }
+        }
+        let deletedBusiness = await Business.findByIdAndDelete(id);
+        console.log(deletedBusiness);
+        res.redirect("/");
+
+    }
+    catch(err){
+        req.flash("error", "Something went wrong while deleting the business.");
+        console.log(err);
+        res.redirect("/");
+    }
+});
 
 //edit route
-app.post("/edit/:id",async(req,res)=>{
+app.post("/edit/:id",isLoggedIn,isOwner,async(req,res)=>{
     let{id} =req.params;
     let business = await Business.findById(id);
     res.render("edit.ejs",{business});
 });
 
 //(edit + update )
-app.put("/edit/:id",upload.single("image"),async(req,res)=>{
-    let{id}=req.params;
-    let {Name, Owner, username, Category, description, Contact, address} = req.body;
-    let image = {url:req.file.path, filename:req.file.filename};
-    let updatedBusiness = await Business.findByIdAndUpdate(
+app.put("/edit/:id",isLoggedIn,isOwner,upload.single("image"),async(req,res)=>{
+    try{
+        let{id}=req.params;
+        let business = await Business.findById(id);
+        if(req.file){
+            if(business.Image && business.Image.filename){
+                await cloudinary.uploader.destroy(business.Image.filename);
+            }
+        }
+        let {Name,Category, description, Contact, address} = req.body;
+        let image = {url:req.file.path, filename:req.file.filename};
+        let updatedBusiness = await Business.findByIdAndUpdate(
         id,
-        {Name, Owner, username, Category, description, Contact, address, Image: image},
-    );
-    console.log(updatedBusiness);
-    res.redirect("/");
+        {Name, Category, description, Contact, address, Image: image},
+        );
+        console.log(updatedBusiness);
+        res.redirect(`/show/${id}`);
+    }catch(err){
+        req.flash("error", "Something went wrong while updating the business.");
+        console.log(err);
+        res.redirect(`/show/${id}`);
+    }
+
 });
 //show route
 app.get("/show/:id",async(req,res)=>{
     let{id}=req.params;
-    let business = await Business.findById(id);
+    let business = await Business.findById(id).populate("Owner","username email");
     res.render("show.ejs",{business});
 });
 
@@ -91,7 +206,6 @@ main()
 async function main() {
     await mongoose.connect(dbUrl);
 }
-
 
 
 
