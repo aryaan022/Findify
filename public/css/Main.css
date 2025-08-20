@@ -30,3 +30,10 @@ a{
     height: 100%;
     width: 50%;
 }
+
+.search-bar{
+    margin-left: 2rem !important;
+    margin-right: 1rem !important;
+    width: 700px;
+
+}

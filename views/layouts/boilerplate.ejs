@@ -32,17 +32,29 @@
               <li class="nav-item">
                 <a class="nav-link" href="#">About Us</a>
               </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  More
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Dealership</a></li>
-                  <li><a class="dropdown-item" href="#">Restaurant</a></li>
-                  <li><a class="dropdown-item" href="#">Cafe</a></li>
-                </ul>
-              </li>
             </ul>
+            <div class="search-container">
+            <form class="d-flex" role="search" action="/search" method="get">
+              <div class="search-bar">
+                <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search"/>
+              </div>
+              <div class="category-container">
+              <select class="form-select me-2" name="category">
+              <option value="">All Categories</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Services">Services</option>
+              <option value="Dealership">Dealership</option>
+              <option value="Cafe">Cafe</option>
+              <option value="Shops">Shops</option>
+              </select>
+              </div>
+
+              <div class="submit-btn">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+              </div>
+
+            </form>
+            </div>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
               <% if(!currentUser){ %>
               <li class="nav-item">

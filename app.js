@@ -67,7 +67,7 @@ app.use((req, res, next) => {
 //home route
 app.get("/",async(req,res)=>{ 
     let business = await Business.find();
-    res.render("index.ejs",{business});  
+    res.render("index.ejs", { business, query: undefined }); 
 });
 
 //regiter route
@@ -118,6 +118,21 @@ app.get("/logout",(req,res)=>{
         res.redirect("/");
     })
 });
+
+
+//search route
+app.get("/search", async (req, res) => {
+    const { query, category } = req.query;
+    let filter = {};
+    if (query) {
+        filter.Name = new RegExp(query, "i");
+    }
+    if (category && category !== "") {
+        filter.Category = category;
+    }
+    let business = await Business.find(filter);
+    res.render("index.ejs", { business, query, category });
+})
 
 
 //new form get request
