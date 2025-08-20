@@ -14,66 +14,64 @@
 <body>
   
     <div class="nav-container">
-        
         <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
         <a class="navbar-brand" href="/"><img src="/image.png" alt="" height="25"></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/new">Add New Business</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">About Us</a>
-              </li>
-            </ul>
-            <div class="search-container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="d-flex w-100 align-items-center" style="justify-content:space-between;">
+          <ul class="navbar-nav flex-row" style="gap:1rem;">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/new">Add New Business</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About Us</a>
+            </li>
+          </ul>
+          <div class="search-container" style="flex: 1; display: flex; justify-content: center; align-items: center;">
             <form class="d-flex" role="search" action="/search" method="get">
               <div class="search-bar">
                 <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search"/>
               </div>
               <div class="category-container">
-              <select class="form-select me-2" name="category">
-              <option value="">All Categories</option>
-              <option value="Restaurant">Restaurant</option>
-              <option value="Services">Services</option>
-              <option value="Dealership">Dealership</option>
-              <option value="Cafe">Cafe</option>
-              <option value="Shops">Shops</option>
-              </select>
+                <select class="form-select me-2" name="category">
+                  <option value="">All Categories</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Services">Services</option>
+                  <option value="Dealership">Dealership</option>
+                  <option value="Cafe">Cafe</option>
+                  <option value="Shops">Shops</option>
+                </select>
               </div>
-
               <div class="submit-btn">
                 <button class="btn btn-outline-success" type="submit">Search</button>
               </div>
-
             </form>
-            </div>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              <% if(!currentUser){ %>
-              <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
-              </li>
-              <%}%>
-              <% if(currentUser){ %>
-                <li class="nav-item">
-                  <a class="nav-link" href="/logout">Log Out</a>
-                </li>
-              <%}%>
-              <% if(!currentUser){ %>
-              <li class="nav-item">
-                <a class="nav-link" href="/register">Signup</a>
-              </li>
-              <%}%>
-            </ul>
-            </ul>
           </div>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <% if(!currentUser){ %>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <%}%>
+            <% if(currentUser){ %>
+              <li class="nav-item">
+                <a class="nav-link" href="/logout">Log Out</a>
+              </li>
+            <%}%>
+            <% if(!currentUser){ %>
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Signup</a>
+            </li>
+            <%}%>
+          </ul>
+        </div>
         </div>
       </nav>
     </div>
