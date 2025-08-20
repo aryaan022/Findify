@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 
   <link rel="stylesheet" href="/css/Main.css">
   <link rel="stylesheet" href="/css/form-center.css">
   <link rel="stylesheet" href="/css/show-page.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+
 </head>
+
 <body>
-  
-    <div class="nav-container">
-        <nav class="navbar navbar-expand-lg bg-light">
-        <div class="container-fluid">
+
+  <div class="nav-container">
+    <nav class="navbar navbar-expand-lg bg-light">
+      <div class="container-fluid">
         <a class="navbar-brand" href="/"><img src="/image.png" alt="" height="25"></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+          aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="d-flex w-100 align-items-center" style="justify-content:space-between;">
@@ -36,7 +40,7 @@
           <div class="search-container" style="flex: 1; display: flex; justify-content: center; align-items: center;">
             <form class="d-flex" role="search" action="/search" method="get">
               <div class="search-bar">
-                <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search"/>
+                <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search" />
               </div>
               <div class="category-container">
                 <select class="form-select me-2" name="category">
@@ -57,38 +61,41 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <% if(!currentUser){ %>
-            <li class="nav-item">
-              <a class="nav-link" href="/login">Login</a>
-            </li>
-            <%}%>
-            <% if(currentUser){ %>
               <li class="nav-item">
-                <a class="nav-link" href="/logout">Log Out</a>
+                <a class="nav-link" href="/login">Login</a>
               </li>
-            <%}%>
-            <% if(!currentUser){ %>
-            <li class="nav-item">
-              <a class="nav-link" href="/register">Signup</a>
-            </li>
-            <%}%>
+              <%}%>
+                <% if(currentUser){ %>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/logout">Log Out</a>
+                  </li>
+                  <%}%>
+                    <% if(!currentUser){ %>
+                      <li class="nav-item">
+                        <a class="nav-link" href="/register">Signup</a>
+                      </li>
+                      <%}%>
           </ul>
         </div>
-        </div>
-      </nav>
+      </div>
+    </nav>
+  </div>
+  <% if (success && success.length) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <% if (success && success.length) { %>
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <%= success %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% } %>
-<% if (error && error.length) { %>
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <%= error %>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% } %>
-    <%- body %>
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    <% } %>
+      <% if (error && error.length) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% } %>
+          <%- body %>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+              integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+              crossorigin="anonymous"></script>
 </body>
+
 </html>
