@@ -1,5 +1,17 @@
 <%= layout("layouts/boilerplate") %>
 
+<div class="profile-container">
+  <img src="<%= business.Image.url %>" alt="<%= business.Name %>">
+  <div class="profile-details">
+    <h2><%= business.Name %></h2>
+    <span class="category"><%= business.Category %></span>
+    <span class="address"><%= business.address %></span>
+  </div>
+  <button class="contact-btn">
+    <i class="fa fa-phone"></i> Contact Business
+  </button>
+</div>
+<!-- 
 <div class="show-page">
   <div class="image-container">
     <img src="<%=business.Image.url %>" alt="<%= business.name %>" />
@@ -27,4 +39,4 @@
     </form>
   </div>
   <%}%>
-</div>
+</div> -->

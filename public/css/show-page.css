@@ -1,53 +1,62 @@
-.show-page {
+.profile-container {
   display: flex;
-  align-items: flex-start;
-  gap: 40px;
-  margin: 40px auto;
-  max-width: 900px;
-}
-.image-container {
-  flex: 0 0 320px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-}
-.image-container img {
-  width: 320px;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-}
-.business-details {
-  flex: 1;
+  align-items: center;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  padding: 32px 24px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+  border-radius: 1rem;
+  padding: 2rem 2.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
-.business-details h1 {
-  font-size: 2rem;
-  margin-bottom: 18px;
+
+.profile-container img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 2rem;
+  background: #deedff;
 }
-.business-details p {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
+
+.profile-details {
+  flex: 1;
 }
-.delete-btn, .edit-btn {
-  margin-top: 24px;
+
+.profile-details h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
-.delete-btn form, .edit-btn form {
+
+.profile-details .category {
+  color: #3b82f6;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
   display: inline-block;
 }
-.delete-btn button, .edit-btn button {
-  padding: 8px 18px;
-  border-radius: 6px;
-  border: none;
-  background: #dc3545;
-  color: #fff;
-  font-weight: 500;
-  margin-right: 10px;
-  cursor: pointer;
+
+.profile-details .address {
+  color: #555;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
 }
-.edit-btn button {
-  background: #007bff;
+
+.contact-btn {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-btn:hover {
+  background: #2563eb;
 }
