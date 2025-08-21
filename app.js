@@ -68,6 +68,7 @@ app.get("/", async (req, res) => {
 app.get("/register", async (req, res) => {
   res.render("register.ejs");
 });
+
 //register route
 app.post("/register", async (req, res, next) => {
   try {
@@ -130,11 +131,11 @@ app.get("/search", async (req, res) => {
   res.render("index.ejs", { business, query, category });
 });
 
-
-//dashboard route
-app.get("/dashboard",async(req,res)=>{
+//dashboard route for vendor
+app.get("/dashboard", isLoggedIn, isVendor, async (req, res) => {
   let user = req.user;
-  let business  = await Business.find({ Owner:user._id});
+  let business = await Business.find({ Owner: user._id });
+  req.flash("success", "Welcome to your dashboard!");
   res.render("dashboard.ejs", { user, business });
 });
 
