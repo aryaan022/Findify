@@ -1,3 +1,8 @@
+.about-section-1{
+  width: 50%;
+}
+
+
 .profile-container {
   display: flex;
   align-items: center;
@@ -7,6 +12,7 @@
   padding: 2rem 2.5rem;
   margin-top: 2rem;
   margin-bottom: 2rem;
+  margin-left: 4rem;
 }
 
 .profile-container img {
@@ -59,4 +65,15 @@
 
 .contact-btn:hover {
   background: #2563eb;
+}
+
+
+
+.about-section{
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  padding: 2rem;
+  border-radius: 1rem;
+  background: #fff;
+  margin-top: 2rem;
+  margin-left: 4.5rem;
 }

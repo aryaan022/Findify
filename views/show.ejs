@@ -1,16 +1,27 @@
 <%= layout("layouts/boilerplate") %>
-
-<div class="profile-container">
-  <img src="<%= business.Image.url %>" alt="<%= business.Name %>">
-  <div class="profile-details">
-    <h2><%= business.Name %></h2>
-    <span class="category"><%= business.Category %></span>
-    <span class="address"><%= business.address %></span>
+<div>
+  <div class="profile-container">
+    <img src="<%= business.Image.url %>" alt="<%= business.Name %>" />
+    <div class="profile-details">
+      <h2><%= business.Name %></h2>
+      <span class="category"><%= business.Category %></span><br />
+      <span class="address"><%= business.address %></span>
+    </div>
+    <button class="contact-btn">
+      <i class="fa fa-phone"></i> Contact Business
+    </button>
   </div>
-  <button class="contact-btn">
-    <i class="fa fa-phone"></i> Contact Business
-  </button>
+  <div class="about-section-1">
+    <div class="about-section">
+      <div><h3>About</h3></div>
+      <div><p><%= business.description %></p></div>
+    </div>
+  </div>
+  <div class="about-section-2">
+    
+  </div>
 </div>
+
 <!-- 
 <div class="show-page">
   <div class="image-container">
