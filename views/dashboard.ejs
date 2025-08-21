@@ -1,0 +1,16 @@
+<%= layout("layouts/boilerplate.ejs") %>
+
+<h1>Dashboard</h1>
+<p>Welcome <%= user.username %>! Here are your businesses:</p>
+<ul>
+  <% for(bus of business){ %>
+    <li>
+        <a href="/show/<%= bus._id %>"><%= bus.Name %></a>
+        <form action="/edit/<%= bus._id %>" method="post" style="display:inline;">
+        <button type="submit">Edit</button>
+        </form>
+        <form action="/delete/<%= bus._id %>?_method=DELETE" method="POST" style="display:inline;">
+        <button type="submit">Delete</button>
+        </form>
+  <% } %>
+</ul>

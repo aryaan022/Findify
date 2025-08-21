@@ -130,6 +130,14 @@ app.get("/search", async (req, res) => {
   res.render("index.ejs", { business, query, category });
 });
 
+
+//dashboard route
+app.get("/dashboard",async(req,res)=>{
+  let user = req.user;
+  let business  = await Business.find({ Owner:user._id});
+  res.render("dashboard.ejs", { user, business });
+});
+
 //new form get request
 app.get("/new", isLoggedIn, isVendor, (req, res) => {
   res.render("new.ejs");

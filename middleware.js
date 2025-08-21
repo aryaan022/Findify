@@ -25,13 +25,7 @@ module.exports.isOwner = async (req, res, next) => {
 };
 
 module.exports.isVendor = async(req,res,next)=>{
-    const{id}= req.params;
-    const business = await Business.findById(id);
-    if(!business || !business.Owner || !req.user){
-         req.flash("error", "Please log in as a vendor to do that");
-         return res.redirect("/");
-    }
-    if(!business.Owner.role.equals("vendor")){
+     if (!req.user || req.user.role !== "Vendor") {
         req.flash("error", "Please log in as a vendor to do that");
         return res.redirect("/");
     }
