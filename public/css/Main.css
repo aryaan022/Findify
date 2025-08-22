@@ -243,6 +243,9 @@ a{
     font-weight: 600;
     margin-bottom: 1rem;
 }
+.footer {
+    margin-top: 40px;
+}
 .footer-col ul {
     list-style: none;
     padding: 0;
@@ -291,7 +294,6 @@ a{
 .footer-bottom-links a:hover {
     color: #3b82f6;
 }
-
 
 
 

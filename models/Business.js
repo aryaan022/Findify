@@ -33,9 +33,20 @@ const businessSchema = new Schema({
     Image:{
         url:String,
         filename:String
-    }
+    },
+    geometry:{
+        type:{
+            type:String,
+            enum:["Point"],
+            required:true
+        },
+        coordinates:{
+            type: [Number],
+            required:true
+        },
+    },
 },{timestamps:true}) // adds createdAt & updatedAt automatically
 
-
+businessSchema.index({geometry:"2dsphere"});//this allows $near queries in MongoDB.
 const Business = mongoose.model("Business",businessSchema);
 module.exports = Business;

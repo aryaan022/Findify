@@ -17,50 +17,63 @@
         <div><h3>About</h3></div>
         <div><p><%= business.description %></p></div>
       </div>
+
+      <div class="map-container">
+        <div class="Location-container">
+          <h4><b>Location :</b></h4>
+        </div>
+        <div class="address-container">
+          <h6>Address</h6>
+          <p><%= business.address %></p>
+        </div>
+        <div id="map"></div>
+      </div>
     </div>
     <div class="about-section-2">
       <h2>Contact Information</h2>
-      <div class="EMAIL"><strong>Email:</strong> <%= business.Owner.email %></div>
-      <div class="CONTACT"><strong>Contact:</strong> <%= business.Contact %></div>
-      <div class="ADDRESS"><strong>Address:</strong> <%= business.address %></div>
+      <div class="EMAIL">
+        <strong>Email:</strong> <%= business.Owner.email %>
+      </div>
+      <div class="CONTACT">
+        <strong>Contact:</strong> <%= business.Contact %>
+      </div>
+      <div class="ADDRESS">
+        <strong>Address:</strong> <%= business.address %>
+      </div>
       <div class="hr-container">
-        <hr>
+        <hr />
       </div>
       <div class="button-container">
-        <div class="call-business"><button class="call-btn">Call Business</button></div>
+        <div class="call-business">
+          <button class="call-btn">Call Business</button>
+        </div>
         <div class="email-business"><button>Email</button></div>
       </div>
-      
+      <div class="business-sections">
+        <h5 class="business-hours-title">Business Hours</h5>
+        <ul class="business-hours-list">
+          <li>
+            <span class="day">Monday-Friday:</span>
+            <span class="hours">9:00 AM - 8:00 PM</span>
+          </li>
+          <li>
+            <span class="day">Saturday:</span>
+            <span class="hours">10:00 AM - 6:00 PM</span>
+          </li>
+          <li>
+            <span class="day">Sunday:</span> <span class="hours">Closed</span>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- 
-<div class="show-page">
-  <div class="image-container">
-    <img src="<%=business.Image.url %>" alt="<%= business.name %>" />
-  </div>
-
-  <div class="business-details">
-    <h1><%= business.Name %></h1>
-    <p><strong>Username:</strong> <%= business.Owner.username %></p>
-    <p><strong>Category:</strong> <%= business.Category %></p>
-    <p><strong>Description:</strong> <%= business.description %></p>
-    <p><strong>Email:</strong> <%= business.Owner.email %></p>
-    <p><strong>Contact:</strong> <%= business.Contact %></p>
-    <p><strong>Address:</strong> <%= business.address %></p>
-  </div>
-  <% if (currentUser && business.Owner._id.toString() ===
-  currentUser._id.toString()) { %>
-  <div class="delete-btn">
-    <form action="/delete/<%= business.id %>?_method=DELETE" method="POST">
-      <button>delete</button>
-    </form>
-  </div>
-  <div class="edit-btn">
-    <form action="/edit/<%= business.id %>" method="post">
-      <button>Edit</button>
-    </form>
-  </div>
-  <%}%>
-</div> -->
+<script>
+  mapboxgl.accessToken = '<%= process.env.MAP_ACCESS_TOKEN %>';
+  const map = new mapboxgl.Map({
+      container: 'map', // container ID
+      center: [<%= business.geometry.coordinates[0] %>, <%= business.geometry.coordinates[1] %>], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+      zoom: 9 // starting zoom
+  });
+</script>

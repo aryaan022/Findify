@@ -1,7 +1,7 @@
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-
+const geocodingClient = require("./mapbox"); // we made this file earlier
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -153,14 +153,32 @@ app.post(
   async (req, res) => {
     let { Name, Category, description, Contact, address } = req.body;
     let image = { url: req.file.path, filename: req.file.filename };
+
+    const geodata = await geocodingClient
+      .forwardGeocode({
+        query: address,
+        limit: 1,
+      })
+      .send();
+
+    if (!geodata.body.features || geodata.body.features.length === 0) {
+      req.flash("error", "Location not found. Try again.");
+      return res.redirect("/new");
+    }
+    const coords = geodata.body.features[0].center; // [lon, lat]
+
     let business = new Business({
       Name,
       Owner: req.user._id,
       Category,
       description,
       Contact,
-      address,
+      address: geodata.body.features[0].text, //address
       Image: image,
+      geometry: {
+        type: "Point",
+        coordinates: coords,
+      },
     });
     await business.save();
     req.flash("success", "Business registered successfully!");

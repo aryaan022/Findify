@@ -134,33 +134,68 @@
   padding: 0.7rem 1.5rem;
   background: #3b82f6;
   color: white;
-   font-size: 1rem;
+  font-size: 1rem;
   font-weight: 500;
   border-radius: 0.5rem;
-   display: flex;
+  display: flex;
   align-items: center;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 2px 8px rgba(59,130,246,0.08);
   border: none;
-  transition: background 0.2s;
-
 }
 
-
-.email-business{
-  margin-bottom: 1.2rem;
-  
-}
 .email-business button{
   padding: 0.7rem 1.5rem;
+  width: 160px;
   background: #3b82f6;
   color: white;
-  width: 150px !important;
   font-size: 1rem;
   font-weight: 500;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0px 2px 8px rgba(59,130,246,0.08);
   border: none;
-  transition: background 0.2s;
 }
+
+.business-sections{
+  margin-top: 5rem !important;
+}
+
+
+
+
+.map-container{
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 1.5rem;
+    margin-left: 5rem !important;
+    width: 775px;
+}
+
+#map{
+  margin-left: 2rem !important;
+  margin-right: 2rem !important;
+  margin-bottom: 2rem !important;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  height: 300px;
+  width: 650px;
+}
+
+.Location-container{
+  margin-left: 3rem !important;
+  margin-top: 2rem !important;
+}
+
+.address-container{
+  margin-left: 3rem !important;
+}
+
+.business-sections{
+  margin-left: 8rem !important;
+}
+
 
