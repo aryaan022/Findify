@@ -67,7 +67,9 @@
   background: #2563eb;
 }
 
-
+.details-container{
+  display: flex;
+}
 
 .about-section{
   box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
@@ -77,3 +79,88 @@
   margin-top: 2rem;
   margin-left: 4.5rem;
 }
+
+.about-section-2{
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+  margin-left: 10rem;
+  margin-top: 2rem;
+  padding-right: 4rem;
+}
+
+.about-section-2 h2{
+  margin-top: 1.8rem;
+  margin-left: 4rem !important;
+}
+.EMAIL{
+  margin-top: 2rem;
+  margin-left: 4rem !important;
+}
+
+.EMAIL strong{
+  margin-right: 1rem;
+}
+
+.CONTACT{
+  margin-top: 1rem;
+  margin-left: 4rem !important;
+}
+
+.CONTACT strong{
+  margin-right: 1rem;
+}
+
+.ADDRESS{
+  margin-top: 1rem;
+  margin-left: 4rem !important;
+}
+
+.ADDRESS strong{
+  margin-right: 1rem;
+}
+
+.hr-container{
+  margin-left: 2.8rem !important;
+}
+
+.button-container {
+  margin-top: 3rem !important;
+  margin-left: 8rem !important;
+  width: 100%;
+}
+.call-business{
+  margin-bottom: 1.2rem;
+}
+.call-business button{
+  padding: 0.7rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+   font-size: 1rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+   display: flex;
+  align-items: center;
+  border: none;
+  transition: background 0.2s;
+
+}
+
+
+.email-business{
+  margin-bottom: 1.2rem;
+  
+}
+.email-business button{
+  padding: 0.7rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  width: 150px !important;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: background 0.2s;
+}
+

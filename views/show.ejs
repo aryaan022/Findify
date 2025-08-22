@@ -11,14 +11,27 @@
       <i class="fa fa-phone"></i> Contact Business
     </button>
   </div>
-  <div class="about-section-1">
-    <div class="about-section">
-      <div><h3>About</h3></div>
-      <div><p><%= business.description %></p></div>
+  <div class="details-container">
+    <div class="about-section-1">
+      <div class="about-section">
+        <div><h3>About</h3></div>
+        <div><p><%= business.description %></p></div>
+      </div>
     </div>
-  </div>
-  <div class="about-section-2">
-    
+    <div class="about-section-2">
+      <h2>Contact Information</h2>
+      <div class="EMAIL"><strong>Email:</strong> <%= business.Owner.email %></div>
+      <div class="CONTACT"><strong>Contact:</strong> <%= business.Contact %></div>
+      <div class="ADDRESS"><strong>Address:</strong> <%= business.address %></div>
+      <div class="hr-container">
+        <hr>
+      </div>
+      <div class="button-container">
+        <div class="call-business"><button class="call-btn">Call Business</button></div>
+        <div class="email-business"><button>Email</button></div>
+      </div>
+      
+    </div>
   </div>
 </div>
 
