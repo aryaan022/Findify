@@ -32,9 +32,14 @@
       rel="stylesheet"
     />
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="/css/loading.css">
   </head>
 
 <body>
+    <div id="loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+  <div id="content">
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
   <div class="container-fluid">
     
@@ -177,7 +182,7 @@
     </div>
   </div>
 </footer>
-
+ </div>
 <style>
   .footer-link {
     text-decoration: none;
@@ -188,6 +193,7 @@
     color: #007bff; /* Bootstrap primary color */
   }
 </style>
+<script src="/js/loading.js"></script>
 
   </body>
 </html>
