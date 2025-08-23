@@ -12,6 +12,8 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+      <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -33,179 +35,159 @@
   </head>
 
 <body>
-    <div class="nav-container">
-      <nav class="navbar navbar-expand-lg bg-light">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="/"
-            ><img src="/image.png" alt="" height="25"
-          /></a>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNavDropdown"
-            aria-controls="navbarNavDropdown"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div
-            class="d-flex w-100 align-items-center"
-            style="justify-content: space-between"
-          >
-            <ul class="navbar-nav flex-row" style="gap: 1rem">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/new">Add New Business</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">About Us</a>
-              </li>
-            </ul>
-            <div
-            class="search-container"
-            style="
-                flex: 1;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-              "
-            >
-            <form class="d-flex" role="search" action="/search" method="get">
-              <div class="search-bar">
-                <input
-                class="form-control me-2"
-                type="search"
-                name="query"
-                placeholder="Search"
-                aria-label="Search"
-                />
-              </div>
-              <div class="category-container">
-                <select class="form-select me-2" name="category">
-                  <option value="">All Categories</option>
-                  <option value="Restaurant">Restaurant</option>
-                  <option value="Services">Services</option>
-                  <option value="Dealership">Dealership</option>
-                  <option value="Cafe">Cafe</option>
-                  <option value="Shops">Shops</option>
-                </select>
-              </div>
-              <div class="submit-btn">
-                <button class="btn btn-outline-success" type="submit">
-                  Search
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav  mb-2 mb-lg-0">
-              <% if(!currentUser){ %>
-              <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
-              </li>
-              <%}%> <% if(currentUser){ %>
-              <li class="nav-item" >
-                <a class="nav-link" href="/logout">Log Out</a>
-              </li>
-              <%}%> <% if(!currentUser){ %>
-              <li class="nav-item">
-                <a class="nav-link" href="/register">Signup</a>
-              </li>
-              <%}%>
-              <% if(currentUser && currentUser.role === 'Vendor') { %>
-              <li class="nav-item">
-                <a class="nav-link" href="/dashboard">Dashboard</a>
-              </li>
-              <% } %>
-            </ul>
-          </div>
-        </div>
-      </nav>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    
+    <!-- Brand Logo -->
+    <a class="navbar-brand me-4" href="/">
+      <img src="/image.png" alt="Logo" height="30" />
+    </a>
+
+    <!-- Left side links -->
+    <div class="collapse navbar-collapse" id="navbarLeft">
+      <ul class="navbar-nav me-4">
+        <li class="nav-item">
+          <a class="nav-link active" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/discover">Discover</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/new">Add New Business</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About Us</a>
+        </li>
+      </ul>
     </div>
-    <% if (success && success.length) { %>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-      <%= success %>
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
+
+    <!-- Centered Search Bar -->
+    <div class="flex-grow-1 d-flex justify-content-center">
+      <form class="d-flex w-75" role="search" action="/search" method="get">
+        <input
+          class="form-control me-2"
+          type="search"
+          name="query"
+          placeholder="Search"
+          aria-label="Search"
+        />
+        <select class="form-select me-2" name="category">
+          <option value="">All Categories</option>
+          <option value="Restaurant">Restaurant</option>
+          <option value="Services">Services</option>
+          <option value="Dealership">Dealership</option>
+          <option value="Cafe">Cafe</option>
+          <option value="Shops">Shops</option>
+        </select>
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
     </div>
-    <% } %> <% if (error && error.length) { %>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      <%= error %>
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
+
+    <!-- Right side Auth Links -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarRight">
+      <ul class="navbar-nav">
+        <% if(!currentUser){ %>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/register">Signup</a>
+          </li>
+        <% } %>
+        <% if(currentUser){ %>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Log Out</a>
+          </li>
+        <% } %>
+        <% if(currentUser && currentUser.role === 'Vendor'){ %>
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard">Dashboard</a>
+          </li>
+        <% } %>
+      </ul>
     </div>
-    <% } %> <%- body %>
+
+  </div>
+</nav> <%- body %>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
       crossorigin="anonymous"
     ></script>
 
-    
-    <footer class="footer">
-      <div class="footer-main">
-        <div class="footer-col">
-          <h4>LocalFinder</h4>
-          <p>
-            Connecting local shoppers with the products they need from
-            businesses they can trust across India.
-          </p>
-          <div class="footer-social">
-            <a href="#"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#"><i class="fa-brands fa-twitter"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <h4>FOR SHOPPERS</h4>
-          <ul>
-            <li><a href="#">Search Products</a></li>
-            <li><a href="#">Browse Categories</a></li>
-            <li><a href="#">Map View</a></li>
-            <li><a href="#">Recent Searches</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>FOR BUSINESSES</h4>
-          <ul>
-            <li><a href="#">Register Business</a></li>
-            <li><a href="#">Business Dashboard</a></li>
-            <li><a href="#">Pricing Plans</a></li>
-            <li><a href="#">Success Stories</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>COMPANY</h4>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Blog</a></li>
-          </ul>
+<footer class="footer bg-light text-dark pt-5 pb-3 border-top">
+  <div class="container">
+    <div class="row gy-4">
+      <!-- Brand -->
+      <div class="col-lg-4 col-md-6">
+        <h4 class="fw-bold mb-3">LocalFinder</h4>
+        <p class="small text-muted">
+          Connecting local shoppers with the products they need from businesses they can trust across India.
+        </p>
+        <div class="d-flex gap-3 mt-3">
+          <a href="#" class="text-dark fs-5"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#" class="text-dark fs-5"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" class="text-dark fs-5"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="text-dark fs-5"><i class="fa-brands fa-linkedin"></i></a>
         </div>
       </div>
-      <div class="footer-bottom">
-        © 2025 LocalFinder. All rights reserved.
-        <div class="footer-bottom-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">Cookie Policy</a>
-        </div>
+
+      <!-- For Shoppers -->
+      <div class="col-lg-2 col-md-6">
+        <h5 class="fw-semibold mb-3">For Shoppers</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="footer-link">Search Products</a></li>
+          <li><a href="#" class="footer-link">Browse Categories</a></li>
+          <li><a href="#" class="footer-link">Map View</a></li>
+          <li><a href="#" class="footer-link">Recent Searches</a></li>
+        </ul>
       </div>
-    </footer>
+
+      <!-- For Businesses -->
+      <div class="col-lg-3 col-md-6">
+        <h5 class="fw-semibold mb-3">For Businesses</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="footer-link">Register Business</a></li>
+          <li><a href="#" class="footer-link">Business Dashboard</a></li>
+          <li><a href="#" class="footer-link">Pricing Plans</a></li>
+          <li><a href="#" class="footer-link">Success Stories</a></li>
+        </ul>
+      </div>
+
+      <!-- Company -->
+      <div class="col-lg-3 col-md-6">
+        <h5 class="fw-semibold mb-3">Company</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="footer-link">About Us</a></li>
+          <li><a href="#" class="footer-link">Contact</a></li>
+          <li><a href="#" class="footer-link">Careers</a></li>
+          <li><a href="#" class="footer-link">Blog</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 pt-3 border-top">
+      <p class="small mb-2 mb-md-0">© 2025 LocalFinder. All rights reserved.</p>
+      <div class="d-flex gap-3">
+        <a href="#" class="footer-link small">Privacy Policy</a>
+        <a href="#" class="footer-link small">Terms of Service</a>
+        <a href="#" class="footer-link small">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-link {
+    text-decoration: none;
+    color: #555;
+    transition: color 0.2s ease-in-out;
+  }
+  .footer-link:hover {
+    color: #007bff; /* Bootstrap primary color */
+  }
+</style>
+
   </body>
 </html>

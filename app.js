@@ -185,6 +185,11 @@ app.post(
   }
 );
 
+//discover page route (find nearby businesses on this page)
+app.get("/discover", async (req, res) => {
+  res.render("discover");
+})
+
 //delete route
 app.delete("/delete/:id", isLoggedIn, isOwner, async (req, res) => {
   try {
