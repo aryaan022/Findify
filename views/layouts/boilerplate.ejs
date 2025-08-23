@@ -32,7 +32,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
   </head>
 
-  <body>
+<body>
     <div class="nav-container">
       <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
@@ -66,50 +66,50 @@
               </li>
             </ul>
             <div
-              class="search-container"
-              style="
+            class="search-container"
+            style="
                 flex: 1;
                 display: flex;
                 justify-content: center;
                 align-items: center;
               "
             >
-              <form class="d-flex" role="search" action="/search" method="get">
-                <div class="search-bar">
-                  <input
-                    class="form-control me-2"
-                    type="search"
-                    name="query"
-                    placeholder="Search"
-                    aria-label="Search"
-                  />
-                </div>
-                <div class="category-container">
-                  <select class="form-select me-2" name="category">
-                    <option value="">All Categories</option>
-                    <option value="Restaurant">Restaurant</option>
-                    <option value="Services">Services</option>
-                    <option value="Dealership">Dealership</option>
-                    <option value="Cafe">Cafe</option>
-                    <option value="Shops">Shops</option>
-                  </select>
-                </div>
-                <div class="submit-btn">
-                  <button class="btn btn-outline-success" type="submit">
-                    Search
-                  </button>
-                </div>
-              </form>
-            </div>
+            <form class="d-flex" role="search" action="/search" method="get">
+              <div class="search-bar">
+                <input
+                class="form-control me-2"
+                type="search"
+                name="query"
+                placeholder="Search"
+                aria-label="Search"
+                />
+              </div>
+              <div class="category-container">
+                <select class="form-select me-2" name="category">
+                  <option value="">All Categories</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Services">Services</option>
+                  <option value="Dealership">Dealership</option>
+                  <option value="Cafe">Cafe</option>
+                  <option value="Shops">Shops</option>
+                </select>
+              </div>
+              <div class="submit-btn">
+                <button class="btn btn-outline-success" type="submit">
+                  Search
+                </button>
+              </div>
+            </form>
           </div>
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav  mb-2 mb-lg-0">
               <% if(!currentUser){ %>
               <li class="nav-item">
                 <a class="nav-link" href="/login">Login</a>
               </li>
               <%}%> <% if(currentUser){ %>
-              <li class="nav-item">
+              <li class="nav-item" >
                 <a class="nav-link" href="/logout">Log Out</a>
               </li>
               <%}%> <% if(!currentUser){ %>
@@ -117,6 +117,11 @@
                 <a class="nav-link" href="/register">Signup</a>
               </li>
               <%}%>
+              <% if(currentUser && currentUser.role === 'Vendor') { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+              </li>
+              <% } %>
             </ul>
           </div>
         </div>

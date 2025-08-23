@@ -135,7 +135,6 @@ app.get("/search", async (req, res) => {
 app.get("/dashboard", isLoggedIn, isVendor, async (req, res) => {
   let user = req.user;
   let business = await Business.find({ Owner: user._id });
-  req.flash("success", "Welcome to your dashboard!");
   res.render("dashboard.ejs", { user, business });
 });
 
