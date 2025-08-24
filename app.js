@@ -199,7 +199,7 @@ app.get("/discover", async (req, res) => {
             type: "Point",
             coordinates: [parseFloat(lng), parseFloat(lat)], // ✅ swap here
           },
-          $maxDistance: 20000,
+          $maxDistance: 5000,
         },
       },
     });
