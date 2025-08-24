@@ -197,9 +197,9 @@ app.get("/discover", async (req, res) => {
         $near: {
           $geometry: {
             type: "Point",
-            coordinates: [parseFloat(lng), parseFloat(lat)], // ✅ swap here
+            coordinates: [parseFloat(lng), parseFloat(lat)], // swapping to [lng, lat]
           },
-          $maxDistance: 5000,
+          $maxDistance: 10000,
         },
       },
     });
@@ -210,22 +210,6 @@ app.get("/discover", async (req, res) => {
         limit: 1,
       })
       .send();
-
-    if (geoData.body.features?.length > 0) {
-      const [lng, lat] = geoData.body.features[0].center; // Mapbox gives [lng, lat]
-
-      businesses = await Business.find({
-        geometry: {
-          $near: {
-            $geometry: {
-              type: "Point",
-              coordinates: [lng, lat], // ✅ already [lng, lat]
-            },
-            $maxDistance: 20000,
-          },
-        },
-      });
-    }
   }
 
   res.render("discover.ejs", { businesses, search });
