@@ -187,8 +187,49 @@ app.post(
 
 //discover page route (find nearby businesses on this page)
 app.get("/discover", async (req, res) => {
-  res.render("discover");
-})
+  const { search, lat, lng } = req.query;
+  let businesses = [];
+
+  if (lat && lng) {
+    // User's current location → schema has [lat, lng], but Mongo wants [lng, lat]
+    businesses = await Business.find({
+      geometry: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(lng), parseFloat(lat)], // ✅ swap here
+          },
+          $maxDistance: 20000,
+        },
+      },
+    });
+  } else if (search) {
+    const geoData = await geocodingClient
+      .forwardGeocode({
+        query: search,
+        limit: 1,
+      })
+      .send();
+
+    if (geoData.body.features?.length > 0) {
+      const [lng, lat] = geoData.body.features[0].center; // Mapbox gives [lng, lat]
+
+      businesses = await Business.find({
+        geometry: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [lng, lat], // ✅ already [lng, lat]
+            },
+            $maxDistance: 20000,
+          },
+        },
+      });
+    }
+  }
+
+  res.render("discover.ejs", { businesses, search });
+});
 
 //delete route
 app.delete("/delete/:id", isLoggedIn, isOwner, async (req, res) => {

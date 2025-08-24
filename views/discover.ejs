@@ -1,37 +1,111 @@
-<%= layout('./layouts/boilerplate') %>
-<style>
-  #map {
-    height: 400px;
-    width: 100%;
-  }
-</style>
-<div class="bg-light d-flex flex-column min-vh-100">
-  <main class="flex-grow-1 ">
-    <!-- Hero Section -->
-    <section class="bg-primary text-white text-center py-5">
-      <div class="container">
-        <h1 class="display-5 fw-bold mb-3">Discover Local Businesses</h1>
-        <p class="lead">
-          Find the perfect local businesses for all your needs across India
-        </p>
+<!DOCTYPE html>
+<html lang="en">
 
-        <!-- Search Form -->
-        <div class="row justify-content-center mt-4">
-          <div class="col-lg-10">
-            <form class="bg-white p-4 rounded shadow">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+
+  <link rel="stylesheet" href="/css/Main.css" />
+  <link rel="stylesheet" href="/css/form-center.css" />
+  <link rel="stylesheet" href="/css/show-page.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
+  <link rel="stylesheet" href="/css/loading.css">
+</head>
+
+<body>
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+  </div>
+  <div id="content">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+      <div class="container-fluid">
+
+        <!-- Brand Logo -->
+        <a class="navbar-brand me-4" href="/">
+          <img src="/image.png" alt="Logo" height="30" />
+        </a>
+
+        <!-- Left side links -->
+        <div class="collapse navbar-collapse" id="navbarLeft">
+          <ul class="navbar-nav me-4">
+            <li class="nav-item">
+              <a class="nav-link active" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/discover">Discover</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/new">Add New Business</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/about">About Us</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Right side Auth Links -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarRight">
+          <ul class="navbar-nav">
+            <% if(!currentUser){ %>
+              <li class="nav-item">
+                <a class="nav-link" href="/login">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/register">Signup</a>
+              </li>
+              <% } %>
+                <% if(currentUser){ %>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/logout">Log Out</a>
+                  </li>
+                  <% } %>
+                    <% if(currentUser && currentUser.role==='Vendor' ){ %>
+                      <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                      </li>
+                      <% } %>
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+    </style>
+    <div class="bg-light d-flex flex-column min-vh-100">
+      <main class="flex-grow-1 ">
+        <!-- Hero Section -->
+        <section class="bg-primary text-white text-center py-5">
+          <div class="container">
+            <h1 class="display-5 fw-bold mb-3">Discover Local Businesses</h1>
+            <p class="lead">
+              Find the perfect local businesses for all your needs across India
+            </p>
+
+            <!-- Search Form -->
+            <form action="/discover" method="GET" class="bg-white p-4 rounded shadow">
               <div class="row g-3">
                 <div class="col-md-4">
                   <label for="search" class="form-label">
                     <i data-lucide="search" class="me-1"></i> Search
                   </label>
-                  <input
-                    type="text"
-                    id="search"
-                    name="search"
-                    class="form-control"
-                    placeholder="Business name or keywords"
-                  />
+                  <input type="text" id="search" name="search" class="form-control"
+                    placeholder="Business name or keywords" />
                 </div>
+
                 <div class="col-md-4">
                   <label for="category" class="form-label">
                     <i data-lucide="tag" class="me-1"></i> Category
@@ -44,140 +118,254 @@
                     <option>Books</option>
                   </select>
                 </div>
+
                 <div class="col-md-4">
                   <label for="location" class="form-label">
                     <i data-lucide="map-pin" class="me-1"></i> Location
                   </label>
-                  <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    class="form-control"
-                    placeholder="City or state"
-                  />
+                  <input type="text" id="location" name="location" class="form-control" placeholder="City or state" />
                 </div>
               </div>
+
               <div class="mt-4">
                 <button type="submit" class="btn btn-primary px-4">
                   <i data-lucide="search" class="me-1"></i> Search Businesses
                 </button>
               </div>
             </form>
+
+        </section>
+
+        <!-- Map Section -->
+        <section class="py-5 bg-white">
+          <div class="container">
+            <h2 class="h4 fw-bold mb-3">Businesses Near You</h2>
+            <div id="map" class="rounded shadow"></div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- Map Section -->
-    <section class="py-5 bg-white">
-      <div class="container">
-        <h2 class="h4 fw-bold mb-3">Businesses Near You</h2>
-        <div id="map" class="rounded shadow"></div>
-      </div>
-    </section>
+        <!-- Results Section -->
+        <section class="py-5">
+          <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="h4 fw-bold">
+                <%= businesses.length %> Businesses Found
+              </h2>
+              <a href="#" class="text-decoration-none text-primary small">
+                <i data-lucide="rotate-ccw" class="me-1"></i> Clear All Filters
+              </a>
+            </div>
 
-    <!-- Results Section -->
-    <section class="py-5">
-      <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="h4 fw-bold">5 Businesses Found</h2>
-          <a href="#" class="text-decoration-none text-primary small">
-            <i data-lucide="rotate-ccw" class="me-1"></i> Clear All Filters
-          </a>
-        </div>
+            <div class="row g-4">
+              <% if (businesses.length> 0) { %>
+                <% businesses.forEach(b=> { %>
+                  <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0">
 
-        <div class="row g-4">
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-0">
-              <div class="card-body">
-                <h5 class="card-title mb-1">Coffee House</h5>
-                <p class="text-primary mb-2">Cafe</p>
-                <p class="text-muted small mb-3">Best coffee in town...</p>
-                <p class="small text-muted mb-1">
-                  <i data-lucide="map-pin" class="me-1"></i> Mumbai, Maharashtra
-                </p>
-                <p class="small text-muted mb-3">
-                  <i data-lucide="phone" class="me-1"></i> +91 9876543210
-                </p>
-                <a href="#" class="btn btn-outline-primary w-100"
-                  >View Details</a
-                >
+                      <!-- ✅ Business Image -->
+                      <% if (b.Image && b.Image.url) { %>
+                        <img src="<%= b.Image.url %>" class="card-img-top" alt="<%= b.Name %>">
+                        <% } else { %>
+                          <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top"
+                            alt="No image">
+                          <% } %>
+
+                            <div class="card-body">
+                              <!-- ✅ Business Name -->
+                              <h5 class="card-title mb-1">
+                                <%= b.Name %>
+                              </h5>
+
+                              <!-- ✅ Category -->
+                              <p class="text-primary mb-2">
+                                <%= b.Category %>
+                              </p>
+
+                              <!-- ✅ Short description -->
+                              <p class="text-muted small mb-3">
+                                <%= b.description && b.description.length> 60
+                                  ? b.description.substring(0, 60) + "..."
+                                  : b.description %>
+                              </p>
+
+                              <!-- ✅ Address -->
+                              <p class="small text-muted mb-1">
+                                <i data-lucide="map-pin" class="me-1"></i>
+                                <%= b.address %>
+                              </p>
+
+                              <!-- ✅ Contact -->
+                              <p class="small text-muted mb-3">
+                                <i data-lucide="phone" class="me-1"></i>
+                                <%= b.Contact %>
+                              </p>
+
+                              <!-- ✅ Link to show page -->
+                              <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100">View Details</a>
+                            </div>
+                    </div>
+                  </div>
+                  <% }) %>
+                    <% } else { %>
+                      <p class="text-muted">No businesses found.</p>
+                      <% } %>
+            </div>
+
+
+        </section>
+
+        <!-- Categories -->
+        <section class="py-5 bg-light">
+          <div class="container text-center">
+            <h2 class="h3 fw-bold mb-4">Browse by Category</h2>
+            <div class="row g-4">
+              <div class="col-6 col-md-3">
+                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
+                  <div class="card-body">
+                    <i data-lucide="coffee" class="mb-2 text-primary"></i>
+                    <h6>Coffee & Tea</h6>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-3">
+                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
+                  <div class="card-body">
+                    <i data-lucide="shopping-bag" class="mb-2 text-success"></i>
+                    <h6>Retail</h6>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-3">
+                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
+                  <div class="card-body">
+                    <i data-lucide="utensils" class="mb-2 text-warning"></i>
+                    <h6>Food</h6>
+                  </div>
+                </a>
+              </div>
+              <div class="col-6 col-md-3">
+                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
+                  <div class="card-body">
+                    <i data-lucide="book" class="mb-2 text-info"></i>
+                    <h6>Books</h6>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- Categories -->
-    <section class="py-5 bg-light">
-      <div class="container text-center">
-        <h2 class="h3 fw-bold mb-4">Browse by Category</h2>
-        <div class="row g-4">
-          <div class="col-6 col-md-3">
-            <a
-              href="#"
-              class="card shadow-sm h-100 text-decoration-none text-dark"
-            >
-              <div class="card-body">
-                <i data-lucide="coffee" class="mb-2 text-primary"></i>
-                <h6>Coffee & Tea</h6>
-              </div>
-            </a>
+        <!-- Call to Action -->
+        <section class="py-5 bg-primary text-center text-white">
+          <div class="container">
+            <h2 class="h3 fw-bold mb-3">Own a Business?</h2>
+            <p class="lead mb-4">
+              Join our platform and reach thousands of customers.
+            </p>
+            <a href="#" class="btn btn-light text-primary px-4">Register Your Business</a>
           </div>
-          <div class="col-6 col-md-3">
-            <a
-              href="#"
-              class="card shadow-sm h-100 text-decoration-none text-dark"
-            >
-              <div class="card-body">
-                <i data-lucide="shopping-bag" class="mb-2 text-success"></i>
-                <h6>Retail</h6>
-              </div>
-            </a>
-          </div>
-          <div class="col-6 col-md-3">
-            <a
-              href="#"
-              class="card shadow-sm h-100 text-decoration-none text-dark"
-            >
-              <div class="card-body">
-                <i data-lucide="utensils" class="mb-2 text-warning"></i>
-                <h6>Food</h6>
-              </div>
-            </a>
-          </div>
-          <div class="col-6 col-md-3">
-            <a
-              href="#"
-              class="card shadow-sm h-100 text-decoration-none text-dark"
-            >
-              <div class="card-body">
-                <i data-lucide="book" class="mb-2 text-info"></i>
-                <h6>Books</h6>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
+        </section>
+      </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+      crossorigin="anonymous"></script>
 
-    <!-- Call to Action -->
-    <section class="py-5 bg-primary text-center text-white">
+    <footer class="footer bg-light text-dark pt-5 pb-3 border-top">
       <div class="container">
-        <h2 class="h3 fw-bold mb-3">Own a Business?</h2>
-        <p class="lead mb-4">
-          Join our platform and reach thousands of customers.
-        </p>
-        <a href="#" class="btn btn-light text-primary px-4"
-          >Register Your Business</a
-        >
+        <div class="row gy-4">
+          <!-- Brand -->
+          <div class="col-lg-4 col-md-6">
+            <h4 class="fw-bold mb-3">LocalFinder</h4>
+            <p class="small text-muted">
+              Connecting local shoppers with the products they need from businesses they can trust across India.
+            </p>
+            <div class="d-flex gap-3 mt-3">
+              <a href="#" class="text-dark fs-5"><i class="fa-brands fa-facebook"></i></a>
+              <a href="#" class="text-dark fs-5"><i class="fa-brands fa-twitter"></i></a>
+              <a href="#" class="text-dark fs-5"><i class="fa-brands fa-instagram"></i></a>
+              <a href="#" class="text-dark fs-5"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+          </div>
+
+          <!-- For Shoppers -->
+          <div class="col-lg-2 col-md-6">
+            <h5 class="fw-semibold mb-3">For Shoppers</h5>
+            <ul class="list-unstyled">
+              <li><a href="#" class="footer-link">Search Products</a></li>
+              <li><a href="#" class="footer-link">Browse Categories</a></li>
+              <li><a href="#" class="footer-link">Map View</a></li>
+              <li><a href="#" class="footer-link">Recent Searches</a></li>
+            </ul>
+          </div>
+
+          <!-- For Businesses -->
+          <div class="col-lg-3 col-md-6">
+            <h5 class="fw-semibold mb-3">For Businesses</h5>
+            <ul class="list-unstyled">
+              <li><a href="#" class="footer-link">Register Business</a></li>
+              <li><a href="#" class="footer-link">Business Dashboard</a></li>
+              <li><a href="#" class="footer-link">Pricing Plans</a></li>
+              <li><a href="#" class="footer-link">Success Stories</a></li>
+            </ul>
+          </div>
+
+          <!-- Company -->
+          <div class="col-lg-3 col-md-6">
+            <h5 class="fw-semibold mb-3">Company</h5>
+            <ul class="list-unstyled">
+              <li><a href="#" class="footer-link">About Us</a></li>
+              <li><a href="#" class="footer-link">Contact</a></li>
+              <li><a href="#" class="footer-link">Careers</a></li>
+              <li><a href="#" class="footer-link">Blog</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 pt-3 border-top">
+          <p class="small mb-2 mb-md-0">© 2025 LocalFinder. All rights reserved.</p>
+          <div class="d-flex gap-3">
+            <a href="#" class="footer-link small">Privacy Policy</a>
+            <a href="#" class="footer-link small">Terms of Service</a>
+            <a href="#" class="footer-link small">Cookie Policy</a>
+          </div>
+        </div>
       </div>
-    </section>
-  </main>
-</div>
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  lucide.createIcons();
-</script>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+
+        // Run only if lat/lng are not already present
+        if (!params.has("lat") && !params.has("lng")) {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+              const lat = pos.coords.latitude;
+              const lng = pos.coords.longitude;
+              window.location.href = `/discover?lat=${lat}&lng=${lng}`;
+            });
+          }
+        }
+      });
+    </script>
+    <style>
+      .footer-link {
+        text-decoration: none;
+        color: #555;
+        transition: color 0.2s ease-in-out;
+      }
+
+      .footer-link:hover {
+        color: #007bff;
+        /* Bootstrap primary color */
+      }
+    </style>
+    <script>
+      lucide.createIcons();
+    </script>
+    <script src="/js/loading.js"></script>
+</body>
