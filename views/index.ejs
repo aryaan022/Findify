@@ -1,66 +1,85 @@
-<%= layout("layouts/boilerplate") %>
-<div class="header">
-  <div class="header-heading">
-    <h1><b>Discover Local Businesses Near You</b></h1>
+<%= layout('/layouts/boilerplate') %>
+
+<!-- 🔹 Hero Section -->
+<section class="bg-gradient bg-primary text-white text-center py-5">
+  <div class="container">
+    <h1 class="display-4 fw-bold">Discover Local Businesses</h1>
+    <p class="lead mb-4">Find the perfect local businesses for all your needs across India.</p>
+    <a href="/discover" class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm">Explore Now</a>
   </div>
-  <div class="header-subheading">
-    <p>
-      <b
-        >Find the Perfect Local Shops, Restaurants, and Services in your area
-        with LocalFinder.</b
-      >
-    </p>
+</section>
+
+<!-- 🔹 Featured Businesses -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="h3 fw-bold text-center mb-5">Featured Businesses</h2>
+    <div class="row g-4">
+      <% if (business && business.length > 0) { %>
+        <% business.forEach(b => { %>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition">
+              <% if (b.Image && b.Image.url) { %>
+                <img src="<%= b.Image.url %>" class="card-img-top" alt="<%= b.Name %>">
+              <% } else { %>
+                <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top" alt="No image">
+              <% } %>
+              <div class="card-body">
+                <h5 class="card-title fw-bold"><%= b.Name %></h5>
+                <p class="text-primary small mb-1"><%= b.Category %></p>
+                <p class="text-muted small"><%= b.description.substring(0, 80) %>...</p>
+                <p class="small text-muted mb-1"><i class="fa fa-map-marker-alt me-1"></i> <%= b.address %></p>
+                <p class="small text-muted"><i class="fa fa-phone me-1"></i> <%= b.Contact %></p>
+              </div>
+              <div class="card-footer bg-transparent border-0">
+                <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100">View Details</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <p class="text-center text-muted">No businesses found.</p>
+      <% } %>
+    </div>
   </div>
-  <div class="find-btn">
-    <form action="/discover">
-      <button class="main-find-btn">Find Nearby Businesses</button>
-    </form>
-  </div>
-</div>
+</section>
 
-
-<div class="category-container">
-  <div class="category-header">
-    <h3><b>Browse by Category</b></h3>
-
-  </div>
-
-  <div class="category-subheader">
-    <h5>Explore businesses by category to find exactly what you're looking for</h5>
-  </div>
-</div>
-
-
-<div class="icon-container">
-  <div class="icon1"><i class="fa-solid fa-utensils"></i></div>
-  <div class="icon2"><i class="fa fa-mug-saucer"></i></div>
-  <div class="icon3"><i class="fa fa-shop"></i></div>
-</div>
-
-<div class="card-container">
-  <% for(let bus of business){ %> <% if(!query){ %>
-  <div class="card" style="width: 18rem">
-    <a href="/show/<%=bus.id%>">
-      <img src="<%=bus.Image.url%>" class="card-img-top" alt="..." />
-      <div class="card-body">
-        <h5 class="card-title"><%=bus.Name %></h5>
-        <p class="card-text"><b><%=bus.Category %></b></p>
-        <p class="card-text"><%=bus.description %></p>
+<!-- 🔹 Categories -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="h3 fw-bold text-center mb-5">Browse by Category</h2>
+    <div class="row g-4 text-center">
+      <div class="col-6 col-md-3">
+        <a href="/discover?category=Coffee" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+          <div class="card-body">
+            <i class="fa fa-coffee fa-2x mb-3 text-primary"></i>
+            <h6 class="fw-semibold">Coffee & Tea</h6>
+          </div>
+        </a>
       </div>
-    </a>
-  </div>
-
-  <% }else{ %>
-
-  <div class="card" style="width: 18rem">
-    <a href="/show/<%=bus.id%>">
-      <img src="<%=bus.Image.url%>" class="card-img-top" alt="..." />
-      <div class="card-body">
-        <h5 class="card-title"><%=bus.Name %></h5>
-        <p class="card-text"><b><%=bus.Category %></b></p>
-        <p class="card-text"><%=bus.description %></p>
+      <div class="col-6 col-md-3">
+        <a href="/discover?category=Retail" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+          <div class="card-body">
+            <i class="fa fa-shopping-bag fa-2x mb-3 text-success"></i>
+            <h6 class="fw-semibold">Retail</h6>
+          </div>
+        </a>
       </div>
-    </a>
+      <div class="col-6 col-md-3">
+        <a href="/discover?category=Food" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+          <div class="card-body">
+            <i class="fa fa-utensils fa-2x mb-3 text-warning"></i>
+            <h6 class="fw-semibold">Food</h6>
+          </div>
+        </a>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="/discover?category=Books" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+          <div class="card-body">
+            <i class="fa fa-book fa-2x mb-3 text-info"></i>
+            <h6 class="fw-semibold">Books</h6>
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
-  <% } %> <% } %>
-</div>
+</section>

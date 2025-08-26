@@ -131,17 +131,37 @@ app.get("/search", async (req, res) => {
   res.render("index.ejs", { business, query, category });
 });
 
-//dashboard route for vendor
-app.get("/dashboard", isLoggedIn, isVendor, async (req, res) => {
-  let user = req.user;
-  let business = await Business.find({ Owner: user._id });
-  res.render("dashboard.ejs", { user, business });
+//dashboard route (supports Vendor and User roles)
+app.get("/dashboard", isLoggedIn, async (req, res) => {
+  const authUser = req.user;
+  const favUser = await user.findById(authUser._id).populate("favorites");
+  const role = (authUser.role || "").toLowerCase();
+
+  if (role === "vendor") {
+    const business = await Business.find({ Owner: authUser._id });
+    return res.render("dashboard.ejs", { user: authUser, business });
+  }
+
+  if (role === "user") {
+    const businesses = await Business.find();
+    return res.render("user-dashboard.ejs", { user: authUser, businesses });
+  }
+
+  req.flash("error", "Your account role is not recognized for dashboard access.");
+  res.redirect("/");
 });
+
+//about us route
+app.get("/aboutus", (req, res) => {
+  res.render("about.ejs");
+});
+
 
 //new form get request
 app.get("/new", isLoggedIn, isVendor, (req, res) => {
   res.render("new.ejs");
 });
+
 
 //new form post request
 app.post(
@@ -211,7 +231,6 @@ app.get("/discover", async (req, res) => {
       })
       .send();
   }
-
   res.render("discover.ejs", { businesses, search });
 });
 
@@ -235,12 +254,36 @@ app.delete("/delete/:id", isLoggedIn, isOwner, async (req, res) => {
   }
 });
 
+
+
 //edit route
 app.post("/edit/:id", isLoggedIn, isOwner, async (req, res) => {
   let { id } = req.params;
   let business = await Business.findById(id);
   res.render("edit.ejs", { business });
 });
+
+//contact route
+app.get("/contact", (req, res) => {
+  res.render("contact.ejs");
+});
+
+
+
+// contact form submission
+app.post("/contact", (req, res) => {
+  try {
+    const { firstName, lastName, email, phone, subject, message, newsletter, agreeTerms } = req.body;
+    console.log("Contact submission:", { firstName, lastName, email, phone, subject, messageLength: message?.length, newsletter: !!newsletter, agreeTerms: !!agreeTerms });
+    req.flash("success", "Thanks for reaching out! We'll get back to you within 24 hours.");
+    res.redirect("/contact");
+  } catch (err) {
+    console.error("Contact submit error", err);
+    req.flash("error", "Something went wrong. Please try again.");
+    res.redirect("/contact");
+  }
+});
+
 
 //(edit + update )
 app.put(
@@ -284,6 +327,37 @@ app.get("/show/:id", async (req, res) => {
     "username email"
   );
   res.render("show.ejs", { business });
+});
+
+//favorite route
+app.post("/favorite/:id",async(req,res)=>{
+  let {id} = req.params;
+  let business = await Business.findById(id);
+  let user = req.user;
+  if(!user.favorites.includes(business._id)){
+    user.favorites.push(business._id);
+    await user.save();
+    req.flash("success","Added to favorites");
+  }
+  else{
+    req.flash("error","Already in favorites");
+  }
+  res.redirect(`/show/${id}`);
+})
+
+
+// 404 handler - catch unmatched routes
+app.use((req, res, next) => {
+  res.status(404);
+  res.render("error.ejs", { url: req.originalUrl });
+});
+
+// Generic error handler - any thrown/rejected errors
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  res.status(err.status || 500);
+  res.render("error.ejs", { url: req.originalUrl, message: err.message, status: err.status || 500 });
 });
 
 main()

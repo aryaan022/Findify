@@ -1,36 +1,264 @@
-<%= layout("layouts/boilerplate") %>
-<form action="/new" method="POST" class="centered-form" enctype="multipart/form-data">
-  <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add New Business</h1>
-  <hr>
-    <div class="form-group">
-        <label for="name">Business Name</label>
-        <input type="text" id="name" name="Name" class="form-control" placeholder="Business Name" required>
+<%= layout('/layouts/boilerplate') %>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <i data-lucide="store" class="text-primary mb-3" style="width: 48px; height: 48px;"></i>
+                    <h2 class="section-title">Add New Business</h2>
+                    <p class="text-muted">List your business and start reaching more customers</p>
+                </div>
+                
+                <!-- Progress Steps -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-center">
+                        <div class="d-flex align-items-center">
+                            <div class="badge bg-primary rounded-circle p-2 me-2">1</div>
+                            <span class="fw-semibold me-3">Business Info</span>
+                            <div class="border-top" style="width: 50px;"></div>
+                            <div class="badge bg-secondary rounded-circle p-2 mx-2">2</div>
+                            <span class="text-muted me-3">Contact & Location</span>
+                            <div class="border-top" style="width: 50px;"></div>
+                            <div class="badge bg-secondary rounded-circle p-2 ms-2">3</div>
+                            <span class="text-muted">Review & Submit</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form -->
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-4">
+                        <form action="/new" method="POST" enctype="multipart/form-data" id="newBusinessForm">
+                            <!-- Basic Information -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <h5 class="fw-bold mb-3">
+                                        <i data-lucide="info" class="me-2 text-primary"></i>
+                                        Basic Information
+                                    </h5>
+                                </div>
+                                
+                                <div class="col-md-8">
+                                    <label for="Name" class="form-label">
+                                        Business Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="Name" name="Name" 
+                                           placeholder="Enter your business name" required>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="Category" class="form-label">
+                                        Category <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="Category" name="Category" required>
+                                        <option value="">Select category</option>
+                                        <option value="Restaurant">Restaurant</option>
+                                        <option value="Cafe">Cafe / Coffee Shop</option>
+                                        <option value="Retail">Retail Store</option>
+                                        <option value="Books">Bookstore</option>
+                                        <option value="Health">Health & Wellness</option>
+                                        <option value="Beauty">Beauty & Spa</option>
+                                        <option value="Services">Professional Services</option>
+                                        <option value="Automotive">Automotive</option>
+                                        <option value="Entertainment">Entertainment</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="description" class="form-label">
+                                        Business Description <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" 
+                                              placeholder="Describe your business, what you offer, and what makes you special..." required></textarea>
+                                    <div class="form-text">Tell customers what makes your business unique (minimum 50 characters)</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Information -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <h5 class="fw-bold mb-3">
+                                        <i data-lucide="phone" class="me-2 text-primary"></i>
+                                        Contact Information
+                                    </h5>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="Contact" class="form-label">
+                                        Phone Number <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="tel" class="form-control" id="Contact" name="Contact" 
+                                           placeholder="(555) 123-4567" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           placeholder="business@example.com">
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="website" class="form-label">Website</label>
+                                    <input type="url" class="form-control" id="website" name="website" 
+                                           placeholder="https://yourbusiness.com">
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="socialMedia" class="form-label">Social Media</label>
+                                    <input type="text" class="form-control" id="socialMedia" name="socialMedia" 
+                                           placeholder="@yourbusiness">
+                                </div>
+                            </div>
+                            
+                            <!-- Location Information -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <h5 class="fw-bold mb-3">
+                                        <i data-lucide="map-pin" class="me-2 text-primary"></i>
+                                        Location & Address
+                                    </h5>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="address" class="form-label">
+                                        Street Address <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="address" name="address" 
+                                           placeholder="123 Main Street" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Business Hours (kept for future use) -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <h5 class="fw-bold mb-3">
+                                        <i data-lucide="clock" class="me-2 text-primary"></i>
+                                        Business Hours
+                                    </h5>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <% 
+                                    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                                    %>
+                                    
+                                    <% days.forEach(day => { %>
+                                    <div class="row align-items-center mb-2">
+                                        <div class="col-md-2">
+                                            <label class="form-label mb-0"><%= day %></label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="time" class="form-control" name="<%= day.toLowerCase() %>_open" id="<%= day.toLowerCase() %>_open">
+                                        </div>
+                                        <div class="col-md-1 text-center">
+                                            <span class="text-muted">to</span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="time" class="form-control" name="<%= day.toLowerCase() %>_close" id="<%= day.toLowerCase() %>_close">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="<%= day.toLowerCase() %>_closed" name="<%= day.toLowerCase() %>_closed">
+                                                <label class="form-check-label" for="<%= day.toLowerCase() %>_closed">Closed</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            
+                            <!-- Images -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <h5 class="fw-bold mb-3">
+                                        <i data-lucide="image" class="me-2 text-primary"></i>
+                                        Business Images
+                                    </h5>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label for="image" class="form-label">
+                                        Upload Images <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="file" class="form-control" id="image" name="image" 
+                                           accept="image/*" required>
+                                    <div class="form-text">Upload an image of your business.</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terms and Submit -->
+                            <div class="row g-4">
+                                <div class="col-12">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                                        <label class="form-check-label" for="agreeTerms">
+                                            I agree to the <a href="/terms" target="_blank">Terms of Service</a> and 
+                                            <a href="/privacy" target="_blank">Privacy Policy</a>.
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-3 justify-content-end">
+                                        <a href="/dashboard" class="btn btn-outline-secondary btn-lg">
+                                            <i data-lucide="x" class="me-2"></i>
+                                            Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i data-lucide="check" class="me-2"></i>
+                                            Submit for Review
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="category">Category</label>
-        <select id="category" name="Category" class="form-control" required>
-            <option value="Restaurant">Restaurant</option>
-            <option value="Services">Services</option>
-            <option value="Dealership">Dealership</option>
-            <option value="Cafe">Cafe</option>
-            <option value="Shops">Shops</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="description">Description</label>
-        <textarea id="description" name="description" class="form-control" placeholder="Description" required></textarea>
-    </div>
-    <div class="form-group">
-        <label for="contact">Contact</label>
-        <input type="text" id="contact" name="Contact" class="form-control" placeholder="Contact" minlength="10" maxlength="10" required>
-    </div>
-    <div class="form-group">
-        <label for="address">Address</label>
-        <input type="text" id="address" name="address" class="form-control" placeholder="Address" required>
-    </div>
-    <div class="form-group">
-        <label for="image">Image</label>
-        <input type="file" id="image" name="image" class="form-control" placeholder="Image URL">
-    </div>
-    <button type="submit" class="btn btn-primary">Add Business</button>
-</form>
+</section>
+
+<script>
+    // Image preview functionality
+    document.getElementById('image').addEventListener('change', function(e) {
+        const files = e.target.files;
+        const preview = document.getElementById('imagePreview');
+        if (!preview) return;
+        preview.innerHTML = '';
+        preview.style.display = 'flex';
+        
+        const file = files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'col-md-3 col-6';
+                div.innerHTML = `
+                    <div class="card">
+                        <img src="${e.target.result}" class="card-img-top" alt="Preview" style="height: 150px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted">Main Photo</small>
+                        </div>
+                    </div>
+                `;
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Form validation
+    document.getElementById('newBusinessForm').addEventListener('submit', function(e) {
+        const description = document.getElementById('description').value;
+        if (description.length < 50) {
+            e.preventDefault();
+            alert('Business description must be at least 50 characters long.');
+            return;
+        }
+    });
+    
+    // Initialize Lucide icons
+    lucide.createIcons();
+</script>

@@ -1,0 +1,317 @@
+<%- layout('layouts/boilerplate') %>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-gradient mb-4">
+                    Connecting Communities with Local Businesses
+                </h1>
+                <p class="lead text-muted mb-4">
+                    LocalBiz Finder is more than just a directory - we're building bridges between 
+                    communities and the local businesses that make them thrive.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/register" class="btn btn-primary btn-lg">
+                        <i data-lucide="users" class="me-2"></i>
+                        Join Our Community
+                    </a>
+                    <a href="/contact" class="btn btn-outline-primary btn-lg">
+                        <i data-lucide="mail" class="me-2"></i>
+                        Get in Touch
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                     alt="Local community" class="img-fluid rounded-4 shadow-lg">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission & Vision -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i data-lucide="target" class="text-primary mb-3" style="width: 64px; height: 64px;"></i>
+                            <h3 class="fw-bold">Our Mission</h3>
+                        </div>
+                        <p class="text-muted text-center">
+                            To empower local businesses by providing them with the tools and visibility they need 
+                            to connect with their community, while helping residents discover the unique gems in their neighborhood.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i data-lucide="eye" class="text-primary mb-3" style="width: 64px; height: 64px;"></i>
+                            <h3 class="fw-bold">Our Vision</h3>
+                        </div>
+                        <p class="text-muted text-center">
+                            To create thriving local economies where small businesses flourish, communities are connected, 
+                            and every neighborhood has a vibrant, sustainable business ecosystem.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Why Choose LocalBiz Finder?</h2>
+            <p class="text-muted">We're more than a business directory - we're your local community partner</p>
+        </div>
+        
+        <div class="row g-4">
+            <% 
+            const features = [
+                {
+                    icon: "search",
+                    title: "Easy Discovery",
+                    description: "Find local businesses quickly with our intuitive search and filtering system",
+                    color: "#2563eb"
+                },
+                {
+                    icon: "shield-check",
+                    title: "Verified Listings",
+                    description: "All businesses go through our verification process to ensure quality and authenticity",
+                    color: "#059669"
+                },
+                {
+                    icon: "star",
+                    title: "Community Reviews",
+                    description: "Read genuine reviews from community members to make informed decisions",
+                    color: "#f59e0b"
+                },
+                {
+                    icon: "smartphone",
+                    title: "Mobile Friendly",
+                    description: "Access business information anytime, anywhere with our responsive design",
+                    color: "#7c3aed"
+                },
+                {
+                    icon: "heart-handshake",
+                    title: "Community Focus",
+                    description: "We prioritize local connections and supporting small business growth",
+                    color: "#dc2626"
+                },
+                {
+                    icon: "trending-up",
+                    title: "Business Growth",
+                    description: "Help local businesses reach more customers and grow their presence",
+                    color: "#0891b2"
+                }
+            ];
+            %>
+            
+            <% features.forEach(feature => { %>
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4 text-center">
+                        <i data-lucide="<%= feature.icon %>" class="mb-3" style="width: 48px; height: 48px; color: <%= feature.color %>;"></i>
+                        <h5 class="fw-bold mb-3"><%= feature.title %></h5>
+                        <p class="text-muted mb-0"><%= feature.description %></p>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</section>
+
+<!-- Our Story -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                     alt="Team collaboration" class="img-fluid rounded-4 shadow-lg">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="section-title mb-4">Our Story</h2>
+                <p class="text-muted mb-4">
+                    LocalBiz Finder was born from a simple observation: amazing local businesses were 
+                    struggling to reach customers in their own neighborhoods, while residents were 
+                    missing out on incredible local experiences right around the corner.
+                </p>
+                <p class="text-muted mb-4">
+                    Founded in 2023 by a team of local business advocates and community enthusiasts, 
+                    we set out to bridge this gap. Today, we're proud to serve over 1,200 users 
+                    and support more than 500 local businesses across multiple communities.
+                </p>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="fw-bold text-primary h4">2023</div>
+                        <small class="text-muted">Founded</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-primary h4">500+</div>
+                        <small class="text-muted">Businesses</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-primary h4">1.2K+</div>
+                        <small class="text-muted">Users</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Meet Our Team</h2>
+            <p class="text-muted">The passionate people behind LocalBiz Finder</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <% 
+            const team = [
+                {
+                    name: "Sarah Johnson",
+                    role: "Founder & CEO",
+                    image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    bio: "Former small business owner with 10+ years in community development"
+                },
+                {
+                    name: "Michael Chen",
+                    role: "Head of Technology",
+                    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    bio: "Software engineer passionate about building tools that matter"
+                },
+                {
+                    name: "Emily Rodriguez",
+                    role: "Community Manager",
+                    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    bio: "Marketing professional dedicated to local business growth"
+                },
+                {
+                    name: "David Kim",
+                    role: "Business Development",
+                    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+                    bio: "Connector of businesses and communities with 8+ years experience"
+                }
+            ];
+            %>
+            
+            <% team.forEach(member => { %>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <img src="<%= member.image %>" 
+                             alt="<%= member.name %>" 
+                             class="rounded-circle mb-3 shadow-sm"
+                             style="width: 120px; height: 120px; object-fit: cover;">
+                        <h5 class="fw-bold mb-1"><%= member.name %></h5>
+                        <p class="text-primary mb-3"><%= member.role %></p>
+                        <p class="text-muted small"><%= member.bio %></p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i data-lucide="linkedin" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i data-lucide="twitter" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Our Values</h2>
+            <p class="text-muted">The principles that guide everything we do</p>
+        </div>
+        
+        <div class="row g-4">
+            <% 
+            const values = [
+                {
+                    title: "Community First",
+                    description: "Every decision we make prioritizes the health and growth of local communities",
+                    icon: "users"
+                },
+                {
+                    title: "Transparency",
+                    description: "We believe in honest, open communication with our users and business partners",
+                    icon: "eye"
+                },
+                {
+                    title: "Quality",
+                    description: "We maintain high standards for both our platform and the businesses we feature",
+                    icon: "award"
+                },
+                {
+                    title: "Innovation",
+                    description: "We continuously improve and adapt to better serve our community's needs",
+                    icon: "lightbulb"
+                }
+            ];
+            %>
+            
+            <% values.forEach(value => { %>
+            <div class="col-lg-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <div class="bg-primary text-white rounded-3 p-3 me-4">
+                            <i data-lucide="<%= value.icon %>" style="width: 32px; height: 32px;"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-2"><%= value.title %></h5>
+                        <p class="text-muted mb-0"><%= value.description %></p>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="fw-bold mb-2">Ready to Join Our Community?</h3>
+                <p class="mb-0">Whether you're a business owner or community member, there's a place for you here.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="d-flex gap-2 justify-content-lg-end">
+                    <a href="/register" class="btn btn-light">
+                        <i data-lucide="user-plus" class="me-2"></i>
+                        Sign Up Today
+                    </a>
+                    <a href="/discover" class="btn btn-outline-light">
+                        <i data-lucide="search" class="me-2"></i>
+                        Explore Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

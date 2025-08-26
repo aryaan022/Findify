@@ -1,82 +1,260 @@
-<%= layout("layouts/boilerplate") %>
-<div>
-  <div class="profile-container">
-    <img src="<%= business.Image.url %>" alt="<%= business.Name %>" />
-    <div class="profile-details">
-      <h2><%= business.Name %></h2>
-      <span class="category"><%= business.Category %></span><br />
-      <span class="address"><%= business.address %></span>
-    </div>
-    <button class="contact-btn">
-      <i class="fa fa-phone"></i> Contact Business
-    </button>
-  </div>
-  <div class="details-container">
-    <div class="about-section-1">
-      <div class="about-section">
-        <div><h3>About</h3></div>
-        <div><p><%= business.description %></p></div>
-      </div>
+<%- layout('/layouts/boilerplate') %>
 
-      <div class="map-container">
-        <div class="Location-container">
-          <h4><b>Location :</b></h4>
-        </div>
-        <div class="address-container">
-          <h6>Address</h6>
-          <p><%= business.address %></p>
-        </div>
-        <div id="map"></div>
-      </div>
-    </div>
-    <div class="about-section-2">
-      <h2>Contact Information</h2>
-      <div class="EMAIL">
-        <strong>Email:</strong> <%= business.Owner.email %>
-      </div>
-      <div class="CONTACT">
-        <strong>Contact:</strong> <%= business.Contact %>
-      </div>
-      <div class="ADDRESS">
-        <strong>Address:</strong> <%= business.address %>
-      </div>
-      <div class="hr-container">
-        <hr />
-      </div>
-      <div class="button-container">
-        <div class="call-business">
-          <button class="call-btn">Call Business</button>
-        </div>
-        <div class="email-business"><button>Email</button></div>
-      </div>
-      <div class="business-sections">
-        <h5 class="business-hours-title">Business Hours</h5>
-        <ul class="business-hours-list">
-          <li>
-            <span class="day">Monday-Friday:</span>
-            <span class="hours">9:00 AM - 8:00 PM</span>
-          </li>
-          <li>
-            <span class="day">Saturday:</span>
-            <span class="hours">10:00 AM - 6:00 PM</span>
-          </li>
-          <li>
-            <span class="day">Sunday:</span> <span class="hours">Closed</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+<%
+  const hours = (business && business.hours) ? business.hours : {
+      monday: { open: "7:00 AM", close: "6:00 PM", closed: false },
+      tuesday: { open: "7:00 AM", close: "6:00 PM", closed: false },
+      wednesday: { open: "7:00 AM", close: "6:00 PM", closed: false },
+      thursday: { open: "7:00 AM", close: "6:00 PM", closed: false },
+      friday: { open: "7:00 AM", close: "8:00 PM", closed: false },
+      saturday: { open: "8:00 AM", close: "8:00 PM", closed: false },
+      sunday: { open: "8:00 AM", close: "5:00 PM", closed: false }
+  };
+%>
 
+
+<!-- Header Image -->
+<section class="position-relative">
+    <div style="height: 300px; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('<%= business.Image && business.Image.url ? business.Image.url : "https://via.placeholder.com/1200x400?text=No+Image" %>'); background-size: cover; background-position: center;">
+        <div class="container h-100 d-flex align-items-end">
+            <div class="row w-100">
+                <div class="col-12 text-white pb-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/" class="text-white-50 text-decoration-none">Home</a></li>
+                            <li class="breadcrumb-item"><a href="/discover" class="text-white-50 text-decoration-none">Discover</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page"><%= business.Name %></li>
+                        </ol>
+                    </nav>
+                    <h1 class="display-5 fw-bold mb-2"><%= business.Name %></h1>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge bg-primary fs-6">
+                            <i data-lucide="tag" class="me-1"></i>
+                            <%= business.Category %>
+                        </span>
+                        <!-- Open/Closed Status -->
+                        <span class="badge bg-success">
+                            <i data-lucide="check-circle" class="me-1"></i>
+                            Open Now
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-lg-8">
+                <!-- Business Info -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="section-title mb-3">About <%= business.Name %></h3>
+                        <p class="lead text-muted mb-4"><%= business.description %></p>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 flex-wrap">
+                            <% if(business.Contact){ %>
+                            <a href="tel:<%= business.Contact %>" class="btn btn-primary">
+                                <i data-lucide="phone" class="me-2"></i>
+                                Call Now
+                            </a>
+                            <% } %>
+                            <% if(business.address){ %>
+                            <a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(business.address) %>" target="_blank" class="btn btn-outline-primary">
+                                <i data-lucide="directions" class="me-2"></i>
+                                Get Directions
+                            </a>
+                            <% } %>
+                            <% if(currentUser && currentUser.role == "User"){ %>
+                                <form action="/favorites/<%= business._id %>" method="post">
+                                    <button class="btn btn-outline-secondary">
+                                        <i data-lucide="heart" class="me-2"></i>
+                                        Save
+                                    </button>
+                                </form>
+                            <% } %>
+                            <button class="btn btn-outline-secondary">
+                                <i data-lucide="share-2" class="me-2"></i>
+                                Share
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Image -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Photo</h5>
+                        <img src="<%= business.Image && business.Image.url ? business.Image.url : 'https://via.placeholder.com/800x400?text=No+Image' %>" 
+                             class="img-fluid rounded shadow-sm" 
+                             alt="<%= business.Name %>">
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0">Customer Reviews</h5>
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i data-lucide="edit" class="me-1"></i>
+                                Write Review
+                            </button>
+                        </div>
+                        
+                        <!-- Review Summary -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div class="display-4 fw-bold text-primary"><%= business.rating %></div>
+                                    <div class="d-flex justify-content-center mb-2">
+                                        <% for(let i = 1; i <= 5; i++) { %>
+                                        <i data-lucide="star" class="<%= i <= Math.floor(business.rating) ? 'text-warning' : 'text-muted' %> me-1"></i>
+                                        <% } %>
+                                    </div>
+                                    <p class="text-muted">Based on <%= business.reviewCount %> reviews</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <% for(let i = 5; i >= 1; i--) { %>
+                                <div class="d-flex align-items-center mb-1">
+                                    <span class="me-2"><%= i %></span>
+                                    <i data-lucide="star" class="text-warning me-2" style="width: 14px; height: 14px;"></i>
+                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                        <div class="progress-bar bg-warning" style="width: <%= (Math.random() * 80 + 20).toFixed(0) + '%' %>"></div>
+                                    </div>
+                                    <small class="text-muted"><%= Math.floor(Math.random() * 30 + 10) %></small>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <!-- Individual Reviews -->
+                        <% 
+                        const reviews = [
+                            {
+                                author: "Mike Chen",
+                                rating: 5,
+                                date: "2 days ago",
+                                comment: "Excellent coffee and the staff is incredibly friendly. The atmosphere is perfect for working or just relaxing with friends."
+                            },
+                            {
+                                author: "Sarah Wilson",
+                                rating: 4,
+                                date: "1 week ago", 
+                                comment: "Great place! Love their pastries and the coffee is always fresh. Gets busy during lunch but worth the wait."
+                            },
+                            {
+                                author: "David Rodriguez",
+                                rating: 5,
+                                date: "2 weeks ago",
+                                comment: "My go-to coffee shop in downtown. Consistent quality and they remember my order. Highly recommend!"
+                            }
+                        ];
+                        %>
+                        
+                        <% reviews.forEach(review => { %>
+                        <div class="border-top pt-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1"><%= review.author %></h6>
+                                    <div class="d-flex align-items-center">
+                                        <% for(let i = 1; i <= 5; i++) { %>
+                                        <i data-lucide="star" class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %> me-1" style="width: 14px; height: 14px;"></i>
+                                        <% } %>
+                                        <small class="text-muted ms-2"><%= review.date %></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-muted mb-0"><%= review.comment %></p>
+                        </div>
+                        <% }); %>
+                        
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-primary">
+                                Load More Reviews
+                                <i data-lucide="chevron-down" class="ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Contact Info -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Contact Information</h5>
+
+                        <% if(business.address){ %>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i data-lucide="map-pin" class="text-primary me-2"></i>
+                                <strong>Address</strong>
+                            </div>
+                            <p class="text-muted ms-4 mb-0"><%= business.address %></p>
+                        </div>
+                        <% } %>
+
+                        <% if(business.Contact){ %>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i data-lucide="phone" class="text-primary me-2"></i>
+                                <strong>Phone</strong>
+                            </div>
+                            <p class="text-muted ms-4 mb-0">
+                                <a href="tel:<%= business.Contact %>" class="text-decoration-none">
+                                    <%= business.Contact %>
+                                </a>
+                            </p>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <!-- Business Hours -->
+                        <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Business Hours</h5>
+                        
+                        <% 
+                        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+                        const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                        %>
+                        
+                        <% days.forEach((day, index) => { %>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold"><%= dayNames[index] %></span>
+                            <span class="text-muted">
+                                <% if (hours[day].closed) { %>
+                                    Closed
+                                <% } else { %>
+                                    <%= hours[day].open %> - <%= hours[day].close %>
+                                <% } %>
+                            </span>
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+                
+
+        <!-- Back to Discover -->
+        <div class="text-center mt-5">
+            <a href="/discover" class="btn btn-outline-primary btn-lg">
+                <i data-lucide="arrow-left" class="me-2"></i>
+                Back to Discover
+            </a>
+        </div>
+    </div>
+</section>
 <script>
-  mapboxgl.accessToken = '<%= process.env.MAP_ACCESS_TOKEN %>';
-  const map = new mapboxgl.Map({
-      container: 'map', // container ID
-      center: [<%= business.geometry.coordinates[0] %>, <%= business.geometry.coordinates[1] %>], // starting position [lng, lat]. Note that lat must be set between -90 and 90
-      zoom: 9 // starting zoom
-  })
-  const marker1 = new mapboxgl.Marker({ color: "red" })
-        .setLngLat([<%= business.geometry.coordinates[0] %>, <%= business.geometry.coordinates[1] %>])
-        .addTo(map);
+    // Initialize Lucide icons
+    lucide.createIcons();
 </script>

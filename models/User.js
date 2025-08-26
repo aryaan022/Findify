@@ -12,7 +12,11 @@ const UserSchema = new Schema({
         type:String,
         enum:["user","Vendor","admin"],
         default:"user"
-    }
+    },
+    favorites:[{
+        type:Schema.Types.ObjectId,
+        ref:"Business"
+    }]
 })
 
 UserSchema.plugin(passportLocalMongoose);

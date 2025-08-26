@@ -1,0 +1,85 @@
+<%= layout("/layouts/boilerplate") %>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-6">
+                <div class="mb-5">
+                    <i data-lucide="search-x" class="text-muted mb-4" style="width: 120px; height: 120px;"></i>
+                    <h1 class="display-1 fw-bold text-primary">404</h1>
+                    <h2 class="fw-bold mb-3">Page Not Found</h2>
+                    <p class="text-muted mb-4">
+                        Sorry, the page you're looking for doesn't exist. 
+                        <% if (typeof url !== 'undefined') { %>
+                        The URL "<code><%= url %></code>" could not be found.
+                        <% } %>
+                    </p>
+                    
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="/" class="btn btn-primary">
+                            <i data-lucide="home" class="me-2"></i>
+                            Go Home
+                        </a>
+                        <a href="/discover" class="btn btn-outline-primary">
+                            <i data-lucide="search" class="me-2"></i>
+                            Discover Businesses
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Helpful Links -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Popular Pages</h5>
+                        <div class="row g-3 text-start">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">
+                                        <a href="/" class="text-decoration-none">
+                                            <i data-lucide="home" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            Home
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/discover" class="text-decoration-none">
+                                            <i data-lucide="search" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            Discover Businesses
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/about" class="text-decoration-none">
+                                            <i data-lucide="info" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            About Us
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">
+                                        <a href="/register" class="text-decoration-none">
+                                            <i data-lucide="user-plus" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            Register
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/contact" class="text-decoration-none">
+                                            <i data-lucide="mail" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            Contact Us
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <a href="/business/new" class="text-decoration-none">
+                                            <i data-lucide="plus-circle" class="me-2" style="width: 16px; height: 16px;"></i>
+                                            Add Business
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
