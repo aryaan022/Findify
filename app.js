@@ -144,7 +144,7 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
 
   if (role === "user") {
     const businesses = await Business.find();
-    return res.render("user-dashboard.ejs", { user: authUser, businesses });
+    return res.render("user-dashboard.ejs", { user: authUser, businesses ,favUser});
   }
 
   req.flash("error", "Your account role is not recognized for dashboard access.");
@@ -343,6 +343,25 @@ app.post("/favorite/:id",async(req,res)=>{
     req.flash("error","Already in favorites");
   }
   res.redirect(`/show/${id}`);
+})
+
+app.post("/favorites/remove/:id", isLoggedIn, async (req, res) => {
+  try {
+    const businessId = req.params.id;
+
+    await user.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { favorites: businessId } },   // remove businessId from favorites array
+      { new: true }
+    );
+
+    req.flash("success", "Removed from favorites!");
+    res.redirect("/dashboard"); // or back to the dashboard
+  } catch (err) {
+    console.error("Error removing favorite:", err);
+    req.flash("error", "Something went wrong.");
+    res.redirect("/dashboard");
+  }
 })
 
 

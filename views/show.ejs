@@ -70,8 +70,8 @@
                                 Get Directions
                             </a>
                             <% } %>
-                            <% if(currentUser && currentUser.role == "User"){ %>
-                                <form action="/favorites/<%= business._id %>" method="post">
+                            <% if(currentUser && currentUser.role == "user"){ %>
+                                <form action="/favorite/<%= business._id %>" method="post">
                                     <button class="btn btn-outline-secondary">
                                         <i data-lucide="heart" class="me-2"></i>
                                         Save
