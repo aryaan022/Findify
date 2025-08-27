@@ -145,7 +145,7 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
 
   if (role === "user") {
     const businesses = await Business.find();
-    return res.render("user-dashboard.ejs", { user: authUser, businesses ,favUser});
+    return res.render("user-dashboard.ejs", { user: authUser, businesses, favUser });
   }
 
   req.flash("error", "Your account role is not recognized for dashboard access.");
@@ -239,12 +239,13 @@ app.get("/discover", async (req, res) => {
 app.delete("/delete/:id", isLoggedIn, isOwner, async (req, res) => {
   try {
     let { id } = req.params;
-    let business = await Business.findById(id);
+    let business = await Business.findById(id).populate(reviews);
     if (business.Image && business.Image.filename) {
       for (let img of business.Image.filename) {
         await cloudinary.uploader.destroy(img);
       }
     }
+    await Review.deleteMany({ _id: { $in: business.reviews } }); // if a business is deleted all the reviews related to that business will get deleted
     let deletedBusiness = await Business.findByIdAndDelete(id);
     console.log(deletedBusiness);
     res.redirect("/");
@@ -327,25 +328,25 @@ app.get("/show/:id", async (req, res) => {
     "Owner",
     "username email"
   )
-  .populate({
-        path: "reviews",
-        populate: { path: "author", select: "username" } // populate review authors
-      });
+    .populate({
+      path: "reviews",
+      populate: { path: "author", select: "username" } // populate review authors
+    });
   res.render("show.ejs", { business });
 });
 
 //favorite route
-app.post("/favorite/:id",isLoggedIn,async(req,res)=>{
-  let {id} = req.params;
+app.post("/favorite/:id", isLoggedIn, async (req, res) => {
+  let { id } = req.params;
   let business = await Business.findById(id);
   let user = req.user;
-  if(!user.favorites.includes(business._id)){
+  if (!user.favorites.includes(business._id)) {
     user.favorites.push(business._id);
     await user.save();
-    req.flash("success","Added to favorites");
+    req.flash("success", "Added to favorites");
   }
-  else{
-    req.flash("error","Already in favorites");
+  else {
+    req.flash("error", "Already in favorites");
   }
   res.redirect(`/show/${id}`);
 })
@@ -376,13 +377,17 @@ app.post("/show/:id/reviews", isLoggedIn, async (req, res) => {
     const { id } = req.params;
     const { rating, comment } = req.body;
 
-    const business = await Business.findById(id);
+    const business = await Business.findById(id).populate("reviews"); 
     if (!business) {
       req.flash("error", "Business not found");
       return res.redirect("/discover");
     }
-    const alreadyadded = await Review.exists({business:id,author:req.user.id});
-    if(alreadyadded){
+
+    // Check if user already has a review in this business
+    const alreadyadded = business.reviews.some(
+      (r) => r.author.toString() === req.user._id.toString()
+    );
+    if (alreadyadded) {
       req.flash("error", "You have already added a review");
       return res.redirect(`/show/${id}`);
     }
@@ -418,11 +423,12 @@ app.post("/show/:id/reviews", isLoggedIn, async (req, res) => {
   }
 });
 
+
 //edit review
 app.get("/show/:id/reviews/:reviewId/edit", isLoggedIn, async (req, res) => {
   const { id, reviewId } = req.params;
   try {
-    // Fetch the existing review from DB
+    // Fetch the existing review from DB because in get request body.params doesnot works!(point to remember and learn)
     const review = await Review.findById(reviewId);
     if (!review) {
       req.flash("error", "Review not found");
@@ -443,10 +449,10 @@ app.get("/show/:id/reviews/:reviewId/edit", isLoggedIn, async (req, res) => {
 });
 
 //putting reviews updation
-app.post("/show/:id/reviews/:reviewId/edit",isLoggedIn,async(req,res)=>{
-  const { id , reviewId } = req.params;
+app.post("/show/:id/reviews/:reviewId/edit", isLoggedIn, async (req, res) => {
+  const { id, reviewId } = req.params;
   const { rating, comment } = req.body;
-  const updatedReview = await Review.findByIdAndUpdate(reviewId,{
+  const updatedReview = await Review.findByIdAndUpdate(reviewId, {
     rating: Number(rating),
     comment
   });
