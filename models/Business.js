@@ -45,6 +45,20 @@ const businessSchema = new Schema({
             required:true
         },
     },
+    reviews:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:"Review"
+        }
+    ],
+    avgRating:{
+        type: Number,
+        default: 0
+    },
+    reviewCount: {
+        type: Number,
+        default: 0
+    }
 },{timestamps:true}) // adds createdAt & updatedAt automatically
 
 businessSchema.index({geometry:"2dsphere"});//this allows $near queries in MongoDB.

@@ -16,6 +16,7 @@ const flash = require("connect-flash");
 const MethodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const multer = require("multer");
+const Review = require("./models/Review");
 const { storage, cloudinary } = require("./cloudconfig");
 const upload = multer({ storage });
 const { isLoggedIn, isOwner, isVendor } = require("./middleware");
@@ -325,12 +326,16 @@ app.get("/show/:id", async (req, res) => {
   let business = await Business.findById(id).populate(
     "Owner",
     "username email"
-  );
+  )
+  .populate({
+        path: "reviews",
+        populate: { path: "author", select: "username" } // populate review authors
+      });
   res.render("show.ejs", { business });
 });
 
 //favorite route
-app.post("/favorite/:id",async(req,res)=>{
+app.post("/favorite/:id",isLoggedIn,async(req,res)=>{
   let {id} = req.params;
   let business = await Business.findById(id);
   let user = req.user;
@@ -345,6 +350,7 @@ app.post("/favorite/:id",async(req,res)=>{
   res.redirect(`/show/${id}`);
 })
 
+//remove favorite route
 app.post("/favorites/remove/:id", isLoggedIn, async (req, res) => {
   try {
     const businessId = req.params.id;
@@ -363,6 +369,103 @@ app.post("/favorites/remove/:id", isLoggedIn, async (req, res) => {
     res.redirect("/dashboard");
   }
 })
+
+// Add a new review:
+app.post("/show/:id/reviews", isLoggedIn, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+
+    const business = await Business.findById(id);
+    if (!business) {
+      req.flash("error", "Business not found");
+      return res.redirect("/discover");
+    }
+    const alreadyadded = await Review.exists({business:id,author:req.user.id});
+    if(alreadyadded){
+      req.flash("error", "You have already added a review");
+      return res.redirect(`/show/${id}`);
+    }
+
+    // Create review
+    const review = new Review({
+      rating: Number(rating),
+      comment,
+      author: req.user._id,
+    });
+    await review.save();
+
+    // Push review to business
+    business.reviews.push(review);
+    await business.save();
+
+    // 🔥 Recalculate rating & count from DB
+    const allReviews = await Review.find({ _id: { $in: business.reviews } });
+
+    const totalReviews = allReviews.length;
+    const sumRatings = allReviews.reduce((acc, r) => acc + r.rating, 0);
+    business.avgRating = (sumRatings / totalReviews).toFixed(1);
+    business.reviewCount = totalReviews;
+
+    await business.save();
+
+    req.flash("success", "Review added!");
+    res.redirect(`/show/${id}`);
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Could not add review");
+    res.redirect("back");
+  }
+});
+
+//edit review
+app.get("/show/:id/reviews/:reviewId/edit", isLoggedIn, async (req, res) => {
+  const { id, reviewId } = req.params;
+  try {
+    // Fetch the existing review from DB
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      req.flash("error", "Review not found");
+      return res.redirect(`/show/${id}`);
+    }
+    // Pass the existing review data to template
+    res.render("edit-review.ejs", {
+      businessId: id,
+      authorId: reviewId,
+      rating: review.rating,
+      comment: review.comment,
+    });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Something went wrong");
+    res.redirect(`/show/${id}`);
+  }
+});
+
+//putting reviews updation
+app.post("/show/:id/reviews/:reviewId/edit",isLoggedIn,async(req,res)=>{
+  const { id , reviewId } = req.params;
+  const { rating, comment } = req.body;
+  const updatedReview = await Review.findByIdAndUpdate(reviewId,{
+    rating: Number(rating),
+    comment
+  });
+  console.log(updatedReview);
+  if (!updatedReview) {
+    req.flash("error", "Review not found");
+    return res.redirect(`/show/${id}`);
+  }
+  // After updating the review, recalculate the business's avgRating and reviewCount
+  const business = await Business.findById(id);
+  const allReviews = await Review.find({ _id: { $in: business.reviews } });
+  const totalReviews = allReviews.length;
+  const sumRatings = allReviews.reduce((acc, r) => acc + r.rating, 0);
+  business.avgRating = (sumRatings / totalReviews).toFixed(1);
+  business.reviewCount = totalReviews;
+  await business.save();
+  req.flash("success", "Review updated!");
+  res.redirect(`/show/${id}`);
+});
 
 
 // 404 handler - catch unmatched routes
