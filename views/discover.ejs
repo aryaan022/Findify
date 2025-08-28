@@ -5,35 +5,30 @@
     <h1 class="fw-bold mb-4">Discover Nearby Businesses</h1>
 
     <!-- Map Section -->
-    <div
-      id="map"
-      style="width: 100%; height: 500px"
-      class="mb-4 rounded shadow-sm"
-    ></div>
+    <div id="map" style="width: 100%; height: 500px;" class="mb-4 rounded shadow-sm"></div>
 
     <!-- Business List -->
     <div class="row">
-      <% if (businesses && businesses.length > 0) { %> <%
-      businesses.forEach(business => { %>
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm border-0">
-          <img
-            src="<%= business.Image && business.Image.url ? business.Image.url : 'https://via.placeholder.com/400x200?text=No+Image' %>"
-            class="card-img-top"
-            alt="<%= business.Name %>"
-          />
-          <div class="card-body">
-            <h5 class="card-title"><%= business.Name %></h5>
-            <p class="text-muted mb-2"><%= business.Category %></p>
-            <p class="small text-muted"><%= business.address %></p>
-            <a href="/show/<%= business._id %>" class="btn btn-primary btn-sm"
-              >View Details</a
-            >
+      <% if (businesses && businesses.length > 0) { %>
+        <% businesses.forEach(business => { %>
+          <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+              <img
+                src="<%= business.Image && business.Image.url ? business.Image.url : 'https://via.placeholder.com/400x200?text=No+Image' %>"
+                class="card-img-top"
+                alt="<%= business.Name %>"
+              />
+              <div class="card-body">
+                <h5 class="card-title"><%= business.Name %></h5>
+                <p class="text-muted mb-2"><%= business.Category %></p>
+                <p class="small text-muted"><%= business.address %></p>
+                <a href="/show/<%= business._id %>" class="btn btn-primary btn-sm">View Details</a>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <% }) %> <% } else { %>
-      <p class="text-muted">No businesses found nearby.</p>
+        <% }) %>
+      <% } else { %>
+        <p class="text-muted">No businesses found nearby.</p>
       <% } %>
     </div>
   </div>
@@ -44,20 +39,19 @@
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v12',
-    center: [77.2090, 28.6139], // fallback (Delhi)
+    center: [77.2090, 28.6139], // fallback Delhi
     zoom: 10
   });
 
-  // Add navigation controls (zoom in/out)
   map.addControl(new mapboxgl.NavigationControl());
 
-  <% if (businesses && businesses.length > 0) { %>
-    const bounds = new mapboxgl.LngLatBounds();
+  const bounds = new mapboxgl.LngLatBounds();
 
+  // Render business markers
+  <% if (businesses && businesses.length > 0) { %>
     <% businesses.forEach(b => { %>
       <% if (b.geometry && b.geometry.coordinates) { %>
         const coords = <%= JSON.stringify(b.geometry.coordinates) %>;
-
         new mapboxgl.Marker({ color: 'red' })
           .setLngLat(coords)
           .setPopup(new mapboxgl.Popup().setHTML(`
@@ -66,36 +60,41 @@
             <a href="/show/<%= b._id %>">View Details</a>
           `))
           .addTo(map);
-
         bounds.extend(coords);
       <% } %>
     <% }) %>
-
-    map.fitBounds(bounds, { padding: 50 });
   <% } %>
 
-  // 🔹 Add user's location (blue dot)
-if (performance.getEntriesByType("navigation")[0].type === "reload") {
-  // Page is reloaded, so request user location
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(position => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      // Add lat/lng to URL and reload
-      const currentUrl = new URL(window.location.href);
-      currentUrl.searchParams.set('lat', lat);
-      currentUrl.searchParams.set('lng', lng);
-      window.location.href = currentUrl.toString();
-    }, () => {
-      console.log("Geolocation not allowed");
-    });
+  // Show user marker if lat/lng in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has("lat") && urlParams.has("lng")) {
+    const userCoords = [parseFloat(urlParams.get("lng")), parseFloat(urlParams.get("lat"))];
+    new mapboxgl.Marker({ color: 'blue' })
+      .setLngLat(userCoords)
+      .setPopup(new mapboxgl.Popup().setHTML(`<b>You are here</b>`))
+      .addTo(map);
+    bounds.extend(userCoords);
   }
-} else {
-  // Page is loaded first time, do not redirect
-  console.log("Initial visit, using fallback location or server-rendered businesses");
-}
 
+  if (!bounds.isEmpty()) {
+    map.fitBounds(bounds, { padding: 50 });
+  }
+
+  // Ask for user location if not already in URL
+  if (!urlParams.has("lat")) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("lat", lat);
+        currentUrl.searchParams.set("lng", lng);
+        window.location.href = currentUrl.toString();
+      }, () => {
+        alert("Location access denied. Cannot show nearby businesses.");
+      });
+    }
+  }
 </script>
 
 <style>
@@ -104,12 +103,8 @@ if (performance.getEntriesByType("navigation")[0].type === "reload") {
     color: #555;
     transition: color 0.2s ease-in-out;
   }
-
   .footer-link:hover {
     color: #007bff;
-    /* Bootstrap primary color */
   }
 </style>
-<script>
-  lucide.createIcons();
-</script>
+<script>lucide.createIcons();</script>
