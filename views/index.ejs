@@ -1,43 +1,162 @@
 <%= layout('/layouts/boilerplate') %>
+<style>
+  #heroCarousel {
+    width: 100vw !important;
+    margin-left: calc(-50vw + 50%) !important;
+    margin-top: 0.2rem !important;
+  }
+</style>
+<div
+  id="heroCarousel"
+  class="carousel slide carousel-fade shadow-lg w-100"
+  data-bs-ride="carousel"
+  data-bs-interval="4000"
+  style="max-height: 500px; overflow: hidden; margin: 0; padding: 0"
+>
+  <div class="carousel-inner">
+    <!-- Slide 1 -->
+    <div class="carousel-item active">
+      <div
+        class="d-flex align-items-center justify-content-center text-center text-white"
+        style="
+          height: 500px;
+          width: 100%;
+          background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+            url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80')
+              center/cover no-repeat;
+        "
+      >
+        <div class="px-3">
+          <h1 class="display-4 fw-bold">Discover Local Businesses</h1>
+          <p class="lead mb-4">
+            Find the perfect businesses for your needs across India.
+          </p>
+          <a
+            href="/discover"
+            class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm"
+            >Explore Now</a
+          >
+        </div>
+      </div>
+    </div>
 
-<!-- 🔹 Hero Section -->
-<section class="bg-gradient bg-primary text-white text-center py-5">
-  <div class="container">
-    <h1 class="display-4 fw-bold">Discover Local Businesses</h1>
-    <p class="lead mb-4">Find the perfect local businesses for all your needs across India.</p>
-    <a href="/discover" class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm">Explore Now</a>
+    <!-- Slide 2 -->
+    <div class="carousel-item">
+      <div
+        class="d-flex align-items-center justify-content-center text-center text-white"
+        style="
+          height: 500px;
+          width: 100%;
+          background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+            url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80')
+              center/cover no-repeat;
+        "
+      >
+        <div class="px-3">
+          <h1 class="display-4 fw-bold">Shop Local</h1>
+          <p class="lead mb-4">
+            Discover shops and markets in your neighborhood.
+          </p>
+          <a
+            href="/discover"
+            class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm"
+            >Explore Now</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="carousel-item">
+      <div
+        class="d-flex align-items-center justify-content-center text-center text-white"
+        style="
+          height: 500px;
+          width: 100%;
+          background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+            url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80')
+              center/cover no-repeat;
+        "
+      >
+        <div class="px-3">
+          <h1 class="display-4 fw-bold">Support Local Services</h1>
+          <p class="lead mb-4">
+            From cafes to dealerships, find trusted services nearby.
+          </p>
+          <a
+            href="/discover"
+            class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm"
+            >Explore Now</a
+          >
+        </div>
+      </div>
+    </div>
   </div>
-</section>
+
+  <!-- Controls -->
+  <button
+    class="carousel-control-prev"
+    type="button"
+    data-bs-target="#heroCarousel"
+    data-bs-slide="prev"
+  >
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button
+    class="carousel-control-next"
+    type="button"
+    data-bs-target="#heroCarousel"
+    data-bs-slide="next"
+  >
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
 
 <!-- 🔹 Featured Businesses -->
 <section class="py-5">
   <div class="container">
     <h2 class="h3 fw-bold text-center mb-5">Featured Businesses</h2>
     <div class="row g-4">
-      <% if (business && business.length > 0) { %>
-        <% business.forEach(b => { %>
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-0 hover-shadow transition">
-              <% if (b.Image && b.Image.url) { %>
-                <img src="<%= b.Image.url %>" class="card-img-top" alt="<%= b.Name %>">
-              <% } else { %>
-                <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top" alt="No image">
-              <% } %>
-              <div class="card-body">
-                <h5 class="card-title fw-bold"><%= b.Name %></h5>
-                <p class="text-primary small mb-1"><%= b.Category %></p>
-                <p class="text-muted small"><%= b.description.substring(0, 80) %>...</p>
-                <p class="small text-muted mb-1"><i class="fa fa-map-marker-alt me-1"></i> <%= b.address %></p>
-                <p class="small text-muted"><i class="fa fa-phone me-1"></i> <%= b.Contact %></p>
-              </div>
-              <div class="card-footer bg-transparent border-0">
-                <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100">View Details</a>
-              </div>
-            </div>
+      <% if (business && business.length> 0) { %> <% business.forEach(b=> { %>
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 shadow-sm border-0 hover-shadow transition">
+          <% if (b.Image && b.Image.url) { %>
+          <img
+            src="<%= b.Image.url %>"
+            class="card-img-top"
+            alt="<%= b.Name %>"
+          />
+          <% } else { %>
+          <img
+            src="https://via.placeholder.com/400x200?text=No+Image"
+            class="card-img-top"
+            alt="No image"
+          />
+          <% } %>
+          <div class="card-body">
+            <h5 class="card-title fw-bold"><%= b.Name %></h5>
+            <p class="text-primary small mb-1"><%= b.Category %></p>
+            <p class="text-muted small">
+              <%= b.description.substring(0, 80) %>...
+            </p>
+            <p class="small text-muted mb-1">
+              <i class="fa fa-map-marker-alt me-1"></i>
+              <%= b.address %>
+            </p>
+            <p class="small text-muted">
+              <i class="fa fa-phone me-1"></i>
+              <%= b.Contact %>
+            </p>
           </div>
-        <% }) %>
-      <% } else { %>
-        <p class="text-center text-muted">No businesses found.</p>
+          <div class="card-footer bg-transparent border-0">
+            <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100"
+              >View Details</a
+            >
+          </div>
+        </div>
+      </div>
+      <% }) %> <% } else { %>
+      <p class="text-center text-muted">No businesses found.</p>
       <% } %>
     </div>
   </div>
@@ -49,7 +168,10 @@
     <h2 class="h3 fw-bold text-center mb-5">Browse by Category</h2>
     <div class="row g-4 text-center">
       <div class="col-6 col-md-3">
-        <a href="/discover?category=Coffee" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+        <a
+          href="/discover?category=Coffee"
+          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
+        >
           <div class="card-body">
             <i class="fa fa-coffee fa-2x mb-3 text-primary"></i>
             <h6 class="fw-semibold">Coffee & Tea</h6>
@@ -57,7 +179,10 @@
         </a>
       </div>
       <div class="col-6 col-md-3">
-        <a href="/discover?category=Retail" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+        <a
+          href="/discover?category=Retail"
+          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
+        >
           <div class="card-body">
             <i class="fa fa-shopping-bag fa-2x mb-3 text-success"></i>
             <h6 class="fw-semibold">Retail</h6>
@@ -65,7 +190,10 @@
         </a>
       </div>
       <div class="col-6 col-md-3">
-        <a href="/discover?category=Food" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+        <a
+          href="/discover?category=Food"
+          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
+        >
           <div class="card-body">
             <i class="fa fa-utensils fa-2x mb-3 text-warning"></i>
             <h6 class="fw-semibold">Food</h6>
@@ -73,7 +201,10 @@
         </a>
       </div>
       <div class="col-6 col-md-3">
-        <a href="/discover?category=Books" class="card h-100 shadow-sm border-0 text-dark text-decoration-none">
+        <a
+          href="/discover?category=Books"
+          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
+        >
           <div class="card-body">
             <i class="fa fa-book fa-2x mb-3 text-info"></i>
             <h6 class="fw-semibold">Books</h6>
