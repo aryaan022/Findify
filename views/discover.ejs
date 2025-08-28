@@ -1,228 +1,108 @@
-<%= layout('/layouts/boilerplate') %>
+<%- layout('/layouts/boilerplate') %>
 
-<div id="loader" class="loader">
-  <div class="spinner"></div>
-</div>
+<section class="py-5">
+  <div class="container">
+    <h1 class="fw-bold mb-4">Discover Nearby Businesses</h1>
+
+    <!-- Map Section -->
+    <div
+      id="map"
+      style="width: 100%; height: 500px"
+      class="mb-4 rounded shadow-sm"
+    ></div>
+
+    <!-- Business List -->
+    <div class="row">
+      <% if (businesses && businesses.length > 0) { %> <%
+      businesses.forEach(business => { %>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <img
+            src="<%= business.Image && business.Image.url ? business.Image.url : 'https://via.placeholder.com/400x200?text=No+Image' %>"
+            class="card-img-top"
+            alt="<%= business.Name %>"
+          />
+          <div class="card-body">
+            <h5 class="card-title"><%= business.Name %></h5>
+            <p class="text-muted mb-2"><%= business.Category %></p>
+            <p class="small text-muted"><%= business.address %></p>
+            <a href="/show/<%= business._id %>" class="btn btn-primary btn-sm"
+              >View Details</a
+            >
+          </div>
+        </div>
+      </div>
+      <% }) %> <% } else { %>
+      <p class="text-muted">No businesses found nearby.</p>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<script>
+  mapboxgl.accessToken = '<%= mapboxToken %>';
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: [77.2090, 28.6139], // fallback (Delhi)
+    zoom: 10
+  });
+
+  // Add navigation controls (zoom in/out)
+  map.addControl(new mapboxgl.NavigationControl());
+
+  <% if (businesses && businesses.length > 0) { %>
+    const bounds = new mapboxgl.LngLatBounds();
+
+    <% businesses.forEach(b => { %>
+      <% if (b.geometry && b.geometry.coordinates) { %>
+        const coords = <%= JSON.stringify(b.geometry.coordinates) %>;
+
+        new mapboxgl.Marker({ color: 'red' })
+          .setLngLat(coords)
+          .setPopup(new mapboxgl.Popup().setHTML(`
+            <h6><%= b.Name %></h6>
+            <p><%= b.address %></p>
+            <a href="/show/<%= b._id %>">View Details</a>
+          `))
+          .addTo(map);
+
+        bounds.extend(coords);
+      <% } %>
+    <% }) %>
+
+    map.fitBounds(bounds, { padding: 50 });
+  <% } %>
+
+  // 🔹 Add user's location (blue dot)
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const userCoords = [position.coords.longitude, position.coords.latitude];
+
+      new mapboxgl.Marker({ color: 'blue' })
+        .setLngLat(userCoords)
+        .setPopup(new mapboxgl.Popup().setHTML(`<b>You are here</b>`))
+        .addTo(map);
+
+      map.flyTo({ center: userCoords, zoom: 13 });
+    }, () => {
+      console.log("Geolocation not allowed");
+    });
+  }
+</script>
 
 <style>
-  #map {
-    height: 400px;
-    width: 100%;
+  .footer-link {
+    text-decoration: none;
+    color: #555;
+    transition: color 0.2s ease-in-out;
+  }
+
+  .footer-link:hover {
+    color: #007bff;
+    /* Bootstrap primary color */
   }
 </style>
-
-<div class="bg-light d-flex flex-column min-vh-100">
-  <main class="flex-grow-1 ">
-        <!-- Hero Section -->
-        <section class="bg-primary text-white text-center py-5">
-          <div class="container">
-            <h1 class="display-5 fw-bold mb-3">Discover Local Businesses</h1>
-            <p class="lead">
-              Find the perfect local businesses for all your needs across India
-            </p>
-
-            <!-- Search Form -->
-            <form action="/discover" method="GET" class="bg-white p-4 rounded shadow">
-              <div class="row g-3">
-                <div class="col-md-4">
-                  <label for="search" class="form-label">
-                    <i data-lucide="search" class="me-1"></i> Search
-                  </label>
-                  <input type="text" id="search" name="search" class="form-control"
-                    placeholder="Business name or keywords" />
-                </div>
-
-                <div class="col-md-4">
-                  <label for="category" class="form-label">
-                    <i data-lucide="tag" class="me-1"></i> Category
-                  </label>
-                  <select id="category" name="category" class="form-select">
-                    <option>All Categories</option>
-                    <option>Retail</option>
-                    <option>Food</option>
-                    <option>Services</option>
-                    <option>Books</option>
-                  </select>
-                </div>
-
-                <div class="col-md-4">
-                  <label for="location" class="form-label">
-                    <i data-lucide="map-pin" class="me-1"></i> Location
-                  </label>
-                  <input type="text" id="location" name="location" class="form-control" placeholder="City or state" />
-                </div>
-              </div>
-
-              <div class="mt-4">
-                <button type="submit" class="btn btn-primary px-4">
-                  <i data-lucide="search" class="me-1"></i> Search Businesses
-                </button>
-              </div>
-            </form>
-
-        </section>
-
-        <!-- Map Section -->
-        <section class="py-5 bg-white">
-          <div class="container">
-            <h2 class="h4 fw-bold mb-3">Businesses Near You</h2>
-            <div id="map" class="rounded shadow"></div>
-          </div>
-        </section>
-
-        <!-- Results Section -->
-        <section class="py-5">
-          <div class="container">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h2 class="h4 fw-bold">
-                <%= businesses.length %> Businesses Found
-              </h2>
-              <a href="#" class="text-decoration-none text-primary small">
-                <i data-lucide="rotate-ccw" class="me-1"></i> Clear All Filters
-              </a>
-            </div>
-
-            <div class="row g-4">
-              <% if (businesses.length> 0) { %>
-                <% businesses.forEach(b=> { %>
-                  <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm border-0">
-
-                      <!-- ✅ Business Image -->
-                      <% if (b.Image && b.Image.url) { %>
-                        <img src="<%= b.Image.url %>" class="card-img-top" alt="<%= b.Name %>">
-                        <% } else { %>
-                          <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top"
-                            alt="No image">
-                          <% } %>
-
-                            <div class="card-body">
-                              <!-- ✅ Business Name -->
-                              <h5 class="card-title mb-1">
-                                <%= b.Name %>
-                              </h5>
-
-                              <!-- ✅ Category -->
-                              <p class="text-primary mb-2">
-                                <%= b.Category %>
-                              </p>
-
-                              <!-- ✅ Short description -->
-                              <p class="text-muted small mb-3">
-                                <%= b.description && b.description.length> 60
-                                  ? b.description.substring(0, 60) + "..."
-                                  : b.description %>
-                              </p>
-
-                              <!-- ✅ Address -->
-                              <p class="small text-muted mb-1">
-                                <i data-lucide="map-pin" class="me-1"></i>
-                                <%= b.address %>
-                              </p>
-
-                              <!-- ✅ Contact -->
-                              <p class="small text-muted mb-3">
-                                <i data-lucide="phone" class="me-1"></i>
-                                <%= b.Contact %>
-                              </p>
-
-                              <!-- ✅ Link to show page -->
-                              <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100">View Details</a>
-                            </div>
-                    </div>
-                  </div>
-                  <% }) %>
-                    <% } else { %>
-                      <p class="text-muted">No businesses found.</p>
-                      <% } %>
-            </div>
-
-
-        </section>
-
-        <!-- Categories -->
-        <section class="py-5 bg-light">
-          <div class="container text-center">
-            <h2 class="h3 fw-bold mb-4">Browse by Category</h2>
-            <div class="row g-4">
-              <div class="col-6 col-md-3">
-                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
-                  <div class="card-body">
-                    <i data-lucide="coffee" class="mb-2 text-primary"></i>
-                    <h6>Coffee & Tea</h6>
-                  </div>
-                </a>
-              </div>
-              <div class="col-6 col-md-3">
-                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
-                  <div class="card-body">
-                    <i data-lucide="shopping-bag" class="mb-2 text-success"></i>
-                    <h6>Retail</h6>
-                  </div>
-                </a>
-              </div>
-              <div class="col-6 col-md-3">
-                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
-                  <div class="card-body">
-                    <i data-lucide="utensils" class="mb-2 text-warning"></i>
-                    <h6>Food</h6>
-                  </div>
-                </a>
-              </div>
-              <div class="col-6 col-md-3">
-                <a href="#" class="card shadow-sm h-100 text-decoration-none text-dark">
-                  <div class="card-body">
-                    <i data-lucide="book" class="mb-2 text-info"></i>
-                    <h6>Books</h6>
-                  </div>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Call to Action -->
-        <section class="py-5 bg-primary text-center text-white">
-          <div class="container">
-            <h2 class="h3 fw-bold mb-3">Own a Business?</h2>
-            <p class="lead mb-4">
-              Join our platform and reach thousands of customers.
-            </p>
-            <a href="#" class="btn btn-light text-primary px-4">Register Your Business</a>
-          </div>
-        </section>
-      </main>
-    </div>
-
-    <script>// used for searching current location
-      document.addEventListener("DOMContentLoaded", () => {
-        const params = new URLSearchParams(window.location.search);
-
-        // Run only if lat/lng are not already present
-        if (!params.has("lat") && !params.has("lng")) {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-              const lat = pos.coords.latitude;
-              const lng = pos.coords.longitude;
-              window.location.href = `/discover?lat=${lat}&lng=${lng}`;
-            });
-          }
-        }
-      });
-    </script>
-    <style>
-      .footer-link {
-        text-decoration: none;
-        color: #555;
-        transition: color 0.2s ease-in-out;
-      }
-
-      .footer-link:hover {
-        color: #007bff;
-        /* Bootstrap primary color */
-      }
-    </style>
-    <script>
-      lucide.createIcons();
-    </script>
-    <script src="/js/loading.js"></script>
+<script>
+  lucide.createIcons();
+</script>
