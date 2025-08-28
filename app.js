@@ -136,6 +136,7 @@ app.get("/search", async (req, res) => {
 app.get("/dashboard", isLoggedIn, async (req, res) => {
   const authUser = req.user;
   const favUser = await user.findById(authUser._id).populate("favorites");
+  const Reviewcount = await Review.countDocuments({ author: authUser._id });
   // THE FIX: Use .find() and the correct field name 'author'
 const UserReview = await Review.find({ author: authUser._id })
     .sort({ createdAt: -1 })
@@ -150,7 +151,7 @@ const UserReview = await Review.find({ author: authUser._id })
 
   if (role === "user") {
     const businesses = await Business.find();
-    return res.render("user-dashboard.ejs", { user: authUser, businesses, favUser, UserReview });
+    return res.render("user-dashboard.ejs", { user: authUser, businesses, favUser, UserReview,Reviewcount });
   }
 
   req.flash("error", "Your account role is not recognized for dashboard access.");
