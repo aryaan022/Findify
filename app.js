@@ -238,7 +238,7 @@ app.get("/discover", async (req, res) => {
       })
       .send();
   }
-  res.render("discover.ejs", { businesses, search });
+  res.render("discover.ejs", { businesses, search, mapboxToken: process.env.MAP_ACCESS_TOKEN});
 });
 
 //delete route
