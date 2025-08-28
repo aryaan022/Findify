@@ -12,249 +12,204 @@
   };
 %>
 
-
 <!-- Header Image -->
 <section class="position-relative">
-    <div style="height: 300px; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('<%= business.Image && business.Image.url ? business.Image.url : "https://via.placeholder.com/1200x400?text=No+Image" %>'); background-size: cover; background-position: center;">
-        <div class="container h-100 d-flex align-items-end">
-            <div class="row w-100">
-                <div class="col-12 text-white pb-4">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/" class="text-white-50 text-decoration-none">Home</a></li>
-                            <li class="breadcrumb-item"><a href="/discover" class="text-white-50 text-decoration-none">Discover</a></li>
-                            <li class="breadcrumb-item active text-white" aria-current="page"><%= business.Name %></li>
-                        </ol>
-                    </nav>
-                    <h1 class="display-5 fw-bold mb-2"><%= business.Name %></h1>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge bg-primary fs-6">
-                            <i data-lucide="tag" class="me-1"></i>
-                            <%= business.Category %>
-                        </span>
-                        <!-- Open/Closed Status -->
-                        <span class="badge bg-success">
-                            <i data-lucide="check-circle" class="me-1"></i>
-                            Open Now
-                        </span>
-                    </div>
-                </div>
-            </div>
+  <div style="height: 300px; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('<%= business.Image && business.Image.url ? business.Image.url : "https://via.placeholder.com/1200x400?text=No+Image" %>'); background-size: cover; background-position: center;">
+    <div class="container h-100 d-flex align-items-end">
+      <div class="row w-100">
+        <div class="col-12 text-white pb-4">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/" class="text-white-50 text-decoration-none">Home</a></li>
+              <li class="breadcrumb-item"><a href="/discover" class="text-white-50 text-decoration-none">Discover</a></li>
+              <li class="breadcrumb-item active text-white" aria-current="page"><%= business.Name %></li>
+            </ol>
+          </nav>
+          <h1 class="display-5 fw-bold mb-2"><%= business.Name %></h1>
+          <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-primary fs-6">
+              <i data-lucide="tag" class="me-1"></i>
+              <%= business.Category %>
+            </span>
+            <span class="badge bg-success">
+              <i data-lucide="check-circle" class="me-1"></i>
+              Open Now
+            </span>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </section>
 
 <!-- Main Content -->
 <section class="py-5">
-    <div class="container">
-        <div class="row g-4">
-            <!-- Left Column -->
-            <div class="col-lg-8">
-                <!-- Business Info -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h3 class="section-title mb-3">About <%= business.Name %></h3>
-                        <p class="lead text-muted mb-4"><%= business.description %></p>
+  <div class="container">
+    <div class="row g-4">
+      <!-- Left Column -->
+      <div class="col-lg-8">
+        <!-- Business Info -->
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-body p-4">
+            <h3 class="section-title mb-3">About <%= business.Name %></h3>
+            <p class="lead text-muted mb-4"><%= business.description %></p>
 
-                        <!-- Action Buttons -->
-                        <div class="d-flex gap-2 flex-wrap">
-                            <% if(business.Contact){ %>
-                            <a href="tel:<%= business.Contact %>" class="btn btn-primary">
-                                <i data-lucide="phone" class="me-2"></i>
-                                Call Now
-                            </a>
-                            <% } %>
-                            <% if(business.address){ %>
-                            <a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(business.address) %>" target="_blank" class="btn btn-outline-primary">
-                                <i data-lucide="directions" class="me-2"></i>
-                                Get Directions
-                            </a>
-                            <% } %>
-                            <% if(currentUser && currentUser.role == "user"){ %>
-                                <form action="/favorite/<%= business._id %>" method="post">
-                                    <button class="btn btn-outline-secondary">
-                                        <i data-lucide="heart" class="me-2"></i>
-                                        Save
-                                    </button>
-                                </form>
-                            <% } %>
-                            <button class="btn btn-outline-secondary">
-                                <i data-lucide="share-2" class="me-2"></i>
-                                Share
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <% if(business.Contact){ %>
+              <a href="tel:<%= business.Contact %>" class="btn btn-primary">
+                <i data-lucide="phone" class="me-2"></i> Call Now
+              </a>
+              <% } %>
+              <% if(business.address){ %>
+              <a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(business.address) %>" target="_blank" class="btn btn-outline-primary">
+                <i data-lucide="directions" class="me-2"></i> Get Directions
+              </a>
+              <% } %>
+              <% if(currentUser && currentUser.role == "user"){ %>
+              <form action="/favorite/<%= business._id %>" method="post">
+                <button class="btn btn-outline-secondary">
+                  <i data-lucide="heart" class="me-2"></i> Save
+                </button>
+              </form>
+              <% } %>
+            </div>
+          </div>
+        </div>
 
-                <!-- Business Image -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Photo</h5>
-                        <img src="<%= business.Image && business.Image.url ? business.Image.url : 'https://via.placeholder.com/800x400?text=No+Image' %>" 
-                             class="img-fluid rounded shadow-sm" 
-                             alt="<%= business.Name %>">
-                    </div>
-                </div>
+        <!-- Business Image -->
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Photo</h5>
+            <img src="<%= business.Image && business.Image.url ? business.Image.url : 'https://via.placeholder.com/800x400?text=No+Image' %>" 
+                 class="img-fluid rounded shadow-sm" alt="<%= business.Name %>">
+          </div>
+        </div>
 
-                <!-- Reviews Section -->
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">Customer Reviews</h5>
-                            <button class="btn btn-outline-primary btn-sm">
-                                <i data-lucide="edit" class="me-1"></i>
-                                Write Review
-                            </button>
-                        </div>
-                        
-                        <!-- Review Summary -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="text-center">
-                                    <div class="display-4 fw-bold text-primary"><%= business.rating %></div>
-                                    <div class="d-flex justify-content-center mb-2">
-                                        <% for(let i = 1; i <= 5; i++) { %>
-                                        <i data-lucide="star" class="<%= i <= Math.floor(business.rating) ? 'text-warning' : 'text-muted' %> me-1"></i>
-                                        <% } %>
-                                    </div>
-                                    <p class="text-muted">Based on <%= business.reviewCount %> reviews</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <% for(let i = 5; i >= 1; i--) { %>
-                                <div class="d-flex align-items-center mb-1">
-                                    <span class="me-2"><%= i %></span>
-                                    <i data-lucide="star" class="text-warning me-2" style="width: 14px; height: 14px;"></i>
-                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
-                                        <div class="progress-bar bg-warning" style="width: <%= (Math.random() * 80 + 20).toFixed(0) + '%' %>"></div>
-                                    </div>
-                                    <small class="text-muted"><%= Math.floor(Math.random() * 30 + 10) %></small>
-                                </div>
-                                <% } %>
-                            </div>
-                        </div>
-                        
-                        <!-- Individual Reviews -->
-                        <% 
-                        const reviews = [
-                            {
-                                author: "Mike Chen",
-                                rating: 5,
-                                date: "2 days ago",
-                                comment: "Excellent coffee and the staff is incredibly friendly. The atmosphere is perfect for working or just relaxing with friends."
-                            },
-                            {
-                                author: "Sarah Wilson",
-                                rating: 4,
-                                date: "1 week ago", 
-                                comment: "Great place! Love their pastries and the coffee is always fresh. Gets busy during lunch but worth the wait."
-                            },
-                            {
-                                author: "David Rodriguez",
-                                rating: 5,
-                                date: "2 weeks ago",
-                                comment: "My go-to coffee shop in downtown. Consistent quality and they remember my order. Highly recommend!"
-                            }
-                        ];
-                        %>
-                        
-                        <% reviews.forEach(review => { %>
-                        <div class="border-top pt-3 mb-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h6 class="mb-1"><%= review.author %></h6>
-                                    <div class="d-flex align-items-center">
-                                        <% for(let i = 1; i <= 5; i++) { %>
-                                        <i data-lucide="star" class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %> me-1" style="width: 14px; height: 14px;"></i>
-                                        <% } %>
-                                        <small class="text-muted ms-2"><%= review.date %></small>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-muted mb-0"><%= review.comment %></p>
-                        </div>
-                        <% }); %>
-                        
-                        <div class="text-center mt-4">
-                            <button class="btn btn-outline-primary">
-                                Load More Reviews
-                                <i data-lucide="chevron-down" class="ms-2"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <!-- Reviews Section -->
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="fw-bold mb-0">Customer Reviews</h5>
             </div>
 
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <!-- Contact Info -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Contact Information</h5>
-
-                        <% if(business.address){ %>
-                        <div class="mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <i data-lucide="map-pin" class="text-primary me-2"></i>
-                                <strong>Address</strong>
-                            </div>
-                            <p class="text-muted ms-4 mb-0"><%= business.address %></p>
-                        </div>
-                        <% } %>
-
-                        <% if(business.Contact){ %>
-                        <div class="mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <i data-lucide="phone" class="text-primary me-2"></i>
-                                <strong>Phone</strong>
-                            </div>
-                            <p class="text-muted ms-4 mb-0">
-                                <a href="tel:<%= business.Contact %>" class="text-decoration-none">
-                                    <%= business.Contact %>
-                                </a>
-                            </p>
-                        </div>
-                        <% } %>
-                    </div>
+            <!-- Review Summary -->
+            <div class="row mb-4">
+              <div class="col-md-6 text-center">
+                <div class="display-4 fw-bold text-primary"><%= business.avgRating || 0 %></div>
+                <div class="d-flex justify-content-center mb-2">
+                  <% for(let i = 1; i <= 5; i++) { %>
+                    <i data-lucide="star" class="<%= i <= Math.floor(business.rating || 0) ? 'text-warning' : 'text-muted' %> me-1"></i>
+                  <% } %>
                 </div>
+                <p class="text-muted">Based on <%= business.reviewCount || 0 %> reviews</p>
+              </div>
             </div>
-        </div>
-                <!-- Business Hours -->
-                        <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Business Hours</h5>
-                        
-                        <% 
-                        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-                        const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                        %>
-                        
-                        <% days.forEach((day, index) => { %>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="fw-semibold"><%= dayNames[index] %></span>
-                            <span class="text-muted">
-                                <% if (hours[day].closed) { %>
-                                    Closed
-                                <% } else { %>
-                                    <%= hours[day].open %> - <%= hours[day].close %>
-                                <% } %>
-                            </span>
-                        </div>
-                        <% }); %>
-                    </div>
-                </div>
-                
 
-        <!-- Back to Discover -->
-        <div class="text-center mt-5">
-            <a href="/discover" class="btn btn-outline-primary btn-lg">
-                <i data-lucide="arrow-left" class="me-2"></i>
-                Back to Discover
-            </a>
+            <!-- Review Form -->
+            <% if (currentUser) { %>
+              <form action="/show/<%= business._id %>/reviews" method="POST" class="mb-4">
+                <div class="mb-3">
+                  <label for="rating" class="form-label">Rating</label>
+                  <select name="rating" id="rating" class="form-select" required>
+                    <option value="5">⭐⭐⭐⭐⭐</option>
+                    <option value="4">⭐⭐⭐⭐</option>
+                    <option value="3">⭐⭐⭐</option>
+                    <option value="2">⭐⭐</option>
+                    <option value="1">⭐</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="comment" class="form-label">Comment</label>
+                  <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+              </form>
+            <% } else { %>
+              <p><a href="/login">Login</a> to write a review</p>
+            <% } %>
+
+            <!-- Individual Reviews -->
+           <% if (business.reviews && business.reviews.length > 0) { %>
+  <% business.reviews.forEach(review => { %>
+    <div class="border-top pt-3 mb-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 class="mb-1"><%= review.author ? review.author.username : "Anonymous" %></h6>
+          <div class="d-flex align-items-center">
+            <% for(let i = 1; i <= 5; i++) { %>
+              <i data-lucide="star" class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %> me-1" style="width: 14px; height: 14px;"></i>
+            <% } %>
+            <small class="text-muted ms-2"><%= review.createdAt ? review.createdAt.toDateString() : "" %></small>
+          </div>
         </div>
+
+        <!-- ✅ Edit button only for the logged-in user who authored this review -->
+        <% if (currentUser && review.author && String(review.author._id) === String(currentUser._id)) { %>
+          <form action="/show/<%= business._id %>/reviews/<%= review._id %>/edit" method="GET" class="ms-2">
+            <button type="submit" class="btn btn-sm btn-outline-primary">Edit</button>
+          </form>
+        <% } %>
+      </div>
+
+      <p class="text-muted mb-0"><%= review.comment %></p>
     </div>
+  <% }) %>
+<% } else { %>
+  <p class="text-muted">No reviews yet. Be the first to write one!</p>
+<% } %>
+
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Contact Information</h5>
+            <% if(business.address){ %>
+              <div class="mb-3">
+                <i data-lucide="map-pin" class="text-primary me-2"></i>
+                <strong>Address</strong>
+                <p class="text-muted"><%= business.address %></p>
+              </div>
+            <% } %>
+            <% if(business.Contact){ %>
+              <div>
+                <i data-lucide="phone" class="text-primary me-2"></i>
+                <strong>Phone</strong>
+                <p class="text-muted"><a href="tel:<%= business.Contact %>" class="text-decoration-none"><%= business.Contact %></a></p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Business Hours -->
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <h5 class="fw-bold mb-3">Business Hours</h5>
+        <% const days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']; %>
+        <% const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']; %>
+        <% days.forEach((day, i) => { %>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-semibold"><%= dayNames[i] %></span>
+            <span class="text-muted">
+              <% if (hours[day].closed) { %> Closed
+              <% } else { %> <%= hours[day].open %> - <%= hours[day].close %> <% } %>
+            </span>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- Back -->
+    <div class="text-center mt-5">
+      <a href="/discover" class="btn btn-outline-primary btn-lg">
+        <i data-lucide="arrow-left" class="me-2"></i> Back to Discover
+      </a>
+    </div>
+  </div>
 </section>
+
 <script>
-    // Initialize Lucide icons
-    lucide.createIcons();
+  lucide.createIcons();
 </script>

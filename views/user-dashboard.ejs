@@ -1,233 +1,230 @@
 <%= layout('/layouts/boilerplate', { title: 'User Dashboard - Localify ' }) %>
 
 <section class="py-4">
-  <div class="container">
-    <!-- Welcome Header -->
-    <div class="row align-items-center mb-4">
-      <div class="col">
-        <h2 class="section-title mb-1">
-          Welcome back, <%= (user && user.username) ? user.username : (currentUser && currentUser.username) ? currentUser.username : 'User' %>!
-        </h2>
-        <p class="text-muted mb-0">Here's what's happening with your local business discoveries</p>
-      </div>
-      <div class="col-auto">
-        <div class="dropdown">
-          <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            <i data-lucide="user" class="me-2"></i>
-            Account Settings
-          </button>
-          <ul class="dropdown-menu">
-            <li>
-              <a class="dropdown-item" href="/profile">
-                <i data-lucide="settings" class="me-2" style="width: 16px; height: 16px;"></i>
-                Profile Settings
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="/preferences">
-                <i data-lucide="sliders" class="me-2" style="width: 16px; height: 16px;"></i>
-                Preferences
-              </a>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <a class="dropdown-item" href="/logout">
-                <i data-lucide="log-out" class="me-2" style="width: 16px; height: 16px;"></i>
-                Logout
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="row g-4 mb-5">
-      <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body text-center">
-            <i data-lucide="heart" class="text-danger mb-3" style="width: 32px; height: 32px;"></i>
-            <h3 class="fw-bold text-danger"><%= favUser && favUser.favorites ? favUser.favorites.length : 0 %></h3>
-            <p class="text-muted mb-0">Favorite Businesses</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body text-center">
-            <i data-lucide="message-square" class="text-primary mb-3" style="width: 32px; height: 32px;"></i>
-            <h3 class="fw-bold text-primary">8</h3>
-            <p class="text-muted mb-0">Reviews Written</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body text-center">
-            <i data-lucide="clock" class="text-warning mb-3" style="width: 32px; height: 32px;"></i>
-            <h3 class="fw-bold text-warning">23</h3>
-            <p class="text-muted mb-0">Recent Searches</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body text-center">
-            <i data-lucide="map-pin" class="text-success mb-3" style="width: 32px; height: 32px;"></i>
-            <h3 class="fw-bold text-success">5</h3>
-            <p class="text-muted mb-0">Areas Explored</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-4">
-      <!-- Saved/Favorite Businesses -->
-      <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
-          <div class="card-header bg-white border-0 py-3">
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0 fw-bold">
-                <i data-lucide="heart" class="me-2 text-danger"></i>
-                Favorite Businesses
-              </h5>
-              <a href="/favorites" class="btn btn-outline-primary btn-sm">View All</a>
+    <div class="container">
+        <div class="row align-items-center mb-4">
+            <div class="col">
+                <h2 class="section-title mb-1">
+                    Welcome back, <%= (user && user.username) ? user.username : (currentUser && currentUser.username) ? currentUser.username : 'User' %>!
+                </h2>
+                <p class="text-muted mb-0">
+                    Here's what's happening with your local business discoveries
+                </p>
             </div>
-          </div>
+            <div class="col-auto">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i data-lucide="user" class="me-2"></i>
+                        Account Settings
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/profile">
+                                <i data-lucide="settings" class="me-2" style="width: 16px; height: 16px;"></i>
+                                Profile Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/preferences">
+                                <i data-lucide="sliders" class="me-2" style="width: 16px; height: 16px;"></i>
+                                Preferences
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/logout">
+                                <i data-lucide="log-out" class="me-2" style="width: 16px; height: 16px;"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-          <div class="card-body">
-            <% if (favUser && favUser.favorites && favUser.favorites.length > 0) { %>
-              <div class="row g-3">
-                <% favUser.favorites.forEach(business => { %>
-                <div class="col-md-6">
-                  <div class="card border-0 bg-light h-100">
-                    <div class="row g-0">
-                      <div class="col-4">
-                        <% if (business.Image && business.Image.url) { %>
-                          <img src="<%= business.Image.url %>" class="img-fluid rounded-start h-100 w-100" alt="<%= business.Name %>" style="object-fit: cover;">
-                        <% } else { %>
-                          <img src="https://via.placeholder.com/200x150?text=No+Image" class="img-fluid rounded-start h-100 w-100" alt="No image" style="object-fit: cover;">
-                        <% } %>
-                      </div>
-                      <div class="col-8">
-                        <div class="card-body p-3">
-                          <h6 class="card-title mb-1"><%= business.Name %></h6>
-                          <p class="text-muted small mb-1">
-                            <i data-lucide="tag" class="me-1" style="width: 12px; height: 12px;"></i>
-                            <%= business.Category %>
-                          </p>
-                          <p class="text-muted small mb-1">
-                            <i data-lucide="map-pin" class="me-1" style="width: 12px; height: 12px;"></i>
-                            <%= business.address %>
-                          </p>
-
-                          <!-- Remove Favorite button -->
-                          <form action="/favorites/remove/<%= business._id %>" method="POST">
-                            <button type="submit" class="btn btn-outline-danger btn-sm w-100 mt-2">
-                              <i data-lucide="heart-off" class="me-1"></i> Remove
-                            </button>
-                          </form>
-                        </div>
-                      </div>
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="heart" class="text-danger mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-danger">
+                            <%= favUser && favUser.favorites ? favUser.favorites.length : 0 %>
+                        </h3>
+                        <p class="text-muted mb-0">Favorite Businesses</p>
                     </div>
-                  </div>
                 </div>
-                <% }) %>
-              </div>
-            <% } else { %>
-              <p class="text-muted">You haven't saved any businesses yet.</p>
-            <% } %>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Activity Sidebar -->
-      <div class="col-lg-4">
-        <!-- Recent Searches -->
-        <div class="card shadow-sm border-0 mb-4">
-          <div class="card-header bg-white border-0 py-3">
-            <h6 class="mb-0 fw-bold">
-              <i data-lucide="clock" class="me-2 text-warning"></i>
-              Recent Searches
-            </h6>
-          </div>
-          <div class="card-body">
-            <% 
-              const recentSearches = [
-                { query: "coffee shops near me", time: "2 hours ago" },
-                { query: "italian restaurants", time: "1 day ago" },
-                { query: "bookstores downtown", time: "3 days ago" },
-                { query: "hair salons", time: "1 week ago" }
-              ];
-            %>
-            <% recentSearches.forEach(search => { %>
-            <div class="d-flex align-items-center mb-3">
-              <i data-lucide="search" class="text-muted me-2" style="width: 16px; height: 16px;"></i>
-              <div class="flex-grow-1">
-                <div class="fw-semibold"><%= search.query %></div>
-                <small class="text-muted"><%= search.time %></small>
-              </div>
             </div>
-            <% }); %>
-            <a href="/search-history" class="btn btn-outline-primary btn-sm w-100">View All Searches</a>
-          </div>
-        </div>
-
-        <!-- My Reviews -->
-        <div class="card shadow-sm border-0">
-          <div class="card-header bg-white border-0 py-3">
-            <h6 class="mb-0 fw-bold">
-              <i data-lucide="message-square" class="me-2 text-info"></i>
-              Recent Reviews
-            </h6>
-          </div>
-          <div class="card-body">
-            <% 
-              const recentReviews = [
-                { business: "Brew & Bean Coffee", rating: 5, comment: "Excellent coffee and friendly staff!", date: "2 days ago" },
-                { business: "Green Garden Bistro", rating: 4, comment: "Great food, cozy atmosphere.", date: "1 week ago" }
-              ];
-            %>
-            <% recentReviews.forEach(review => { %>
-            <div class="mb-3 pb-3 border-bottom">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h6 class="mb-0 small"><%= review.business %></h6>
-                <div>
-                  <% for(let i = 1; i <= 5; i++) { %>
-                  <i data-lucide="star" class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %>" style="width: 12px; height: 12px;"></i>
-                  <% } %>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="message-square" class="text-primary mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-primary">8</h3>
+                        <p class="text-muted mb-0">Reviews Written</p>
+                    </div>
                 </div>
-              </div>
-              <p class="small text-muted mb-1">"<%= review.comment %>"</p>
-              <small class="text-muted"><%= review.date %></small>
             </div>
-            <% }); %>
-            <a href="/my-reviews" class="btn btn-outline-primary btn-sm w-100">View All Reviews</a>
-          </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="clock" class="text-warning mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-warning">23</h3>
+                        <p class="text-muted mb-0">Recent Searches</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="map-pin" class="text-success mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-success">5</h3>
+                        <p class="text-muted mb-0">Areas Explored</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Quick Actions -->
-    <div class="row mt-5">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm bg-primary text-white">
-          <div class="card-body py-4">
-            <div class="row align-items-center">
-              <div class="col-md-8">
-                <h5 class="mb-2">Ready to discover more local businesses?</h5>
-                <p class="mb-0">Explore restaurants, shops, and services in your area.</p>
-              </div>
-              <div class="col-md-4 text-md-end">
-                <a href="/discover" class="btn btn-light btn-lg">
-                  <i data-lucide="search" class="me-2"></i>
-                  Start Exploring
-                </a>
-              </div>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-0 py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold">
+                                <i data-lucide="heart" class="me-2 text-danger"></i>
+                                Favorite Businesses
+                            </h5>
+                            <a href="/favorites" class="btn btn-outline-primary btn-sm">View All</a>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <% if (favUser && favUser.favorites && favUser.favorites.length > 0) { %>
+                        <div class="row g-3">
+                            <% favUser.favorites.forEach(business => { %>
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light h-100">
+                                    <div class="row g-0">
+                                        <div class="col-4">
+                                            <% if (business.Image && business.Image.url) { %>
+                                            <img src="<%= business.Image.url %>" class="img-fluid rounded-start h-100 w-100" alt="<%= business.Name %>" style="object-fit: cover" />
+                                            <% } else { %>
+                                            <img src="https://via.placeholder.com/200x150?text=No+Image" class="img-fluid rounded-start h-100 w-100" alt="No image" style="object-fit: cover" />
+                                            <% } %>
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="card-body p-3">
+                                                <h6 class="card-title mb-1"><%= business.Name %></h6>
+                                                <p class="text-muted small mb-1">
+                                                    <i data-lucide="tag" class="me-1" style="width: 12px; height: 12px;"></i>
+                                                    <%= business.Category %>
+                                                </p>
+                                                <p class="text-muted small mb-1">
+                                                    <i data-lucide="map-pin" class="me-1" style="width: 12px; height: 12px;"></i>
+                                                    <%= business.address %>
+                                                </p>
+
+                                                <form action="/favorites/remove/<%= business._id %>" method="POST">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100 mt-2">
+                                                        <i data-lucide="heart-off" class="me-1"></i> Remove
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                        </div>
+                        <% } else { %>
+                        <p class="text-muted">You haven't saved any businesses yet.</p>
+                        <% } %>
+                    </div>
+                </div>
             </div>
-          </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold">
+                            <i data-lucide="clock" class="me-2 text-warning"></i>
+                            Recent Searches
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <% const recentSearches = [ { query: "coffee shops near me", time: "2 hours ago" }, { query: "italian restaurants", time: "1 day ago" }, { query: "bookstores downtown", time: "3 days ago" }, { query: "hair salons", time: "1 week ago" } ]; %>
+                        <% recentSearches.forEach(search => { %>
+                        <div class="d-flex align-items-center mb-3">
+                            <i data-lucide="search" class="text-muted me-2" style="width: 16px; height: 16px;"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold"><%= search.query %></div>
+                                <small class="text-muted"><%= search.time %></small>
+                            </div>
+                        </div>
+                        <% }); %>
+                        <a href="/search-history" class="btn btn-outline-primary btn-sm w-100">View All Searches</a>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h6 class="mb-0 fw-bold">
+                            <i data-lucide="message-square" class="me-2 text-info"></i>
+                            Recent Reviews
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <% if (UserReview && UserReview.length > 0) { %>
+                            <% UserReview.forEach(review => { %>
+                                <div class="mb-3 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        
+                                        <% if (review.business) { %>
+                                            <h6 class="mb-0 small"><%= review.business.Name %></h6>
+                                        <% } else { %>
+                                            <h6 class="mb-0 small text-muted">[Business Unavailable]</h6>
+                                        <% } %>
+
+                                        <div>
+                                            <% for(let i = 1; i <= 5; i++) { %>
+                                            <i data-lucide="star" class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %>" style="width: 12px; height: 12px; fill: <%= i <= review.rating ? 'currentColor' : 'none' %>;"></i>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <p class="small text-muted mb-1">"<%= review.comment %>"</p>
+                                    <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-muted text-center">You haven't written any reviews yet.</p>
+                        <% } %>
+                        <a href="/my-reviews" class="btn btn-outline-primary btn-sm w-100">View All Reviews</a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm bg-primary text-white">
+                    <div class="card-body py-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h5 class="mb-2">Ready to discover more local businesses?</h5>
+                                <p class="mb-0">
+                                    Explore restaurants, shops, and services in your area.
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <a href="/discover" class="btn btn-dark btn-lg">
+                                    <i data-lucide="search" class="me-2"></i>
+                                    Start Exploring
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </section>

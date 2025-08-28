@@ -1,0 +1,74 @@
+<%- layout('/layouts/boilerplate') %>
+
+<style>
+  /* Custom CSS for the interactive star rating */
+  .star-rating {
+    display: flex;
+    flex-direction: row-reverse; /* Reverses the order of stars for a clever CSS trick */
+    justify-content: center;
+    font-size: 2.5rem; /* Makes stars larger */
+    gap: 0.2rem;
+  }
+
+  .star-rating input[type="radio"] {
+    display: none; /* Hides the actual radio buttons */
+  }
+
+  .star-rating label {
+    color: #e0e0e0; /* Color of an empty star */
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  /* When a star (label) is hovered over, color it and all the stars before it */
+  .star-rating label:hover,
+  .star-rating label:hover ~ label {
+    color: #ffca08; /* A bright yellow for hover effect */
+  }
+
+  /* When a radio button is checked, permanently color its star and all stars before it */
+  .star-rating input[type="radio"]:checked ~ label {
+    color: #ffc107; /* Bootstrap's 'warning' yellow for a selected star */
+  }
+</style>
+
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4 p-md-5">
+          <h3 class="card-title text-center mb-4">Edit Your Review</h3>
+
+          <form action="/show/<%= businessId %>/reviews/<%= authorId %>/edit" method="POST" novalidate>
+            
+            <div class="mb-4 text-center">
+              <label class="form-label d-block mb-2">Your Rating</label>
+              <div class="star-rating">
+                <input type="radio" id="star5" name="rating" value="5" <%- rating == 5 ? 'checked' : '' %> required /><label for="star5" title="5 stars">★</label>
+                <input type="radio" id="star4" name="rating" value="4" <%- rating == 4 ? 'checked' : '' %> /><label for="star4" title="4 stars">★</label>
+                <input type="radio" id="star3" name="rating" value="3" <%- rating == 3 ? 'checked' : '' %> /><label for="star3" title="3 stars">★</label>
+                <input type="radio" id="star2" name="rating" value="2" <%- rating == 2 ? 'checked' : '' %> /><label for="star2" title="2 stars">★</label>
+                <input type="radio" id="star1" name="rating" value="1" <%- rating == 1 ? 'checked' : '' %> /><label for="star1" title="1 star">★</label>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="comment" class="form-label">Your Comment</label>
+              <textarea name="comment" id="comment" class="form-control" rows="4" placeholder="Share your experience..." required><%= comment %></textarea>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Update Review</button>
+            </div>
+          </form>
+
+          <div class="text-center mt-3">
+             <a href="/show/<%= businessId %>" class="text-muted text-decoration-none">Cancel</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
