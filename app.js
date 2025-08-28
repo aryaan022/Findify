@@ -136,6 +136,11 @@ app.get("/search", async (req, res) => {
 app.get("/dashboard", isLoggedIn, async (req, res) => {
   const authUser = req.user;
   const favUser = await user.findById(authUser._id).populate("favorites");
+  // THE FIX: Use .find() and the correct field name 'author'
+const UserReview = await Review.find({ author: authUser._id })
+    .sort({ createdAt: -1 })
+    .limit(2)
+    .populate("business");
   const role = (authUser.role || "").toLowerCase();
 
   if (role === "vendor") {
@@ -145,7 +150,7 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
 
   if (role === "user") {
     const businesses = await Business.find();
-    return res.render("user-dashboard.ejs", { user: authUser, businesses, favUser });
+    return res.render("user-dashboard.ejs", { user: authUser, businesses, favUser, UserReview });
   }
 
   req.flash("error", "Your account role is not recognized for dashboard access.");
@@ -397,6 +402,7 @@ app.post("/show/:id/reviews", isLoggedIn, async (req, res) => {
       rating: Number(rating),
       comment,
       author: req.user._id,
+      business: id
     });
     await review.save();
 
@@ -404,7 +410,7 @@ app.post("/show/:id/reviews", isLoggedIn, async (req, res) => {
     business.reviews.push(review);
     await business.save();
 
-    // 🔥 Recalculate rating & count from DB
+    //Recalculate rating & count from DB
     const allReviews = await Review.find({ _id: { $in: business.reviews } });
 
     const totalReviews = allReviews.length;
