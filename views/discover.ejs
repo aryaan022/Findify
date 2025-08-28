@@ -75,20 +75,27 @@
   <% } %>
 
   // 🔹 Add user's location (blue dot)
+if (performance.getEntriesByType("navigation")[0].type === "reload") {
+  // Page is reloaded, so request user location
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(position => {
-      const userCoords = [position.coords.longitude, position.coords.latitude];
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
 
-      new mapboxgl.Marker({ color: 'blue' })
-        .setLngLat(userCoords)
-        .setPopup(new mapboxgl.Popup().setHTML(`<b>You are here</b>`))
-        .addTo(map);
-
-      map.flyTo({ center: userCoords, zoom: 13 });
+      // Add lat/lng to URL and reload
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('lat', lat);
+      currentUrl.searchParams.set('lng', lng);
+      window.location.href = currentUrl.toString();
     }, () => {
       console.log("Geolocation not allowed");
     });
   }
+} else {
+  // Page is loaded first time, do not redirect
+  console.log("Initial visit, using fallback location or server-rendered businesses");
+}
+
 </script>
 
 <style>
