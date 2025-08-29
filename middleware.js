@@ -33,6 +33,14 @@ module.exports.isVendor = async(req,res,next)=>{
 };
 
 
+module.exports.isAdmin = (req, res, next) => {
+    if (req.isAuthenticated() && req.user.role === 'admin') {
+        return next();
+    }
+    req.flash('error', 'You do not have permission to view this page.');
+    res.redirect('/');
+};
+
 
 
 

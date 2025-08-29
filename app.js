@@ -19,7 +19,7 @@ const multer = require("multer");
 const Review = require("./models/Review");
 const { storage, cloudinary } = require("./cloudconfig");
 const upload = multer({ storage });
-const { isLoggedIn, isOwner, isVendor } = require("./middleware");
+const { isLoggedIn, isOwner, isVendor, isAdmin } = require("./middleware");
 
 const dbUrl = "mongodb://127.0.0.1:27017/localbuisness";
 
@@ -61,7 +61,7 @@ app.use((req, res, next) => {
 
 //home route
 app.get("/", async (req, res) => {
-  let business = await Business.find();
+  let business = await Business.find({ status: 'active' }); // <-- ADDED FILTER
   res.render("index.ejs", { business, query: undefined });
 });
 
@@ -74,8 +74,15 @@ app.get("/register", async (req, res) => {
 app.post("/register", async (req, res, next) => {
   try {
     let { username, email, role, password } = req.body;
+    
+    //SECURITY: Prevent users from making themselves admins ++
+    if (role === 'admin') {
+      role = 'user'; // Default them to 'user' if they try to select 'admin'
+    }
+
     let newuser = new user({ email, username, role });
     const registeredUser = await user.register(newuser, password);
+    // ... rest of the code remains the same
     console.log(registeredUser);
     req.login(registeredUser, (err) => {
       if (err) {
@@ -86,6 +93,7 @@ app.post("/register", async (req, res, next) => {
       }
     });
   } catch (e) {
+    req.flash("error", e.message); // Also a good idea to flash the actual error
     res.redirect("/register");
   }
 });
@@ -122,6 +130,9 @@ app.get("/logout", (req, res) => {
 app.get("/search", async (req, res) => {
   const { query, category } = req.query;
   let filter = {};
+  
+  filter.status = 'active'; // <-- ADD THIS LINE
+
   if (query) {
     filter.Name = new RegExp(query, "i");
   }
@@ -229,6 +240,8 @@ app.get("/discover", async (req, res) => {
           $maxDistance: 10000, // 10km radius
         },
       },
+
+      status : 'active'
     });
   }
 
@@ -484,13 +497,74 @@ app.post("/show/:id/reviews/:reviewId/edit", isLoggedIn, async (req, res) => {
 
 
 //admin dashboard work
-app.get("/admin",(req,res)=>{
-  res.render("admin-dashboard.ejs")
-})
+// In app.js, inside app.post("/register", ...)
+app.get("/admin", isLoggedIn, isAdmin, async (req, res) => {
+    try {
+        // 1. Data for the Stat Cards
+        const totalUsers = await user.countDocuments();
+        const activeVendors = await user.countDocuments({ role: 'vendor', status: 'active' });
+        const totalBusinesses = await Business.countDocuments();
+        const pendingBusinesses = await Business.countDocuments({ status: 'pending' });
+        const totalReviews = await Review.countDocuments();
+        const avgRatingData = await Business.aggregate([
+            { $match: { avgRating: { $gt: 0 } } },
+            { $group: { _id: null, avg: { $avg: "$avgRating" } } }
+        ]);
+        const averageRating = avgRatingData.length > 0 ? avgRatingData[0].avg.toFixed(1) : 0;
+
+        // 2. Data for the User Management Table
+        const allUsers = await user.find({}).sort({ createdAt: -1 });
+
+        // 3. Data for the Business Management Table
+        const allBusinesses = await Business.find({}).populate('Owner', 'username').sort({ createdAt: -1 });
+
+        // 4. Data for Reports & Analytics Tab
+        const categoryDistribution = await Business.aggregate([
+            { $group: { _id: "$Category", count: { $sum: 1 } } },
+            { $sort: { count: -1 } }
+        ]);
+        
+        // Use totalBusinesses from above, ensure it's not zero to prevent division errors
+        const totalBusinessesForPercentage = totalBusinesses > 0 ? totalBusinesses : 1;
+
+        res.render("admin-dashboard.ejs", {
+            // This object structure passes all data to the EJS file
+            stats: {
+                totalUsers,
+                activeVendors,
+                totalBusinesses,
+                pendingBusinesses,
+                totalReviews,
+                averageRating
+            },
+            users: allUsers,
+            businesses: allBusinesses,
+            reports: {
+                categoryDistribution,
+                totalBusinessesForPercentage
+            }
+        });
+
+    } catch (err) {
+        console.error("Admin Dashboard Error:", err);
+        req.flash('error', 'Could not load the admin dashboard.');
+        res.redirect('/');
+    }
+});
 
 
-
-
+// Route to approve a business
+app.patch("/admin/businesses/:id/approve", isLoggedIn, isAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Business.findByIdAndUpdate(id, { status: 'active' });
+        req.flash("success", "Business has been successfully approved!");
+    } catch (err) {
+        console.error(err);
+        req.flash("error", "Something went wrong while approving the business.");
+    }
+    res.redirect("/admin"); // Redirect back to the admin dashboard
+});
 
 
 

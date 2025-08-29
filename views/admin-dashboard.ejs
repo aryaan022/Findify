@@ -1,88 +1,102 @@
 <%- layout('/layouts/boilerplate') %>
+
 <style>
     /* Styling for the animated 'Coming Soon' features */
 
-/* Keyframe for the glowing button animation */
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(var(--bs-primary-rgb), 0.2);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(var(--bs-primary-rgb), 0.5);
-  }
-}
+    /* Keyframe for the glowing button animation */
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 0 5px rgba(var(--bs-primary-rgb), 0.2);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(var(--bs-primary-rgb), 0.5);
+      }
+    }
 
-/* Keyframe for the floating lock icon animation */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
+    /* Keyframe for the floating lock icon animation */
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-6px);
+      }
+    }
 
-/* Style for the glowing 'Admin Tools' button */
-.coming-soon-btn {
-  position: relative;
-  cursor: not-allowed;
-  animation: glow 2.5s infinite ease-in-out;
-}
+    /* Style for the glowing 'Admin Tools' button */
+    .coming-soon-btn {
+      position: relative;
+      cursor: not-allowed;
+      animation: glow 2.5s infinite ease-in-out;
+      transition: transform 0.2s ease-out; /* Added for smooth hover */
+    }
 
-.coming-soon-btn::after {
-  content: 'Soon';
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  padding: 2px 6px;
-  font-size: 0.65rem;
-  font-weight: bold;
-  color: white;
-  background-color: var(--bs-primary);
-  border-radius: 50px;
-  border: 2px solid white;
-}
+    /* NEW: Hover effect for the button */
+    .coming-soon-btn:hover {
+        transform: translateY(-2px);
+    }
 
-/* NEW: Style for the 'Revenue Growth' coming soon stat card */
-.stat-coming-soon {
-    position: relative;
-    border-radius: var(--bs-card-border-radius);
-    overflow: hidden;
-}
+    .coming-soon-btn::after {
+      content: 'Soon';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      padding: 2px 6px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      color: white;
+      background-color: var(--bs-primary);
+      border-radius: 50px;
+      border: 2px solid white;
+    }
 
-.stat-coming-soon .stat-content-blur {
-    filter: blur(5px);
-    opacity: 0.6;
-    user-select: none;
-    pointer-events: none;
-}
+    /* Style for the 'Coming Soon' stat cards */
+    .stat-coming-soon {
+        position: relative;
+        border-radius: var(--bs-card-border-radius);
+        overflow: hidden;
+    }
 
-.stat-coming-soon .stat-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--bs-primary);
-    font-weight: bold;
-}
+    .stat-coming-soon .stat-content-blur {
+        filter: blur(5px);
+        opacity: 0.6;
+        user-select: none;
+        pointer-events: none;
+    }
 
-.stat-coming-soon .stat-overlay i {
-    animation: float 2.5s infinite ease-in-out;
-}
+    .stat-coming-soon .stat-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--bs-primary);
+        font-weight: bold;
+        transition: background-color 0.2s ease-out; /* Added for smooth hover */
+    }
+    
+    /* NEW: Hover effect for the stat card overlay */
+    .stat-coming-soon:hover .stat-overlay {
+        background-color: rgba(248, 249, 250, 0.7);
+    }
+
+    .stat-coming-soon .stat-overlay i {
+        animation: float 2.5s infinite ease-in-out;
+    }
 </style>
+
 <section class="py-4">
     <div class="container-fluid">
-        <div class="row align-items: center mb-4">
+        <div class="row align-items-center mb-4">
             <div class="col">
                 <h2 class="section-title mb-1">Admin Panel</h2>
                 <p class="text-muted mb-0">Manage users, businesses, and platform operations</p>
             </div>
-            <div class="col-auto">
+             <div class="col-auto">
                 <div class="dropdown">
                     <button class="btn btn-outline-primary dropdown-toggle coming-soon-btn" type="button" title="This feature is coming soon!">
                         <i data-lucide="settings" class="me-2"></i>
@@ -102,11 +116,8 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i data-lucide="users" class="text-primary mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-primary">1,247</h3>
+                        <h3 class="fw-bold text-primary"><%= stats.totalUsers %></h3>
                         <p class="text-muted mb-0">Total Users</p>
-                        <div class="mt-2">
-                            <span class="badge bg-success">+12% this month</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -114,11 +125,8 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i data-lucide="store" class="text-success mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-success">348</h3>
+                        <h3 class="fw-bold text-success"><%= stats.activeVendors %></h3>
                         <p class="text-muted mb-0">Active Vendors</p>
-                        <div class="mt-2">
-                            <span class="badge bg-success">+8% this month</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -126,11 +134,13 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i data-lucide="building" class="text-info mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-info">562</h3>
+                        <h3 class="fw-bold text-info"><%= stats.totalBusinesses %></h3>
                         <p class="text-muted mb-0">Total Businesses</p>
+                        <% if(stats.pendingBusinesses > 0) { %>
                         <div class="mt-2">
-                            <span class="badge bg-warning">23 pending</span>
+                             <span class="badge bg-warning"><%= stats.pendingBusinesses %> pending</span>
                         </div>
+                        <% } %>
                     </div>
                 </div>
             </div>
@@ -138,10 +148,10 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body text-center">
                         <i data-lucide="message-square" class="text-warning mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-warning">1,829</h3>
+                        <h3 class="fw-bold text-warning"><%= stats.totalReviews %></h3>
                         <p class="text-muted mb-0">Total Reviews</p>
                         <div class="mt-2">
-                            <span class="badge bg-info">4.7 avg rating</span>
+                             <span class="badge bg-info"><%= stats.averageRating %> avg rating</span>
                         </div>
                     </div>
                 </div>
@@ -153,20 +163,17 @@
                 <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
-                            <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i>
-                            Manage Users
+                            <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i> Manage Users
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="businesses-tab" data-bs-toggle="tab" data-bs-target="#businesses" type="button" role="tab">
-                            <i data-lucide="store" class="me-2" style="width: 16px; height: 16px;"></i>
-                            Manage Businesses
+                            <i data-lucide="store" class="me-2" style="width: 16px; height: 16px;"></i> Manage Businesses
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
-                            <i data-lucide="bar-chart" class="me-2" style="width: 16px; height: 16px;"></i>
-                            Reports & Analytics
+                            <i data-lucide="bar-chart" class="me-2" style="width: 16px; height: 16px;"></i> Reports & Analytics
                         </button>
                     </li>
                 </ul>
@@ -174,24 +181,8 @@
             <div class="card-body">
                 <div class="tab-content" id="adminTabsContent">
                     <div class="tab-pane fade show active" id="users" role="tabpanel">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">User Management</h5>
-                            <div class="d-flex gap-2">
-                                <div class="input-group" style="width: 250px;">
-                                    <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
-                                    <button class="btn btn-outline-secondary" type="button">
-                                        <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-                                    </button>
-                                </div>
-                                <button class="btn btn-primary">
-                                    <i data-lucide="user-plus" class="me-2"></i>
-                                    Add User
-                                </button>
-                            </div>
-                        </div>
-                        
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>User</th>
@@ -203,89 +194,37 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% 
-                                        const users = [
-                                            { id: 1, username: "john_doe", email: "john@example.com", role: "user", status: "active", joined: "Jan 15, 2024", businesses: 0 },
-                                            { id: 2, username: "sarah_biz", email: "sarah@brewbean.com", role: "vendor", status: "active", joined: "Dec 8, 2023", businesses: 3 },
-                                            { id: 3, username: "mike_owner", email: "mike@greengarder.com", role: "vendor", status: "active", joined: "Nov 20, 2023", businesses: 2 },
-                                            { id: 4, username: "admin_user", email: "admin@localbiz.com", role: "admin", status: "active", joined: "Oct 1, 2023", businesses: 0 },
-                                            { id: 5, username: "jane_customer", email: "jane@example.com", role: "user", status: "inactive", joined: "Feb 3, 2024", businesses: 0 }
-                                        ];
-                                    %>
-                                    
-                                    <% users.forEach(user => { %>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle bg-primary text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                                                    <%= user.username.charAt(0).toUpperCase() %>
-                                                </div>
-                                                <div>
+                                    <% if(users.length > 0) { %>
+                                        <% for(let user of users) { %>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle bg-primary text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                                        <%= user.username.charAt(0).toUpperCase() %>
+                                                    </div>
                                                     <div class="fw-semibold"><%= user.username %></div>
-                                                    <% if (user.role === 'vendor') { %>
-                                                        <small class="text-muted"><%= user.businesses %> businesses</small>
-                                                    <% } %>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td><%= user.email %></td>
-                                        <td>
-                                            <span class="badge bg-<%= user.role === 'admin' ? 'danger' : user.role === 'vendor' ? 'info' : 'secondary' %>">
-                                                <%= user.role %>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-<%= user.status === 'active' ? 'success' : 'warning' %>">
-                                                <%= user.status %>
-                                            </span>
-                                        </td>
-                                        <td><%= user.joined %></td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    Actions
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>"><i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i> View Details</a></li>
-                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>/edit"><i data-lucide="edit" class="me-2" style="width: 14px; height: 14px;"></i> Edit User</a></li>
-                                                    <% if (user.status === 'active') { %>
-                                                        <li><a class="dropdown-item text-warning" href="#" onclick="suspendUser(<%= user.id %>)"><i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i> Suspend</a></li>
-                                                    <% } else { %>
-                                                        <li><a class="dropdown-item text-success" href="#" onclick="activateUser(<%= user.id %>)"><i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i> Activate</a></li>
-                                                    <% } %>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(<%= user.id %>, '<%= user.username %>')"><i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i> Delete</a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <% }); %>
+                                            </td>
+                                            <td><%= user.email %></td>
+                                            <td><span class="badge bg-<%= user.role === 'admin' ? 'danger' : user.role === 'vendor' ? 'info' : 'secondary' %> text-capitalize"><%= user.role %></span></td>
+                                            <td><span class="badge bg-<%= user.status === 'active' ? 'success' : 'warning' %> text-capitalize"><%= user.status %></span></td>
+                                            <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+                                            <td></td>
+                                        </tr>
+                                        <% } %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">No users found.</td>
+                                        </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
                     <div class="tab-pane fade" id="businesses" role="tabpanel">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">Business Management</h5>
-                            <div class="d-flex gap-2">
-                                <select class="form-select" style="width: auto;">
-                                    <option value="">All Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="suspended">Suspended</option>
-                                </select>
-                                <div class="input-group" style="width: 250px;">
-                                    <input type="text" class="form-control" placeholder="Search businesses...">
-                                    <button class="btn btn-outline-secondary" type="button">
-                                        <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="table table-hover">
+                       <div class="table-responsive">
+                            <table class="table table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Business</th>
@@ -298,251 +237,118 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% 
-                                        const businesses = [
-                                            { id: 1, name: "Brew & Bean Coffee", owner: "sarah_biz", category: "Coffee Shop", status: "active", rating: 4.8, reviews: 124, created: "Dec 8, 2023" },
-                                            { id: 2, name: "Green Garden Bistro", owner: "mike_owner", category: "Restaurant", status: "active", rating: 4.6, reviews: 89, created: "Nov 20, 2023" },
-                                            { id: 3, name: "Style Central", owner: "sarah_biz", category: "Retail", status: "pending", rating: 0, reviews: 0, created: "Feb 15, 2024" },
-                                            { id: 4, name: "The Book Nook", owner: "book_lover", category: "Bookstore", status: "active", rating: 4.9, reviews: 67, created: "Jan 10, 2024" },
-                                            { id: 5, name: "Quick Burger Joint", owner: "fast_food_owner", category: "Restaurant", status: "suspended", rating: 3.2, reviews: 45, created: "Oct 5, 2023" }
-                                        ];
-                                    %>
-                                    
-                                    <% businesses.forEach(business => { %>
-                                    <tr>
-                                        <td>
-                                            <div class="fw-semibold"><%= business.name %></div>
-                                            <small class="text-muted">ID: #<%= business.id %></small>
-                                        </td>
-                                        <td><%= business.owner %></td>
-                                        <td><%= business.category %></td>
-                                        <td>
-                                            <span class="badge bg-<%= business.status === 'active' ? 'success' : business.status === 'pending' ? 'warning' : 'danger' %>">
-                                                <%= business.status %>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <% if (business.rating > 0) { %>
-                                            <div class="d-flex align-items-center">
-                                                <i data-lucide="star" class="text-warning me-1" style="width: 14px; height: 14px;"></i>
-                                                <span><%= business.rating %> (<%= business.reviews %>)</span>
-                                            </div>
-                                            <% } else { %>
-                                            <span class="text-muted">No reviews</span>
-                                            <% } %>
-                                        </td>
-                                        <td><%= business.created %></td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                    Actions
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="/business/<%= business.id %>"><i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i> View Business</a></li>
-                                                    <% if (business.status === 'pending') { %>
-                                                        <li><a class="dropdown-item text-success" href="#" onclick="approveBusiness(<%= business.id %>)"><i data-lucide="check" class="me-2" style="width: 14px; height: 14px;"></i> Approve</a></li>
-                                                        <li><a class="dropdown-item text-danger" href="#" onclick="rejectBusiness(<%= business.id %>)"><i data-lucide="x" class="me-2" style="width: 14px; height: 14px;"></i> Reject</a></li>
-                                                    <% } else if (business.status === 'active') { %>
-                                                        <li><a class="dropdown-item text-warning" href="#" onclick="suspendBusiness(<%= business.id %>)"><i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i> Suspend</a></li>
-                                                    <% } else { %>
-                                                        <li><a class="dropdown-item text-success" href="#" onclick="reactivateBusiness(<%= business.id %>)"><i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i> Reactivate</a></li>
-                                                    <% } %>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteBusiness(<%= business.id %>, '<%= business.name %>')"><i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i> Delete</a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <% }); %>
+                                    <% if(businesses.length > 0) { %>
+                                        <% for(let business of businesses) { %>
+                                        <tr>
+                                            <td><a href="/show/<%= business._id %>" class="fw-semibold text-decoration-none" target="_blank"><%= business.Name %></a></td>
+                                            <td><%= business.Owner ? business.Owner.username : 'N/A' %></td>
+                                            <td><%= business.Category %></td>
+                                            <td><span class="badge bg-<%= business.status === 'active' ? 'success' : business.status === 'pending' ? 'warning' : 'danger' %> text-capitalize"><%= business.status %></span></td>
+                                            <td>
+                                                <% if (business.reviewCount > 0) { %>
+                                                <div class="d-flex align-items-center"><i data-lucide="star" class="text-warning me-1" style="width: 14px; height: 14px; fill: currentColor;"></i> <%= business.avgRating %> (<%= business.reviewCount %>)</div>
+                                                <% } else { %>
+                                                <span class="text-muted">No reviews</span>
+                                                <% } %>
+                                            </td>
+                                            <td><%= new Date(business.createdAt).toLocaleDateString() %></td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        Actions
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a class="dropdown-item" href="/show/<%= business._id %>" target="_blank">
+                                                                <i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i> View Business
+                                                            </a>
+                                                        </li>
+                                                        <% if (business.status === 'pending') { %>
+                                                            <li>
+                                                                <form action="/admin/businesses/<%= business._id %>/approve?_method=PATCH" method="POST" class="d-inline">
+                                                                    <button type="submit" class="dropdown-item text-success">
+                                                                        <i data-lucide="check" class="me-2" style="width: 14px; height: 14px;"></i> Approve
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                            <li>
+                                                                <button type="button" class="dropdown-item text-danger">
+                                                                    <i data-lucide="x" class="me-2" style="width: 14px; height: 14px;"></i> Reject
+                                                                </button>
+                                                            </li>
+                                                        <% } else if (business.status === 'active') { %>
+                                                            <li>
+                                                                <button type="button" class="dropdown-item text-warning">
+                                                                    <i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i> Suspend
+                                                                </button>
+                                                            </li>
+                                                        <% } %>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item text-danger">
+                                                                <i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i> Delete
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">No businesses found.</td>
+                                        </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
                     <div class="tab-pane fade" id="reports" role="tabpanel">
-                        <h5 class="fw-bold mb-4">Reports & Analytics</h5>
-                        
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body">
-                                        <h6 class="fw-bold mb-3">
-                                            <i data-lucide="trending-up" class="me-2 text-primary"></i>
-                                            Growth Metrics
-                                        </h6>
-                                        <div class="row text-center">
-                                            <div class="col-6 mb-3">
-                                                <div class="fw-bold text-primary">+15%</div>
-                                                <small class="text-muted">User Growth</small>
-                                            </div>
-                                            <div class="col-6 mb-3">
-                                                <div class="fw-bold text-success">+22%</div>
-                                                <small class="text-muted">Business Growth</small>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="fw-bold text-info">+8%</div>
-                                                <small class="text-muted">Review Growth</small>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="stat-coming-soon">
-                                                    <div class="stat-content-blur">
-                                                        <div class="fw-bold text-warning">+12%</div>
-                                                        <small class="text-muted">Revenue Growth</small>
-                                                    </div>
-                                                    <div class="stat-overlay">
-                                                        <i data-lucide="lock" class="mb-1"></i>
-                                                        <small>Coming Soon</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body">
-                                        <h6 class="fw-bold mb-3">
-                                            <i data-lucide="pie-chart" class="me-2 text-primary"></i>
-                                            Category Distribution
-                                        </h6>
-                                        <div class="mb-2">
-                                            <div class="d-flex justify-content-between">
-                                                <span>Restaurants</span>
-                                                <span>35%</span>
-                                            </div>
-                                            <div class="progress" style="height: 6px;">
-                                                <div class="progress-bar bg-primary" style="width: 35%"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <div class="d-flex justify-content-between">
-                                                <span>Retail</span>
-                                                <span>28%</span>
-                                            </div>
-                                            <div class="progress" style="height: 6px;">
-                                                <div class="progress-bar bg-success" style="width: 28%"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <div class="d-flex justify-content-between">
-                                                <span>Services</span>
-                                                <span>20%</span>
-                                            </div>
-                                            <div class="progress" style="height: 6px;">
-                                                <div class="progress-bar bg-info" style="width: 20%"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <div class="d-flex justify-content-between">
-                                                <span>Other</span>
-                                                <span>17%</span>
-                                            </div>
-                                            <div class="progress" style="height: 6px;">
-                                                <div class="progress-bar bg-warning" style="width: 17%"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body">
-                                        <h6 class="fw-bold mb-3">
-                                            <i data-lucide="download" class="me-2 text-primary"></i>
-                                            Export Reports
-                                        </h6>
-                                        <div class="d-flex gap-2 flex-wrap">
-                                            <button class="btn btn-outline-primary btn-sm">
-                                                <i data-lucide="file-text" class="me-2"></i>
-                                                User Report (CSV)
-                                            </button>
-                                            <button class="btn btn-outline-success btn-sm">
-                                                <i data-lucide="building" class="me-2"></i>
-                                                Business Report (CSV)
-                                            </button>
-                                            <button class="btn btn-outline-info btn-sm">
-                                                <i data-lucide="star" class="me-2"></i>
-                                                Reviews Report (CSV)
-                                            </button>
-                                            <button class="btn btn-outline-warning btn-sm">
-                                                <i data-lucide="bar-chart" class="me-2"></i>
-                                                Analytics Report (PDF)
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <div class="row g-4">
+            <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i data-lucide="trending-up" class="me-2 text-primary"></i> Growth Metrics</h6>
+                    <div class="row text-center">
+                        <div class="col-6"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-primary">+15%</div><small class="text-muted">User Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
+                        <div class="col-6"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-success">+22%</div><small class="text-muted">Business Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
+                        <div class="col-6 mt-3"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-info">+8%</div><small class="text-muted">Review Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
+                        <div class="col-6 mt-3"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-warning">+12%</div><small class="text-muted">Revenue Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3"><i data-lucide="pie-chart" class="me-2 text-primary"></i> Category Distribution</h6>
+                    
+                    <% if(reports.categoryDistribution && reports.categoryDistribution.length > 0) { %>
+                        <% const colors = ['primary', 'success', 'info', 'warning', 'danger', 'secondary']; %>
+                        <% reports.categoryDistribution.forEach((category, index) => { %>
+                            <% const percentage = ((category.count / reports.totalBusinessesForPercentage) * 100).toFixed(0); %>
+                            <% const barColor = colors[index % colors.length]; %>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span><%= category._id %></span>
+                                    <span><%= percentage %>%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-<%= barColor %>" role="progressbar" style="width: <%= percentage %>%;"></div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted">No business data available.</p>
+                    <% } %>
 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
 <script>
-    // User management functions
-    function suspendUser(userId) {
-        if (confirm('Are you sure you want to suspend this user?')) {
-            console.log('Suspending user:', userId);
-            alert('User suspended successfully!');
-        }
-    }
-    
-    function activateUser(userId) {
-        if (confirm('Are you sure you want to activate this user?')) {
-            console.log('Activating user:', userId);
-            alert('User activated successfully!');
-        }
-    }
-    
-    function deleteUser(userId, username) {
-        if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
-            console.log('Deleting user:', userId);
-            alert('User deleted successfully!');
-        }
-    }
-    
-    // Business management functions
-    function approveBusiness(businessId) {
-        if (confirm('Are you sure you want to approve this business?')) {
-            console.log('Approving business:', businessId);
-            alert('Business approved successfully!');
-        }
-    }
-    
-    function rejectBusiness(businessId) {
-        if (confirm('Are you sure you want to reject this business?')) {
-            console.log('Rejecting business:', businessId);
-            alert('Business rejected successfully!');
-        }
-    }
-    
-    function suspendBusiness(businessId) {
-        if (confirm('Are you sure you want to suspend this business?')) {
-            console.log('Suspending business:', businessId);
-            alert('Business suspended successfully!');
-        }
-    }
-    
-    function reactivateBusiness(businessId) {
-        if (confirm('Are you sure you want to reactivate this business?')) {
-            console.log('Reactivating business:', businessId);
-            alert('Business reactivated successfully!');
-        }
-    }
-    
-    function deleteBusiness(businessId, businessName) {
-        if (confirm(`Are you sure you want to delete "${businessName}"? This action cannot be undone.`)) {
-            console.log('Deleting business:', businessId);
-            alert('Business deleted successfully!');
-        }
-    }
-    
-    // Initialize Lucide icons
     lucide.createIcons();
 </script>

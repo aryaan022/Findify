@@ -13,7 +13,11 @@ const UserSchema = new Schema({
         enum:["user","Vendor","admin"],
         default:"user"
     },
-    
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'suspended'],
+        default: 'active'
+    },
     favorites:[{
         type:Schema.Types.ObjectId,
         ref:"Business"
