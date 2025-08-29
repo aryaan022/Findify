@@ -1,0 +1,514 @@
+<%- include('boilerplate', { title: 'Admin Panel - Local Business Finder' }) %>
+
+<section class="py-4">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row align-items-center mb-4">
+            <div class="col">
+                <h2 class="section-title mb-1">Admin Panel</h2>
+                <p class="text-muted mb-0">Manage users, businesses, and platform operations</p>
+            </div>
+            <div class="col-auto">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i data-lucide="settings" class="me-2"></i>
+                        Admin Tools
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/settings">
+                            <i data-lucide="cog" class="me-2" style="width: 16px; height: 16px;"></i>
+                            System Settings
+                        </a></li>
+                        <li><a class="dropdown-item" href="/admin/backup">
+                            <i data-lucide="database" class="me-2" style="width: 16px; height: 16px;"></i>
+                            Backup Data
+                        </a></li>
+                        <li><a class="dropdown-item" href="/admin/logs">
+                            <i data-lucide="file-text" class="me-2" style="width: 16px; height: 16px;"></i>
+                            View Logs
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reports Overview -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="users" class="text-primary mb-3" style="width: 48px; height: 48px;"></i>
+                        <h3 class="fw-bold text-primary">1,247</h3>
+                        <p class="text-muted mb-0">Total Users</p>
+                        <div class="mt-2">
+                            <span class="badge bg-success">+12% this month</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="store" class="text-success mb-3" style="width: 48px; height: 48px;"></i>
+                        <h3 class="fw-bold text-success">348</h3>
+                        <p class="text-muted mb-0">Active Vendors</p>
+                        <div class="mt-2">
+                            <span class="badge bg-success">+8% this month</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="building" class="text-info mb-3" style="width: 48px; height: 48px;"></i>
+                        <h3 class="fw-bold text-info">562</h3>
+                        <p class="text-muted mb-0">Total Businesses</p>
+                        <div class="mt-2">
+                            <span class="badge bg-warning">23 pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="message-square" class="text-warning mb-3" style="width: 48px; height: 48px;"></i>
+                        <h3 class="fw-bold text-warning">1,829</h3>
+                        <p class="text-muted mb-0">Total Reviews</p>
+                        <div class="mt-2">
+                            <span class="badge bg-info">4.7 avg rating</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Admin Tabs -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0">
+                <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                            <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i>
+                            Manage Users
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="businesses-tab" data-bs-toggle="tab" data-bs-target="#businesses" type="button" role="tab">
+                            <i data-lucide="store" class="me-2" style="width: 16px; height: 16px;"></i>
+                            Manage Businesses
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                            <i data-lucide="bar-chart" class="me-2" style="width: 16px; height: 16px;"></i>
+                            Reports & Analytics
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="adminTabsContent">
+                    <!-- Users Tab -->
+                    <div class="tab-pane fade show active" id="users" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0">User Management</h5>
+                            <div class="d-flex gap-2">
+                                <div class="input-group" style="width: 250px;">
+                                    <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                                    </button>
+                                </div>
+                                <button class="btn btn-primary">
+                                    <i data-lucide="user-plus" class="me-2"></i>
+                                    Add User
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Joined</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% 
+                                    const users = [
+                                        { id: 1, username: "john_doe", email: "john@example.com", role: "user", status: "active", joined: "Jan 15, 2024", businesses: 0 },
+                                        { id: 2, username: "sarah_biz", email: "sarah@brewbean.com", role: "vendor", status: "active", joined: "Dec 8, 2023", businesses: 3 },
+                                        { id: 3, username: "mike_owner", email: "mike@greengarder.com", role: "vendor", status: "active", joined: "Nov 20, 2023", businesses: 2 },
+                                        { id: 4, username: "admin_user", email: "admin@localbiz.com", role: "admin", status: "active", joined: "Oct 1, 2023", businesses: 0 },
+                                        { id: 5, username: "jane_customer", email: "jane@example.com", role: "user", status: "inactive", joined: "Feb 3, 2024", businesses: 0 }
+                                    ];
+                                    %>
+                                    
+                                    <% users.forEach(user => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle bg-primary text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                                    <%= user.username.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold"><%= user.username %></div>
+                                                    <% if (user.role === 'vendor') { %>
+                                                        <small class="text-muted"><%= user.businesses %> businesses</small>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><%= user.email %></td>
+                                        <td>
+                                            <span class="badge bg-<%= user.role === 'admin' ? 'danger' : user.role === 'vendor' ? 'info' : 'secondary' %>">
+                                                <%= user.role %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-<%= user.status === 'active' ? 'success' : 'warning' %>">
+                                                <%= user.status %>
+                                            </span>
+                                        </td>
+                                        <td><%= user.joined %></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>">
+                                                        <i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        View Details
+                                                    </a></li>
+                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>/edit">
+                                                        <i data-lucide="edit" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Edit User
+                                                    </a></li>
+                                                    <% if (user.status === 'active') { %>
+                                                    <li><a class="dropdown-item text-warning" href="#" onclick="suspendUser(<%= user.id %>)">
+                                                        <i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Suspend
+                                                    </a></li>
+                                                    <% } else { %>
+                                                    <li><a class="dropdown-item text-success" href="#" onclick="activateUser(<%= user.id %>)">
+                                                        <i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Activate
+                                                    </a></li>
+                                                    <% } %>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(<%= user.id %>, '<%= user.username %>')">
+                                                        <i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Delete
+                                                    </a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Businesses Tab -->
+                    <div class="tab-pane fade" id="businesses" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0">Business Management</h5>
+                            <div class="d-flex gap-2">
+                                <select class="form-select" style="width: auto;">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="suspended">Suspended</option>
+                                </select>
+                                <div class="input-group" style="width: 250px;">
+                                    <input type="text" class="form-control" placeholder="Search businesses...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Business</th>
+                                        <th>Owner</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Reviews</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% 
+                                    const businesses = [
+                                        { id: 1, name: "Brew & Bean Coffee", owner: "sarah_biz", category: "Coffee Shop", status: "active", rating: 4.8, reviews: 124, created: "Dec 8, 2023" },
+                                        { id: 2, name: "Green Garden Bistro", owner: "mike_owner", category: "Restaurant", status: "active", rating: 4.6, reviews: 89, created: "Nov 20, 2023" },
+                                        { id: 3, name: "Style Central", owner: "sarah_biz", category: "Retail", status: "pending", rating: 0, reviews: 0, created: "Feb 15, 2024" },
+                                        { id: 4, name: "The Book Nook", owner: "book_lover", category: "Bookstore", status: "active", rating: 4.9, reviews: 67, created: "Jan 10, 2024" },
+                                        { id: 5, name: "Quick Burger Joint", owner: "fast_food_owner", category: "Restaurant", status: "suspended", rating: 3.2, reviews: 45, created: "Oct 5, 2023" }
+                                    ];
+                                    %>
+                                    
+                                    <% businesses.forEach(business => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold"><%= business.name %></div>
+                                            <small class="text-muted">ID: #<%= business.id %></small>
+                                        </td>
+                                        <td><%= business.owner %></td>
+                                        <td><%= business.category %></td>
+                                        <td>
+                                            <span class="badge bg-<%= business.status === 'active' ? 'success' : business.status === 'pending' ? 'warning' : 'danger' %>">
+                                                <%= business.status %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <% if (business.rating > 0) { %>
+                                                <div class="d-flex align-items-center">
+                                                    <i data-lucide="star" class="text-warning me-1" style="width: 14px; height: 14px;"></i>
+                                                    <span><%= business.rating %> (<%= business.reviews %>)</span>
+                                                </div>
+                                            <% } else { %>
+                                                <span class="text-muted">No reviews</span>
+                                            <% } %>
+                                        </td>
+                                        <td><%= business.created %></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    Actions
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="/business/<%= business.id %>">
+                                                        <i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        View Business
+                                                    </a></li>
+                                                    <% if (business.status === 'pending') { %>
+                                                    <li><a class="dropdown-item text-success" href="#" onclick="approveBusiness(<%= business.id %>)">
+                                                        <i data-lucide="check" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Approve
+                                                    </a></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="rejectBusiness(<%= business.id %>)">
+                                                        <i data-lucide="x" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Reject
+                                                    </a></li>
+                                                    <% } else if (business.status === 'active') { %>
+                                                    <li><a class="dropdown-item text-warning" href="#" onclick="suspendBusiness(<%= business.id %>)">
+                                                        <i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Suspend
+                                                    </a></li>
+                                                    <% } else { %>
+                                                    <li><a class="dropdown-item text-success" href="#" onclick="reactivateBusiness(<%= business.id %>)">
+                                                        <i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Reactivate
+                                                    </a></li>
+                                                    <% } %>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteBusiness(<%= business.id %>, '<%= business.name %>')">
+                                                        <i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i>
+                                                        Delete
+                                                    </a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Reports Tab -->
+                    <div class="tab-pane fade" id="reports" role="tabpanel">
+                        <h5 class="fw-bold mb-4">Reports & Analytics</h5>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3">
+                                            <i data-lucide="trending-up" class="me-2 text-primary"></i>
+                                            Growth Metrics
+                                        </h6>
+                                        <div class="row text-center">
+                                            <div class="col-6 mb-3">
+                                                <div class="fw-bold text-primary">+15%</div>
+                                                <small class="text-muted">User Growth</small>
+                                            </div>
+                                            <div class="col-6 mb-3">
+                                                <div class="fw-bold text-success">+22%</div>
+                                                <small class="text-muted">Business Growth</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="fw-bold text-info">+8%</div>
+                                                <small class="text-muted">Review Growth</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="fw-bold text-warning">+12%</div>
+                                                <small class="text-muted">Revenue Growth</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3">
+                                            <i data-lucide="pie-chart" class="me-2 text-primary"></i>
+                                            Category Distribution
+                                        </h6>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Restaurants</span>
+                                                <span>35%</span>
+                                            </div>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-primary" style="width: 35%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Retail</span>
+                                                <span>28%</span>
+                                            </div>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-success" style="width: 28%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Services</span>
+                                                <span>20%</span>
+                                            </div>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-info" style="width: 20%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Other</span>
+                                                <span>17%</span>
+                                            </div>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-warning" style="width: 17%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3">
+                                            <i data-lucide="download" class="me-2 text-primary"></i>
+                                            Export Reports
+                                        </h6>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <button class="btn btn-outline-primary btn-sm">
+                                                <i data-lucide="file-text" class="me-2"></i>
+                                                User Report (CSV)
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm">
+                                                <i data-lucide="building" class="me-2"></i>
+                                                Business Report (CSV)
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm">
+                                                <i data-lucide="star" class="me-2"></i>
+                                                Reviews Report (CSV)
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-sm">
+                                                <i data-lucide="bar-chart" class="me-2"></i>
+                                                Analytics Report (PDF)
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // User management functions
+    function suspendUser(userId) {
+        if (confirm('Are you sure you want to suspend this user?')) {
+            console.log('Suspending user:', userId);
+            alert('User suspended successfully!');
+        }
+    }
+    
+    function activateUser(userId) {
+        if (confirm('Are you sure you want to activate this user?')) {
+            console.log('Activating user:', userId);
+            alert('User activated successfully!');
+        }
+    }
+    
+    function deleteUser(userId, username) {
+        if (confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            console.log('Deleting user:', userId);
+            alert('User deleted successfully!');
+        }
+    }
+    
+    // Business management functions
+    function approveBusiness(businessId) {
+        if (confirm('Are you sure you want to approve this business?')) {
+            console.log('Approving business:', businessId);
+            alert('Business approved successfully!');
+        }
+    }
+    
+    function rejectBusiness(businessId) {
+        if (confirm('Are you sure you want to reject this business?')) {
+            console.log('Rejecting business:', businessId);
+            alert('Business rejected successfully!');
+        }
+    }
+    
+    function suspendBusiness(businessId) {
+        if (confirm('Are you sure you want to suspend this business?')) {
+            console.log('Suspending business:', businessId);
+            alert('Business suspended successfully!');
+        }
+    }
+    
+    function reactivateBusiness(businessId) {
+        if (confirm('Are you sure you want to reactivate this business?')) {
+            console.log('Reactivating business:', businessId);
+            alert('Business reactivated successfully!');
+        }
+    }
+    
+    function deleteBusiness(businessId, businessName) {
+        if (confirm(`Are you sure you want to delete "${businessName}"? This action cannot be undone.`)) {
+            console.log('Deleting business:', businessId);
+            alert('Business deleted successfully!');
+        }
+    }
+    
+    // Initialize Lucide icons
+    lucide.createIcons();
+</script>

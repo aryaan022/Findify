@@ -1,15 +1,274 @@
-<%= layout("layouts/boilerplate.ejs") %>
-<h1>Dashboard</h1>
-<p>Welcome <%= user.username %>! Here are your businesses:</p>
-<ul>
-  <% for(bus of business){ %>
-    <li>
-        <a href="/show/<%= bus._id %>"><%= bus.Name %></a>
-        <form action="/edit/<%= bus._id %>" method="post" style="display:inline;">
-        <button type="submit">Edit</button>
-        </form>
-        <form action="/delete/<%= bus._id %>?_method=DELETE" method="POST" style="display:inline;">
-        <button type="submit">Delete</button>
-        </form>
-  <% } %>
-</ul>
+<%- layout("layouts/boilerplate.ejs") %>
+
+<%# --- DATA CALCULATION --- %>
+<%
+    // Calculate total reviews across all businesses
+    const totalReviewCount = business.reduce((sum, bus) => sum + (bus.reviewCount || 0), 0);
+
+    // Calculate the average rating across all businesses that have ratings
+    const businessesWithRatings = business.filter(bus => bus.avgRating > 0);
+    const totalAvgRating = businessesWithRatings.reduce((sum, bus) => sum + bus.avgRating, 0);
+    const overallAvgRating = businessesWithRatings.length > 0 ? (totalAvgRating / businessesWithRatings.length).toFixed(1) : 'N/A';
+%>
+
+<%# --- STYLING for locked feature --- %>
+<style>
+    /* --- Premium Locked Feature Styling --- */
+    .locked-feature {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Add a premium glow on hover */
+    .locked-feature:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3); /* Golden glow */
+    }
+
+    /* The content that gets blurred in the background */
+    .locked-feature .blurred-content {
+        filter: blur(4px) grayscale(50%);
+        transform: scale(1.05);
+        opacity: 0.6;
+        transition: filter 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* On hover, give a "peek" by reducing the blur */
+    .locked-feature:hover .blurred-content {
+        filter: blur(2px) grayscale(0%);
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    /* The main overlay element */
+    .lock-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(2px); /* Glass effect for modern browsers */
+        -webkit-backdrop-filter: blur(2px);
+        color: #333;
+        transition: background-color 0.3s ease;
+    }
+
+    .locked-feature:hover .lock-overlay {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* The content inside the overlay (both default and hover states) */
+    .lock-overlay .overlay-content {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* --- Handling the switch between default and hover text --- */
+
+    /* By default, the hover state is hidden and slightly scaled down */
+    .lock-overlay .hover-state {
+        position: absolute;
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    /* On hover, fade out the default text */
+    .locked-feature:hover .default-state {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    /* On hover, fade in the new premium text */
+    .locked-feature:hover .hover-state {
+        opacity: 1;
+        transform: scale(1);
+    }
+</style>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row align-items-center mb-4">
+            <div class="col">
+                <h2 class="section-title mb-1">Vendor Dashboard</h2>
+                <p class="text-muted mb-0">
+                    Welcome back, <%= user.username %>
+                </p>
+            </div>
+            <div class="col-auto">
+                <a href="/new" class="btn btn-primary">
+                    <i data-lucide="plus-circle" class="me-2"></i>
+                    Add New Business
+                </a>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="store" class="text-primary mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-primary"><%= business.length %></h3>
+                        <p class="text-muted mb-0">Active Businesses</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm locked-feature">
+                    <div class="card-body blurred-content">
+                        <i data-lucide="eye" class="text-success mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-success">Coming Soon</h3>
+                        <p class="text-muted mb-0">Total Views</p>
+                    </div>
+                    <div class="lock-overlay">
+                        <div class="overlay-content default-state">
+                            <i data-lucide="lock" class="mb-2" style="width: 28px; height: 28px;"></i>
+                            <div class="fw-bold">Coming Soon</div>
+                            <div class="small text-muted">Premium Feature</div>
+                        </div>
+                        <div class="overlay-content hover-state">
+                            <i data-lucide="gem" class="mb-2" style="width: 28px; height: 28px;"></i>
+                            <div class="fw-bold">Unlock Premium</div>
+                            <div class="small text-muted">Get Detailed Analytics</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="star" class="text-warning mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-warning"><%= overallAvgRating %></h3>
+                        <p class="text-muted mb-0">Avg. Rating</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <i data-lucide="message-square" class="text-info mb-3" style="width: 32px; height: 32px;"></i>
+                        <h3 class="fw-bold text-info"><%= totalReviewCount %></h3>
+                        <p class="text-muted mb-0">Total Reviews</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold">My Businesses</h5>
+            </div>
+            <div class="card-body p-0">
+                <% if(business.length > 0) { %>
+                <div class="row g-4 p-4">
+                    <% business.forEach(bus => { %>
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card business-card h-100">
+                            <div class="position-relative">
+                                <img src="<%= bus.Image && bus.Image.url ? bus.Image.url.replace('/upload', '/upload/w_400,h_300,c_fill') : 'https://images.unsplash.com/photo-1585503468331-597f38515d19?ixlib=rb-4.0.3&auto=format&fit=crop&w_400&q_80' %>" class="card-img-top" alt="<%= bus.Name %>" style="height: 200px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title mb-2"><%= bus.Name %></h6>
+                                <p class="text-muted mb-2">
+                                    <i data-lucide="tag" class="me-1" style="width: 14px; height: 14px;"></i>
+                                    <%= bus.Category %>
+                                </p>
+                                
+                                <div class="row text-center mb-3">
+                                    <div class="col-6">
+                                        <div class="small text-muted">Rating</div>
+                                        <div class="fw-bold">
+                                            <i data-lucide="star" class="text-warning" style="width: 12px; height: 12px;"></i>
+                                            <%= bus.avgRating %>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="small text-muted">Reviews</div>
+                                        <div class="fw-bold"><%= bus.reviewCount %></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-auto">
+                                    <div class="small text-muted mb-3">Created: <%= new Date(bus.createdAt).toLocaleDateString() %></div>
+                                    <div class="d-flex gap-2">
+                                        <form action="/edit/<%= bus._id %>" method="POST" class="flex-fill">
+                                             <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                <i data-lucide="edit" class="me-1" style="width: 14px; height: 14px;"></i> Edit
+                                            </button>
+                                        </form>
+
+                                        <a href="/show/<%= bus._id %>" class="btn btn-outline-secondary btn-sm">
+                                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                        </a>
+
+                                        <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete('<%= bus._id %>', '<%= bus.Name %>')">
+                                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                <% } else { %>
+                    <div class="text-center p-5">
+                        <i data-lucide="store" class="text-muted mb-3" style="width: 48px; height: 48px;"></i>
+                        <h5 class="fw-bold">No businesses found.</h5>
+                        <p class="text-muted">Click the button below to add your first business listing.</p>
+                        <a href="/new" class="btn btn-primary mt-2">Add Your First Business</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<span id="businessNameToDelete"></span>"?</p>
+                <p class="text-muted small">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST">
+                     <button type="submit" class="btn btn-danger">
+                        <i data-lucide="trash-2" class="me-2"></i> Delete Business
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(businessId, businessName) {
+        const deleteForm = document.getElementById('deleteForm');
+        // Set the action of the form to the correct delete route
+        deleteForm.action = `/delete/${businessId}?_method=DELETE`;
+        
+        document.getElementById('businessNameToDelete').textContent = businessName;
+        
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+    
+    // Initialize Lucide icons
+    lucide.createIcons();
+</script>
