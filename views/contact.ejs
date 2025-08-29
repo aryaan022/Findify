@@ -18,6 +18,20 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(var(--bs-primary-rgb), 0.3);
     }
+
+    /* NEW: Styling for the animated 'Coming Soon' button */
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(var(--bs-secondary-rgb), 0.2);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(var(--bs-secondary-rgb), 0.4);
+      }
+    }
+    .btn-coming-soon {
+        cursor: not-allowed;
+        animation: pulse-glow 2.5s infinite ease-in-out;
+    }
 </style>
 
 <section class="py-5 text-center bg-light fade-in-section">
@@ -76,8 +90,10 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="d-grid">
-                                        <button type="submit" class="btn btn-primary btn-lg btn-submit" style="transition: all 0.2s ease-in-out;">
-                                            <i data-lucide="send" class="me-2"></i> Send Message
+                                        <button type="button" class="btn btn-secondary btn-lg btn-coming-soon" disabled 
+                                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                                title="Our team is working on it!">
+                                            <i data-lucide="lock" class="me-2"></i> Coming Soon
                                         </button>
                                     </div>
                                 </div>
@@ -128,6 +144,12 @@
 <script>
     // Initialize Lucide icons
     lucide.createIcons();
+    
+    // NEW: Initialize Bootstrap Tooltips for the hover effect
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
