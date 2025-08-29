@@ -61,8 +61,19 @@ app.use((req, res, next) => {
 
 //home route
 app.get("/", async (req, res) => {
-  let business = await Business.find({ status: 'active' }); // <-- ADDED FILTER
-  res.render("index.ejs", { business, query: undefined });
+    const business = await Business.find({ status: 'active' }).lean();
+
+    // NEW: Fetch the top 6 businesses based on rating and review count
+    const topRatedBusinesses = await Business.find({ status: 'active' })
+        .sort({ avgRating: -1, reviewCount: -1 }) // Sort by rating then by review count
+        .limit(6) // Get only the top 6
+        .lean();
+
+    res.render("index.ejs", { 
+        business, 
+        topRatedBusinesses, //top-rated businesses data to the template
+        query: undefined 
+    });
 });
 
 //regiter route
@@ -566,9 +577,95 @@ app.patch("/admin/businesses/:id/approve", isLoggedIn, isAdmin, async (req, res)
     res.redirect("/admin"); // Redirect back to the admin dashboard
 });
 
+// Route to reject (and delete) a pending business
+app.delete("/admin/businesses/:id/reject", isLoggedIn, isAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // First, find the business to get the image filename
+        const business = await Business.findById(id);
+        if (business && business.Image && business.Image.filename) {
+            // If an image exists, delete it from Cloudinary
+            await cloudinary.uploader.destroy(business.Image.filename);
+        }
+
+        // Then, delete the business from our database
+        await Business.findByIdAndDelete(id);
+
+        req.flash("success", "Business has been rejected and deleted.");
+    } catch (err) {
+        console.error(err);
+        req.flash("error", "Something went wrong while rejecting the business.");
+    }
+    res.redirect("/admin");
+});
 
 
 
+// Route to suspend an active business
+app.patch("/admin/businesses/:id/suspend", isLoggedIn, isAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Business.findByIdAndUpdate(id, { status: 'suspended' });
+        req.flash("success", "Business has been suspended.");
+    } catch (err) {
+        console.error(err);
+        req.flash("error", "Something went wrong while suspending the business.");
+    }
+    res.redirect("/admin");
+});
+
+
+// Route to re-activate a suspended business
+app.patch("/admin/businesses/:id/reactivate", isLoggedIn, isAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Business.findByIdAndUpdate(id, { status: 'active' });
+        req.flash("success", "Business has been re-activated.");
+    } catch (err) {
+        console.error(err);
+        req.flash("error", "Something went wrong while re-activating the business.");
+    }
+    res.redirect("/admin");
+});
+
+// Route to permanently delete a business and its reviews
+// Route to permanently delete a business, its image, and its reviews
+app.delete("/admin/businesses/:id", isLoggedIn, isAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        [cite_start]// Step 1: Find the business document by its ID [cite: 1]
+        const businessToDelete = await Business.findById(id);
+
+        if (!businessToDelete) {
+            req.flash("error", "Business not found.");
+            return res.redirect("/admin");
+        }
+
+        [cite_start]// Step 2: If an image exists, delete it from Cloudinary [cite: 1, 3]
+        if (businessToDelete.Image && businessToDelete.Image.filename) {
+            await cloudinary.uploader.destroy(businessToDelete.Image.filename);
+        }
+
+        [cite_start]// Step 3: If there are associated reviews, delete them from the Review collection [cite: 1, 2]
+        if (businessToDelete.reviews.length > 0) {
+            await Review.deleteMany({ _id: { $in: businessToDelete.reviews } });
+        }
+
+        [cite_start]// Step 4: Finally, delete the business document from the database [cite: 1]
+        await Business.findByIdAndDelete(id);
+
+        req.flash("success", "Business and all associated assets were successfully deleted.");
+
+    } catch (err) {
+        console.error("Error during business deletion:", err);
+        req.flash("error", "An error occurred while deleting the business.");
+    }
+    
+    // Step 5: Redirect back to the admin dashboard
+    res.redirect("/admin");
+});
 
 
 

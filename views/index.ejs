@@ -1,209 +1,292 @@
-<%= layout('/layouts/boilerplate') %>
-<div
-  id="heroCarousel"
-  class="carousel slide carousel-fade shadow-lg w-100"
-  data-bs-ride="carousel"
-  data-bs-interval="4000"
-  style="max-height: 500px; overflow: hidden; margin: 0; padding: 0"
->
-  <div class="carousel-inner">
-    <!-- Slide 1 -->
-    <div class="carousel-item active">
-      <div
-        class="d-flex align-items-center justify-content-center text-center text-white"
-        style="
-          height: 500px;
-          width: 100%;
-          background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-            url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80')
-              center/cover no-repeat;
-        "
-      >
-        <div class="px-3">
-          <h1 class="display-4 fw-bold">Discover Local Businesses</h1>
-          <p class="lead mb-4">
-            Find the perfect businesses for your needs across India.
-          </p>
-          <a
-            href="/discover"
-            class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm"
-            >Explore Now</a
-          >
-        </div>
-      </div>
-    </div>
+<%- layout('/layouts/boilerplate') %>
 
-    <!-- Slide 2 -->
-    <div class="carousel-item">
-      <div
-        class="d-flex align-items-center justify-content-center text-center text-white"
-        style="
-          height: 500px;
-          width: 100%;
-          background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-            url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=80')
-              center/cover no-repeat;
-        "
-      >
-        <div class="px-3">
-          <h1 class="display-4 fw-bold">Shop Local</h1>
-          <p class="lead mb-4">
-            Discover shops and markets in your neighborhood.
-          </p>
-          <a
-            href="/discover"
-            class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm"
-            >Explore Now</a
-          >
-        </div>
-      </div>
-    </div>
+<style>
+  /* Styling for the new animated Shimmer Placeholder */
+.shimmer-wrapper {
+    position: relative;
+    overflow: hidden;
+    background-color: #e9ecef; /* A light grey background for the section */
+}
 
-    <!-- Slide 3 -->
-    <div class="carousel-item">
-      <div
-        class="d-flex align-items-center justify-content-center text-center text-white"
-        style="
-          height: 500px;
-          width: 100%;
-          background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-            url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80')
-              center/cover no-repeat;
-        "
-      >
-        <div class="px-3">
-          <h1 class="display-4 fw-bold">Support Local Services</h1>
-          <p class="lead mb-4">
-            From cafes to dealerships, find trusted services nearby.
-          </p>
-          <a
-            href="/discover"
-            class="btn btn-light text-primary px-4 py-2 fw-semibold shadow-sm"
-            >Explore Now</a
-          >
-        </div>
-      </div>
-    </div>
-  </div>
+.skeleton-card {
+    background-color: #fff;
+    border-radius: .375rem;
+    padding: 1.5rem;
+    height: 100%;
+}
 
-  <!-- Controls -->
-  <button
-    class="carousel-control-prev"
-    type="button"
-    data-bs-target="#heroCarousel"
-    data-bs-slide="prev"
-  >
-    <span class="carousel-control-prev-icon"></span>
-  </button>
-  <button
-    class="carousel-control-next"
-    type="button"
-    data-bs-target="#heroCarousel"
-    data-bs-slide="next"
-  >
-    <span class="carousel-control-next-icon"></span>
-  </button>
+.skeleton {
+    background-color: #e9ecef;
+    border-radius: .25rem;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton.img {
+    height: 180px;
+    margin-bottom: 1rem;
+}
+
+.skeleton.title {
+    height: 24px;
+    width: 70%;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton.text {
+    height: 16px;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton.text-short {
+    width: 50%;
+}
+
+.shimmer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(100deg, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0) 80%);
+    animation: shimmer 2s infinite linear;
+}
+
+.coming-soon-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    text-align: center;
+    z-index: 10;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+    /* Styling for the new animated 'Coming Soon' section */
+    .coming-soon-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        position: relative;
+        padding: 2rem;
+        color: white;
+    }
+
+    .coming-soon-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .coming-soon-card .lock-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .coming-soon-card .card-title-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #0d6efd; /* Bootstrap Primary Blue */
+        background: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<div class="hero-section text-white text-center" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat; height: 70vh; display: flex; align-items: center; justify-content: center;">
+    <div class="container">
+        <h1 class="display-3 fw-bold">Find & Connect With Local Businesses</h1>
+        <p class="lead mb-4">Your trusted guide to the best services, shops, and restaurants right in your neighborhood.</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <form action="/search" method="GET" class="d-flex gap-2 p-2 bg-white rounded-pill shadow-lg">
+                    <input type="text" name="query" class="form-control form-control-lg border-0" placeholder="What are you looking for? (e.g., 'cafe', 'bookstore')" required>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 d-flex align-items-center">
+                        <i data-lucide="search" class="me-2"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- 🔹 Featured Businesses -->
+<section class="py-5 text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-4">How It Works</h2>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <i data-lucide="search" class="text-primary mb-3" style="width:48px; height:48px;"></i>
+                        <h5 class="fw-bold">1. Search & Discover</h5>
+                        <p class="text-muted">Find exactly what you need with our powerful search and easy-to-browse categories.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                 <div class="card border-0">
+                    <div class="card-body">
+                        <i data-lucide="star" class="text-primary mb-3" style="width:48px; height:48px;"></i>
+                        <h5 class="fw-bold">2. View Ratings & Reviews</h5>
+                        <p class="text-muted">Read authentic reviews from real customers to make informed decisions.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                 <div class="card border-0">
+                    <div class="card-body">
+                         <i data-lucide="message-circle" class="text-primary mb-3" style="width:48px; height:48px;"></i>
+                        <h5 class="fw-bold">3. Connect & Visit</h5>
+                        <p class="text-muted">Get contact details and directions to connect with the best local businesses.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-5 shimmer-wrapper">
+    <div class="container" style="opacity: 0.5;">
+        <h2 class="fw-bold text-center mb-4 text-dark">Featured Businesses</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="skeleton-card">
+                    <div class="skeleton img"></div>
+                    <div class="skeleton title"></div>
+                    <div class="skeleton text"></div>
+                    <div class="skeleton text"></div>
+                    <div class="skeleton text text-short"></div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 d-none d-md-block">
+                <div class="skeleton-card">
+                    <div class="skeleton img"></div>
+                    <div class="skeleton title"></div>
+                    <div class="skeleton text"></div>
+                    <div class="skeleton text"></div>
+                    <div class="skeleton text text-short"></div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 d-none d-lg-block">
+                <div class="skeleton-card">
+                    <div class="skeleton img"></div>
+                    <div class="skeleton title"></div>
+                    <div class="skeleton text"></div>
+                    <div class="skeleton text"></div>
+                    <div class="skeleton text text-short"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="shimmer-overlay"></div>
+    
+    <div class="coming-soon-badge">
+        <i data-lucide="gem" class="mb-2"></i>
+        <h5 class="fw-bold">Premium 'Featured' Placements</h5>
+        <p class="mb-0 small">A new paid feature for businesses is coming soon!</p>
+    </div>
+</section>
 <section class="py-5">
   <div class="container">
-    <h2 class="h3 fw-bold text-center mb-5">Featured Businesses</h2>
+    <h2 class="fw-bold text-center mb-4">Top Rated by the Community</h2>
     <div class="row g-4">
-      <% if (business && business.length> 0) { %> <% business.forEach(b=> { %>
-      <div class="col-md-6 col-lg-4">
-        <div class="card h-100 shadow-sm border-0 hover-shadow transition">
-          <% if (b.Image && b.Image.url) { %>
-          <img
-            src="<%= b.Image.url %>"
-            class="card-img-top"
-            alt="<%= b.Name %>"
-          />
-          <% } else { %>
-          <img
-            src="https://via.placeholder.com/400x200?text=No+Image"
-            class="card-img-top"
-            alt="No image"
-          />
-          <% } %>
-          <div class="card-body">
-            <h5 class="card-title fw-bold"><%= b.Name %></h5>
-            <p class="text-primary small mb-1"><%= b.Category %></p>
-            <p class="text-muted small">
-              <%= b.description.substring(0, 80) %>...
-            </p>
-            <p class="small text-muted mb-1">
-              <i class="fa fa-map-marker-alt me-1"></i>
-              <%= b.address %>
-            </p>
-            <p class="small text-muted">
-              <i class="fa fa-phone me-1"></i>
-              <%= b.Contact %>
-            </p>
-          </div>
-          <div class="card-footer bg-transparent border-0">
-            <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100"
-              >View Details</a
-            >
+      <% if (topRatedBusinesses && topRatedBusinesses.length > 0) { %>
+        <% topRatedBusinesses.forEach(b => { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <img src="<%= (b.Image && b.Image.url) ? b.Image.url : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&auto=format&fit=crop&q=60' %>" class="card-img-top" alt="<%= b.Name %>" style="height: 200px; object-fit: cover;">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title fw-bold"><%= b.Name %></h5>
+              <p class="text-primary small mb-2"><%= b.Category %></p>
+              
+              <div class="d-flex align-items-center mb-3">
+                  <span class="badge bg-warning text-dark me-2">
+                      <i data-lucide="star" style="width:14px; height:14px; fill:currentColor;" class="me-1"></i><%= b.avgRating %>
+                  </span>
+                  <span class="text-muted small">(<%= b.reviewCount %> reviews)</span>
+              </div>
+
+              <p class="small text-muted mb-2 flex-grow-1"><i data-lucide="map-pin" class="me-2" style="width:16px;"></i> <%= b.address %></p>
+              <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100 mt-auto">View Details</a>
+            </div>
           </div>
         </div>
-      </div>
-      <% }) %> <% } else { %>
-      <p class="text-center text-muted">No businesses found.</p>
+        <% }) %>
+      <% } else { %>
+        <p class="text-center text-muted">No rated businesses found yet. Be the first to leave a review!</p>
       <% } %>
     </div>
   </div>
 </section>
 
-<!-- 🔹 Categories -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="h3 fw-bold text-center mb-5">Browse by Category</h2>
-    <div class="row g-4 text-center">
-      <div class="col-6 col-md-3">
-        <a
-          href="/discover?category=Coffee"
-          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
-        >
-          <div class="card-body">
-            <i class="fa fa-coffee fa-2x mb-3 text-primary"></i>
-            <h6 class="fw-semibold">Coffee & Tea</h6>
-          </div>
-        </a>
-      </div>
-      <div class="col-6 col-md-3">
-        <a
-          href="/discover?category=Retail"
-          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
-        >
-          <div class="card-body">
-            <i class="fa fa-shopping-bag fa-2x mb-3 text-success"></i>
-            <h6 class="fw-semibold">Retail</h6>
-          </div>
-        </a>
-      </div>
-      <div class="col-6 col-md-3">
-        <a
-          href="/discover?category=Food"
-          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
-        >
-          <div class="card-body">
-            <i class="fa fa-utensils fa-2x mb-3 text-warning"></i>
-            <h6 class="fw-semibold">Food</h6>
-          </div>
-        </a>
-      </div>
-      <div class="col-6 col-md-3">
-        <a
-          href="/discover?category=Books"
-          class="card h-100 shadow-sm border-0 text-dark text-decoration-none"
-        >
-          <div class="card-body">
-            <i class="fa fa-book fa-2x mb-3 text-info"></i>
-            <h6 class="fw-semibold">Books</h6>
-          </div>
-        </a>
-      </div>
+<section class="py-5" style="background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);">
+    <div class="container text-white">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">The Future of Localify is Bright</h2>
+            <p class="lead text-white-50">We're constantly working on new features to make discovering local businesses even better.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="coming-soon-card h-100">
+                    <div class="lock-icon"><i data-lucide="lock"></i></div>
+                    <div class="card-title-icon"><i data-lucide="tag"></i></div>
+                    <h5 class="fw-bold mb-3">Real-Time Deals & Offers</h5>
+                    <p class="text-white-50">Imagine getting live notifications for "happy hour" at a local cafe or a flash sale at your favorite boutique. This feature will bring exclusive, time-sensitive deals directly to you.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="coming-soon-card h-100">
+                    <div class="lock-icon"><i data-lucide="lock"></i></div>
+                    <div class="card-title-icon"><i data-lucide="message-circle"></i></div>
+                    <h5 class="fw-bold mb-3">Direct Business Messaging</h5>
+                    <p class="text-white-50">Need to ask if a restaurant is pet-friendly or if a shop has an item in stock? Soon you'll be able to chat directly and securely with business owners right from their listing page.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="coming-soon-card h-100">
+                     <div class="lock-icon"><i data-lucide="lock"></i></div>
+                    <div class="card-title-icon"><i data-lucide="calendar-check"></i></div>
+                    <h5 class="fw-bold mb-3">Integrated Appointment Booking</h5>
+                    <p class="text-white-50">Book your next haircut, dental check-up, or spa day without ever leaving our site. We're building a seamless booking system to save you time and hassle.</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="fw-bold">Are You a Business Owner?</h2>
+                <p class="lead text-muted my-3">Join our growing community of local businesses and connect with thousands of customers in your area.</p>
+                <a href="/new" class="btn btn-primary btn-lg mt-2">
+                    <i data-lucide="plus-circle" class="me-2"></i> List Your Business Today
+                </a>
+            </div>
+        </div>
+    </div>
 </section>

@@ -1,354 +1,515 @@
 <%- layout('/layouts/boilerplate') %>
 
-<style>
-    /* Styling for the animated 'Coming Soon' features */
+    <style>
+        /* Styling for the animated 'Coming Soon' features */
 
-    /* Keyframe for the glowing button animation */
-    @keyframes glow {
-      0%, 100% {
-        box-shadow: 0 0 5px rgba(var(--bs-primary-rgb), 0.2);
-      }
-      50% {
-        box-shadow: 0 0 20px rgba(var(--bs-primary-rgb), 0.5);
-      }
-    }
+        /* Keyframe for the glowing button animation */
+        @keyframes glow {
 
-    /* Keyframe for the floating lock icon animation */
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-6px);
-      }
-    }
+            0%,
+            100% {
+                box-shadow: 0 0 5px rgba(var(--bs-primary-rgb), 0.2);
+            }
 
-    /* Style for the glowing 'Admin Tools' button */
-    .coming-soon-btn {
-      position: relative;
-      cursor: not-allowed;
-      animation: glow 2.5s infinite ease-in-out;
-      transition: transform 0.2s ease-out; /* Added for smooth hover */
-    }
+            50% {
+                box-shadow: 0 0 20px rgba(var(--bs-primary-rgb), 0.5);
+            }
+        }
 
-    /* NEW: Hover effect for the button */
-    .coming-soon-btn:hover {
-        transform: translateY(-2px);
-    }
+        /* Keyframe for the floating lock icon animation */
+        @keyframes float {
 
-    .coming-soon-btn::after {
-      content: 'Soon';
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      padding: 2px 6px;
-      font-size: 0.65rem;
-      font-weight: bold;
-      color: white;
-      background-color: var(--bs-primary);
-      border-radius: 50px;
-      border: 2px solid white;
-    }
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
 
-    /* Style for the 'Coming Soon' stat cards */
-    .stat-coming-soon {
-        position: relative;
-        border-radius: var(--bs-card-border-radius);
-        overflow: hidden;
-    }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
 
-    .stat-coming-soon .stat-content-blur {
-        filter: blur(5px);
-        opacity: 0.6;
-        user-select: none;
-        pointer-events: none;
-    }
+        /* Style for the glowing 'Admin Tools' button */
+        .coming-soon-btn {
+            position: relative;
+            cursor: not-allowed;
+            animation: glow 2.5s infinite ease-in-out;
+            transition: transform 0.2s ease-out;
+            /* Added for smooth hover */
+        }
 
-    .stat-coming-soon .stat-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: var(--bs-primary);
-        font-weight: bold;
-        transition: background-color 0.2s ease-out; /* Added for smooth hover */
-    }
-    
-    /* NEW: Hover effect for the stat card overlay */
-    .stat-coming-soon:hover .stat-overlay {
-        background-color: rgba(248, 249, 250, 0.7);
-    }
+        /* NEW: Hover effect for the button */
+        .coming-soon-btn:hover {
+            transform: translateY(-2px);
+        }
 
-    .stat-coming-soon .stat-overlay i {
-        animation: float 2.5s infinite ease-in-out;
-    }
-</style>
+        .coming-soon-btn::after {
+            content: 'Soon';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            padding: 2px 6px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: white;
+            background-color: var(--bs-primary);
+            border-radius: 50px;
+            border: 2px solid white;
+        }
 
-<section class="py-4">
-    <div class="container-fluid">
-        <div class="row align-items-center mb-4">
-            <div class="col">
-                <h2 class="section-title mb-1">Admin Panel</h2>
-                <p class="text-muted mb-0">Manage users, businesses, and platform operations</p>
+        /* Style for the 'Coming Soon' stat cards */
+        .stat-coming-soon {
+            position: relative;
+            border-radius: var(--bs-card-border-radius);
+            overflow: hidden;
+        }
+
+        .stat-coming-soon .stat-content-blur {
+            filter: blur(5px);
+            opacity: 0.6;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .stat-coming-soon .stat-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-primary);
+            font-weight: bold;
+            transition: background-color 0.2s ease-out;
+            /* Added for smooth hover */
+        }
+
+        /* NEW: Hover effect for the stat card overlay */
+        .stat-coming-soon:hover .stat-overlay {
+            background-color: rgba(248, 249, 250, 0.7);
+        }
+
+        .stat-coming-soon .stat-overlay i {
+            animation: float 2.5s infinite ease-in-out;
+        }
+    </style>
+
+    <section class="py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center mb-4">
+                <div class="col">
+                    <h2 class="section-title mb-1">Admin Panel</h2>
+                    <p class="text-muted mb-0">Manage users, businesses, and platform operations</p>
+                </div>
+                <div class="col-auto">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary dropdown-toggle coming-soon-btn" type="button"
+                            title="This feature is coming soon!">
+                            <i data-lucide="settings" class="me-2"></i>
+                            Admin Tools
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i data-lucide="cog" class="me-2"
+                                        style="width: 16px; height: 16px;"></i>System Settings</a></li>
+                            <li><a class="dropdown-item" href="#"><i data-lucide="database" class="me-2"
+                                        style="width: 16px; height: 16px;"></i>Backup Data</a></li>
+                            <li><a class="dropdown-item" href="#"><i data-lucide="file-text" class="me-2"
+                                        style="width: 16px; height: 16px;"></i>View Logs</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-             <div class="col-auto">
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle coming-soon-btn" type="button" title="This feature is coming soon!">
-                        <i data-lucide="settings" class="me-2"></i>
-                        Admin Tools
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i data-lucide="cog" class="me-2" style="width: 16px; height: 16px;"></i>System Settings</a></li>
-                        <li><a class="dropdown-item" href="#"><i data-lucide="database" class="me-2" style="width: 16px; height: 16px;"></i>Backup Data</a></li>
-                        <li><a class="dropdown-item" href="#"><i data-lucide="file-text" class="me-2" style="width: 16px; height: 16px;"></i>View Logs</a></li>
+
+            <div class="row g-4 mb-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i data-lucide="users" class="text-primary mb-3" style="width: 48px; height: 48px;"></i>
+                            <h3 class="fw-bold text-primary">
+                                <%= stats.totalUsers %>
+                            </h3>
+                            <p class="text-muted mb-0">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i data-lucide="store" class="text-success mb-3" style="width: 48px; height: 48px;"></i>
+                            <h3 class="fw-bold text-success">
+                                <%= stats.activeVendors %>
+                            </h3>
+                            <p class="text-muted mb-0">Active Vendors</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i data-lucide="building" class="text-info mb-3" style="width: 48px; height: 48px;"></i>
+                            <h3 class="fw-bold text-info">
+                                <%= stats.totalBusinesses %>
+                            </h3>
+                            <p class="text-muted mb-0">Total Businesses</p>
+                            <% if(stats.pendingBusinesses> 0) { %>
+                                <div class="mt-2">
+                                    <span class="badge bg-warning">
+                                        <%= stats.pendingBusinesses %> pending
+                                    </span>
+                                </div>
+                                <% } %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i data-lucide="message-square" class="text-warning mb-3"
+                                style="width: 48px; height: 48px;"></i>
+                            <h3 class="fw-bold text-warning">
+                                <%= stats.totalReviews %>
+                            </h3>
+                            <p class="text-muted mb-0">Total Reviews</p>
+                            <div class="mt-2">
+                                <span class="badge bg-info">
+                                    <%= stats.averageRating %> avg rating
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0">
+                    <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users"
+                                type="button" role="tab">
+                                <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i> Manage Users
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="businesses-tab" data-bs-toggle="tab"
+                                data-bs-target="#businesses" type="button" role="tab">
+                                <i data-lucide="store" class="me-2" style="width: 16px; height: 16px;"></i> Manage
+                                Businesses
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports"
+                                type="button" role="tab">
+                                <i data-lucide="bar-chart" class="me-2" style="width: 16px; height: 16px;"></i> Reports
+                                & Analytics
+                            </button>
+                        </li>
                     </ul>
                 </div>
-            </div>
-        </div>
-        
-        <div class="row g-4 mb-5">
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i data-lucide="users" class="text-primary mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-primary"><%= stats.totalUsers %></h3>
-                        <p class="text-muted mb-0">Total Users</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i data-lucide="store" class="text-success mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-success"><%= stats.activeVendors %></h3>
-                        <p class="text-muted mb-0">Active Vendors</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i data-lucide="building" class="text-info mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-info"><%= stats.totalBusinesses %></h3>
-                        <p class="text-muted mb-0">Total Businesses</p>
-                        <% if(stats.pendingBusinesses > 0) { %>
-                        <div class="mt-2">
-                             <span class="badge bg-warning"><%= stats.pendingBusinesses %> pending</span>
-                        </div>
-                        <% } %>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body text-center">
-                        <i data-lucide="message-square" class="text-warning mb-3" style="width: 48px; height: 48px;"></i>
-                        <h3 class="fw-bold text-warning"><%= stats.totalReviews %></h3>
-                        <p class="text-muted mb-0">Total Reviews</p>
-                        <div class="mt-2">
-                             <span class="badge bg-info"><%= stats.averageRating %> avg rating</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-0">
-                <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
-                            <i data-lucide="users" class="me-2" style="width: 16px; height: 16px;"></i> Manage Users
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="businesses-tab" data-bs-toggle="tab" data-bs-target="#businesses" type="button" role="tab">
-                            <i data-lucide="store" class="me-2" style="width: 16px; height: 16px;"></i> Manage Businesses
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
-                            <i data-lucide="bar-chart" class="me-2" style="width: 16px; height: 16px;"></i> Reports & Analytics
-                        </button>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="tab-content" id="adminTabsContent">
-                    <div class="tab-pane fade show active" id="users" role="tabpanel">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Joined</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if(users.length > 0) { %>
-                                        <% for(let user of users) { %>
+                <div class="card-body">
+                    <div class="tab-content" id="adminTabsContent">
+                        <div class="tab-pane fade show active" id="users" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-circle bg-primary text-white me-3" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                                                        <%= user.username.charAt(0).toUpperCase() %>
-                                                    </div>
-                                                    <div class="fw-semibold"><%= user.username %></div>
-                                                </div>
-                                            </td>
-                                            <td><%= user.email %></td>
-                                            <td><span class="badge bg-<%= user.role === 'admin' ? 'danger' : user.role === 'vendor' ? 'info' : 'secondary' %> text-capitalize"><%= user.role %></span></td>
-                                            <td><span class="badge bg-<%= user.status === 'active' ? 'success' : 'warning' %> text-capitalize"><%= user.status %></span></td>
-                                            <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
-                                            <td></td>
+                                            <th>User</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Joined</th>
+                                            <th>Actions</th>
                                         </tr>
-                                        <% } %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="6" class="text-center text-muted">No users found.</td>
-                                        </tr>
-                                    <% } %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-pane fade" id="businesses" role="tabpanel">
-                       <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Business</th>
-                                        <th>Owner</th>
-                                        <th>Category</th>
-                                        <th>Status</th>
-                                        <th>Reviews</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if(businesses.length > 0) { %>
-                                        <% for(let business of businesses) { %>
-                                        <tr>
-                                            <td><a href="/show/<%= business._id %>" class="fw-semibold text-decoration-none" target="_blank"><%= business.Name %></a></td>
-                                            <td><%= business.Owner ? business.Owner.username : 'N/A' %></td>
-                                            <td><%= business.Category %></td>
-                                            <td><span class="badge bg-<%= business.status === 'active' ? 'success' : business.status === 'pending' ? 'warning' : 'danger' %> text-capitalize"><%= business.status %></span></td>
-                                            <td>
-                                                <% if (business.reviewCount > 0) { %>
-                                                <div class="d-flex align-items-center"><i data-lucide="star" class="text-warning me-1" style="width: 14px; height: 14px; fill: currentColor;"></i> <%= business.avgRating %> (<%= business.reviewCount %>)</div>
-                                                <% } else { %>
-                                                <span class="text-muted">No reviews</span>
+                                    </thead>
+                                    <tbody>
+                                        <% if(users.length> 0) { %>
+                                            <% for(let user of users) { %>
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar-circle bg-primary text-white me-3"
+                                                                style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                                                <%= user.username.charAt(0).toUpperCase() %>
+                                                            </div>
+                                                            <div class="fw-semibold">
+                                                                <%= user.username %>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <%= user.email %>
+                                                    </td>
+                                                    <td><span
+                                                            class="badge bg-<%= user.role === 'admin' ? 'danger' : user.role === 'vendor' ? 'info' : 'secondary' %> text-capitalize">
+                                                            <%= user.role %>
+                                                        </span></td>
+                                                    <td><span
+                                                            class="badge bg-<%= user.status === 'active' ? 'success' : 'warning' %> text-capitalize">
+                                                            <%= user.status %>
+                                                        </span></td>
+                                                    <td>
+                                                        <%= new Date(user.createdAt).toLocaleDateString() %>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
                                                 <% } %>
-                                            </td>
-                                            <td><%= new Date(business.createdAt).toLocaleDateString() %></td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                        Actions
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li>
-                                                            <a class="dropdown-item" href="/show/<%= business._id %>" target="_blank">
-                                                                <i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i> View Business
-                                                            </a>
-                                                        </li>
-                                                        <% if (business.status === 'pending') { %>
-                                                            <li>
-                                                                <form action="/admin/businesses/<%= business._id %>/approve?_method=PATCH" method="POST" class="d-inline">
-                                                                    <button type="submit" class="dropdown-item text-success">
-                                                                        <i data-lucide="check" class="me-2" style="width: 14px; height: 14px;"></i> Approve
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            <li>
-                                                                <button type="button" class="dropdown-item text-danger">
-                                                                    <i data-lucide="x" class="me-2" style="width: 14px; height: 14px;"></i> Reject
-                                                                </button>
-                                                            </li>
-                                                        <% } else if (business.status === 'active') { %>
-                                                            <li>
-                                                                <button type="button" class="dropdown-item text-warning">
-                                                                    <i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i> Suspend
-                                                                </button>
-                                                            </li>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="6" class="text-center text-muted">No users
+                                                                found.</td>
+                                                        </tr>
                                                         <% } %>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li>
-                                                            <button type="button" class="dropdown-item text-danger">
-                                                                <i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i> Delete
-                                                            </button>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <% } %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted">No businesses found.</td>
-                                        </tr>
-                                    <% } %>
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="tab-pane fade" id="reports" role="tabpanel">
-    <div class="row g-4">
-            <div class="col-md-6">
-            <div class="card border-0 bg-light">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3"><i data-lucide="trending-up" class="me-2 text-primary"></i> Growth Metrics</h6>
-                    <div class="row text-center">
-                        <div class="col-6"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-primary">+15%</div><small class="text-muted">User Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
-                        <div class="col-6"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-success">+22%</div><small class="text-muted">Business Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
-                        <div class="col-6 mt-3"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-info">+8%</div><small class="text-muted">Review Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
-                        <div class="col-6 mt-3"><div class="stat-coming-soon"><div class="stat-content-blur"><div class="fw-bold text-warning">+12%</div><small class="text-muted">Revenue Growth</small></div><div class="stat-overlay"><i data-lucide="lock" class="mb-1"></i><small>Coming Soon</small></div></div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card border-0 bg-light">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3"><i data-lucide="pie-chart" class="me-2 text-primary"></i> Category Distribution</h6>
-                    
-                    <% if(reports.categoryDistribution && reports.categoryDistribution.length > 0) { %>
-                        <% const colors = ['primary', 'success', 'info', 'warning', 'danger', 'secondary']; %>
-                        <% reports.categoryDistribution.forEach((category, index) => { %>
-                            <% const percentage = ((category.count / reports.totalBusinessesForPercentage) * 100).toFixed(0); %>
-                            <% const barColor = colors[index % colors.length]; %>
-                            <div class="mb-2">
-                                <div class="d-flex justify-content-between">
-                                    <span><%= category._id %></span>
-                                    <span><%= percentage %>%</span>
+
+                        <div class="tab-pane fade" id="businesses" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Business</th>
+                                            <th>Owner</th>
+                                            <th>Category</th>
+                                            <th>Status</th>
+                                            <th>Reviews</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if(businesses.length> 0) { %>
+                                            <% for(let business of businesses) { %>
+                                                <tr>
+                                                    <td><a href="/show/<%= business._id %>"
+                                                            class="fw-semibold text-decoration-none" target="_blank">
+                                                            <%= business.Name %>
+                                                        </a></td>
+                                                    <td>
+                                                        <%= business.Owner ? business.Owner.username : 'N/A' %>
+                                                    </td>
+                                                    <td>
+                                                        <%= business.Category %>
+                                                    </td>
+                                                    <td><span
+                                                            class="badge bg-<%= business.status === 'active' ? 'success' : business.status === 'pending' ? 'warning' : 'danger' %> text-capitalize">
+                                                            <%= business.status %>
+                                                        </span></td>
+                                                    <td>
+                                                        <% if (business.reviewCount> 0) { %>
+                                                            <div class="d-flex align-items-center"><i data-lucide="star"
+                                                                    class="text-warning me-1"
+                                                                    style="width: 14px; height: 14px; fill: currentColor;"></i>
+                                                                <%= business.avgRating %> (<%= business.reviewCount %>)
+                                                            </div>
+                                                            <% } else { %>
+                                                                <span class="text-muted">No reviews</span>
+                                                                <% } %>
+                                                    </td>
+                                                    <td>
+                                                        <%= new Date(business.createdAt).toLocaleDateString() %>
+                                                    </td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button
+                                                                class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                                                                type="button" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
+                                                                Actions
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="/show/<%= business._id %>"
+                                                                        target="_blank">
+                                                                        <i data-lucide="eye" class="me-2"
+                                                                            style="width: 14px; height: 14px;"></i> View
+                                                                        Business
+                                                                    </a>
+                                                                </li>
+
+                                                                <% if (business.status==='pending' ) { %>
+                                                                    <li>
+                                                                        <form
+                                                                            action="/admin/businesses/<%= business._id %>/approve?_method=PATCH"
+                                                                            method="POST" class="d-inline">
+                                                                            <button type="submit"
+                                                                                class="dropdown-item text-success">
+                                                                                <i data-lucide="check" class="me-2"
+                                                                                    style="width: 14px; height: 14px;"></i>
+                                                                                Approve
+                                                                            </button>
+                                                                        </form>
+                                                                    </li>
+                                                                    <li>
+                                                                        <form
+                                                                            action="/admin/businesses/<%= business._id %>/reject?_method=DELETE"
+                                                                            method="POST"
+                                                                            onsubmit="return confirm('Are you sure you want to permanently reject this business? This action cannot be undone.');">
+                                                                            <button type="submit"
+                                                                                class="dropdown-item text-danger">
+                                                                                <i data-lucide="x" class="me-2"
+                                                                                    style="width: 14px; height: 14px;"></i>
+                                                                                Reject
+                                                                            </button>
+                                                                        </form>
+                                                                    </li>
+                                                                    <% } else if (business.status==='active' ) { %>
+                                                                        <li>
+                                                                            <form
+                                                                                action="/admin/businesses/<%= business._id %>/suspend?_method=PATCH"
+                                                                                method="POST"
+                                                                                onsubmit="return confirm('Are you sure you want to suspend this business? It will be hidden from the public.');">
+                                                                                <button type="submit"
+                                                                                    class="dropdown-item text-warning">
+                                                                                    <i data-lucide="pause-circle"
+                                                                                        class="me-2"
+                                                                                        style="width: 14px; height: 14px;"></i>
+                                                                                    Suspend
+                                                                                </button>
+                                                                            </form>
+                                                                        </li>
+                                                                        <% } else if (business.status==='suspended' ) {
+                                                                            %>
+                                                                            <li>
+                                                                                <form
+                                                                                    action="/admin/businesses/<%= business._id %>/reactivate?_method=PATCH"
+                                                                                    method="POST"
+                                                                                    onsubmit="return confirm('Are you sure you want to re-activate this business? It will become public again.');">
+                                                                                    <button type="submit"
+                                                                                        class="dropdown-item text-success">
+                                                                                        <i data-lucide="play-circle"
+                                                                                            class="me-2"
+                                                                                            style="width: 14px; height: 14px;"></i>
+                                                                                        Re-activate
+                                                                                    </button>
+                                                                                </form>
+                                                                            </li>
+                                                                            <% } %>
+
+                                                                                <li>
+                                                                                    <hr class="dropdown-divider">
+                                                                                </li>
+
+                                                                                <li>
+    <form action="/admin/businesses/<%= business._id %>?_method=DELETE" method="POST" onsubmit="return confirm('WARNING: This will permanently delete the business and all of its reviews. Are you absolutely sure?');">
+        <button type="submit" class="dropdown-item text-danger">
+            <i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i> Delete
+        </button>
+    </form>
+</li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="7" class="text-center text-muted">No businesses
+                                                                found.</td>
+                                                        </tr>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="reports" role="tabpanel">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3"><i data-lucide="trending-up"
+                                                    class="me-2 text-primary"></i> Growth Metrics</h6>
+                                            <div class="row text-center">
+                                                <div class="col-6">
+                                                    <div class="stat-coming-soon">
+                                                        <div class="stat-content-blur">
+                                                            <div class="fw-bold text-primary">+15%</div><small
+                                                                class="text-muted">User Growth</small>
+                                                        </div>
+                                                        <div class="stat-overlay"><i data-lucide="lock"
+                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="stat-coming-soon">
+                                                        <div class="stat-content-blur">
+                                                            <div class="fw-bold text-success">+22%</div><small
+                                                                class="text-muted">Business Growth</small>
+                                                        </div>
+                                                        <div class="stat-overlay"><i data-lucide="lock"
+                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mt-3">
+                                                    <div class="stat-coming-soon">
+                                                        <div class="stat-content-blur">
+                                                            <div class="fw-bold text-info">+8%</div><small
+                                                                class="text-muted">Review Growth</small>
+                                                        </div>
+                                                        <div class="stat-overlay"><i data-lucide="lock"
+                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mt-3">
+                                                    <div class="stat-coming-soon">
+                                                        <div class="stat-content-blur">
+                                                            <div class="fw-bold text-warning">+12%</div><small
+                                                                class="text-muted">Revenue Growth</small>
+                                                        </div>
+                                                        <div class="stat-overlay"><i data-lucide="lock"
+                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar bg-<%= barColor %>" role="progressbar" style="width: <%= percentage %>%;"></div>
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3"><i data-lucide="pie-chart"
+                                                    class="me-2 text-primary"></i> Category Distribution</h6>
+
+                                            <% if(reports.categoryDistribution && reports.categoryDistribution.length>
+                                                0) { %>
+                                                <% const colors=['primary', 'success' , 'info' , 'warning' , 'danger'
+                                                    , 'secondary' ]; %>
+                                                    <% reports.categoryDistribution.forEach((category, index)=> { %>
+                                                        <% const percentage=((category.count /
+                                                            reports.totalBusinessesForPercentage) * 100).toFixed(0); %>
+                                                            <% const barColor=colors[index % colors.length]; %>
+                                                                <div class="mb-2">
+                                                                    <div class="d-flex justify-content-between">
+                                                                        <span>
+                                                                            <%= category._id %>
+                                                                        </span>
+                                                                        <span>
+                                                                            <%= percentage %>%
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="progress" style="height: 6px;">
+                                                                        <div class="progress-bar bg-<%= barColor %>"
+                                                                            role="progressbar"
+                                                                            style="width: <%= percentage %>%;"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <% }); %>
+                                                                    <% } else { %>
+                                                                        <p class="text-muted">No business data
+                                                                            available.</p>
+                                                                        <% } %>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        <% }); %>
-                    <% } else { %>
-                        <p class="text-muted">No business data available.</p>
-                    <% } %>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</section>
-<script>
-    lucide.createIcons();
-</script>
+                        </div>
+    </section>
+    <script>
+        lucide.createIcons();
+    </script>
