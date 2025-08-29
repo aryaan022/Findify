@@ -36,6 +36,10 @@ app.use(
     secret: "YourScevretKEy",
     resave: false,
     saveUninitialized: true,
+     store: MongoStore.create({
+      mongoUrl: process.env.DB_URL,   // Use your actual connection string
+      touchAfter: 24 * 3600 // time period in seconds
+    }),
     cookie: {
       expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days 24hours 60 min 60 sec 1000 millisecond
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
