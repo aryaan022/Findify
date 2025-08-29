@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== "production") {
 const geocodingClient = require("./mapbox"); // we made this file earlier
 const express = require("express");
 const app = express();
+const MongoStore = require('connect-mongo');
 const path = require("path");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
