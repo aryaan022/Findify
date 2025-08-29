@@ -13,6 +13,7 @@ const UserSchema = new Schema({
         enum:["user","Vendor","admin"],
         default:"user"
     },
+    
     favorites:[{
         type:Schema.Types.ObjectId,
         ref:"Business"

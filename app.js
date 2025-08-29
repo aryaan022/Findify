@@ -480,6 +480,40 @@ app.post("/show/:id/reviews/:reviewId/edit", isLoggedIn, async (req, res) => {
 });
 
 
+
+
+
+//admin dashboard work
+app.get("/admin",(req,res)=>{
+  res.render("admin-dashboard.ejs")
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // 404 handler - catch unmatched routes
 app.use((req, res, next) => {
   res.status(404);

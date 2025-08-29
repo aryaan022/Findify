@@ -1,38 +1,102 @@
-<%- include('boilerplate', { title: 'Admin Panel - Local Business Finder' }) %>
+<%- layout('/layouts/boilerplate') %>
+<style>
+    /* Styling for the animated 'Coming Soon' features */
 
+/* Keyframe for the glowing button animation */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--bs-primary-rgb), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--bs-primary-rgb), 0.5);
+  }
+}
+
+/* Keyframe for the floating lock icon animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Style for the glowing 'Admin Tools' button */
+.coming-soon-btn {
+  position: relative;
+  cursor: not-allowed;
+  animation: glow 2.5s infinite ease-in-out;
+}
+
+.coming-soon-btn::after {
+  content: 'Soon';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: white;
+  background-color: var(--bs-primary);
+  border-radius: 50px;
+  border: 2px solid white;
+}
+
+/* NEW: Style for the 'Revenue Growth' coming soon stat card */
+.stat-coming-soon {
+    position: relative;
+    border-radius: var(--bs-card-border-radius);
+    overflow: hidden;
+}
+
+.stat-coming-soon .stat-content-blur {
+    filter: blur(5px);
+    opacity: 0.6;
+    user-select: none;
+    pointer-events: none;
+}
+
+.stat-coming-soon .stat-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--bs-primary);
+    font-weight: bold;
+}
+
+.stat-coming-soon .stat-overlay i {
+    animation: float 2.5s infinite ease-in-out;
+}
+</style>
 <section class="py-4">
     <div class="container-fluid">
-        <!-- Header -->
-        <div class="row align-items-center mb-4">
+        <div class="row align-items: center mb-4">
             <div class="col">
                 <h2 class="section-title mb-1">Admin Panel</h2>
                 <p class="text-muted mb-0">Manage users, businesses, and platform operations</p>
             </div>
             <div class="col-auto">
                 <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle coming-soon-btn" type="button" title="This feature is coming soon!">
                         <i data-lucide="settings" class="me-2"></i>
                         Admin Tools
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/admin/settings">
-                            <i data-lucide="cog" class="me-2" style="width: 16px; height: 16px;"></i>
-                            System Settings
-                        </a></li>
-                        <li><a class="dropdown-item" href="/admin/backup">
-                            <i data-lucide="database" class="me-2" style="width: 16px; height: 16px;"></i>
-                            Backup Data
-                        </a></li>
-                        <li><a class="dropdown-item" href="/admin/logs">
-                            <i data-lucide="file-text" class="me-2" style="width: 16px; height: 16px;"></i>
-                            View Logs
-                        </a></li>
+                        <li><a class="dropdown-item" href="#"><i data-lucide="cog" class="me-2" style="width: 16px; height: 16px;"></i>System Settings</a></li>
+                        <li><a class="dropdown-item" href="#"><i data-lucide="database" class="me-2" style="width: 16px; height: 16px;"></i>Backup Data</a></li>
+                        <li><a class="dropdown-item" href="#"><i data-lucide="file-text" class="me-2" style="width: 16px; height: 16px;"></i>View Logs</a></li>
                     </ul>
                 </div>
             </div>
         </div>
         
-        <!-- Reports Overview -->
         <div class="row g-4 mb-5">
             <div class="col-lg-3 col-md-6">
                 <div class="card border-0 shadow-sm">
@@ -84,7 +148,6 @@
             </div>
         </div>
         
-        <!-- Admin Tabs -->
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white border-0">
                 <ul class="nav nav-tabs card-header-tabs" id="adminTabs" role="tablist">
@@ -110,7 +173,6 @@
             </div>
             <div class="card-body">
                 <div class="tab-content" id="adminTabsContent">
-                    <!-- Users Tab -->
                     <div class="tab-pane fade show active" id="users" role="tabpanel">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h5 class="fw-bold mb-0">User Management</h5>
@@ -142,13 +204,13 @@
                                 </thead>
                                 <tbody>
                                     <% 
-                                    const users = [
-                                        { id: 1, username: "john_doe", email: "john@example.com", role: "user", status: "active", joined: "Jan 15, 2024", businesses: 0 },
-                                        { id: 2, username: "sarah_biz", email: "sarah@brewbean.com", role: "vendor", status: "active", joined: "Dec 8, 2023", businesses: 3 },
-                                        { id: 3, username: "mike_owner", email: "mike@greengarder.com", role: "vendor", status: "active", joined: "Nov 20, 2023", businesses: 2 },
-                                        { id: 4, username: "admin_user", email: "admin@localbiz.com", role: "admin", status: "active", joined: "Oct 1, 2023", businesses: 0 },
-                                        { id: 5, username: "jane_customer", email: "jane@example.com", role: "user", status: "inactive", joined: "Feb 3, 2024", businesses: 0 }
-                                    ];
+                                        const users = [
+                                            { id: 1, username: "john_doe", email: "john@example.com", role: "user", status: "active", joined: "Jan 15, 2024", businesses: 0 },
+                                            { id: 2, username: "sarah_biz", email: "sarah@brewbean.com", role: "vendor", status: "active", joined: "Dec 8, 2023", businesses: 3 },
+                                            { id: 3, username: "mike_owner", email: "mike@greengarder.com", role: "vendor", status: "active", joined: "Nov 20, 2023", businesses: 2 },
+                                            { id: 4, username: "admin_user", email: "admin@localbiz.com", role: "admin", status: "active", joined: "Oct 1, 2023", businesses: 0 },
+                                            { id: 5, username: "jane_customer", email: "jane@example.com", role: "user", status: "inactive", joined: "Feb 3, 2024", businesses: 0 }
+                                        ];
                                     %>
                                     
                                     <% users.forEach(user => { %>
@@ -184,30 +246,15 @@
                                                     Actions
                                                 </button>
                                                 <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>">
-                                                        <i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        View Details
-                                                    </a></li>
-                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>/edit">
-                                                        <i data-lucide="edit" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Edit User
-                                                    </a></li>
+                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>"><i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i> View Details</a></li>
+                                                    <li><a class="dropdown-item" href="/admin/user/<%= user.id %>/edit"><i data-lucide="edit" class="me-2" style="width: 14px; height: 14px;"></i> Edit User</a></li>
                                                     <% if (user.status === 'active') { %>
-                                                    <li><a class="dropdown-item text-warning" href="#" onclick="suspendUser(<%= user.id %>)">
-                                                        <i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Suspend
-                                                    </a></li>
+                                                        <li><a class="dropdown-item text-warning" href="#" onclick="suspendUser(<%= user.id %>)"><i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i> Suspend</a></li>
                                                     <% } else { %>
-                                                    <li><a class="dropdown-item text-success" href="#" onclick="activateUser(<%= user.id %>)">
-                                                        <i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Activate
-                                                    </a></li>
+                                                        <li><a class="dropdown-item text-success" href="#" onclick="activateUser(<%= user.id %>)"><i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i> Activate</a></li>
                                                     <% } %>
                                                     <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(<%= user.id %>, '<%= user.username %>')">
-                                                        <i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Delete
-                                                    </a></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(<%= user.id %>, '<%= user.username %>')"><i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i> Delete</a></li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -218,7 +265,6 @@
                         </div>
                     </div>
                     
-                    <!-- Businesses Tab -->
                     <div class="tab-pane fade" id="businesses" role="tabpanel">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h5 class="fw-bold mb-0">Business Management</h5>
@@ -253,13 +299,13 @@
                                 </thead>
                                 <tbody>
                                     <% 
-                                    const businesses = [
-                                        { id: 1, name: "Brew & Bean Coffee", owner: "sarah_biz", category: "Coffee Shop", status: "active", rating: 4.8, reviews: 124, created: "Dec 8, 2023" },
-                                        { id: 2, name: "Green Garden Bistro", owner: "mike_owner", category: "Restaurant", status: "active", rating: 4.6, reviews: 89, created: "Nov 20, 2023" },
-                                        { id: 3, name: "Style Central", owner: "sarah_biz", category: "Retail", status: "pending", rating: 0, reviews: 0, created: "Feb 15, 2024" },
-                                        { id: 4, name: "The Book Nook", owner: "book_lover", category: "Bookstore", status: "active", rating: 4.9, reviews: 67, created: "Jan 10, 2024" },
-                                        { id: 5, name: "Quick Burger Joint", owner: "fast_food_owner", category: "Restaurant", status: "suspended", rating: 3.2, reviews: 45, created: "Oct 5, 2023" }
-                                    ];
+                                        const businesses = [
+                                            { id: 1, name: "Brew & Bean Coffee", owner: "sarah_biz", category: "Coffee Shop", status: "active", rating: 4.8, reviews: 124, created: "Dec 8, 2023" },
+                                            { id: 2, name: "Green Garden Bistro", owner: "mike_owner", category: "Restaurant", status: "active", rating: 4.6, reviews: 89, created: "Nov 20, 2023" },
+                                            { id: 3, name: "Style Central", owner: "sarah_biz", category: "Retail", status: "pending", rating: 0, reviews: 0, created: "Feb 15, 2024" },
+                                            { id: 4, name: "The Book Nook", owner: "book_lover", category: "Bookstore", status: "active", rating: 4.9, reviews: 67, created: "Jan 10, 2024" },
+                                            { id: 5, name: "Quick Burger Joint", owner: "fast_food_owner", category: "Restaurant", status: "suspended", rating: 3.2, reviews: 45, created: "Oct 5, 2023" }
+                                        ];
                                     %>
                                     
                                     <% businesses.forEach(business => { %>
@@ -277,12 +323,12 @@
                                         </td>
                                         <td>
                                             <% if (business.rating > 0) { %>
-                                                <div class="d-flex align-items-center">
-                                                    <i data-lucide="star" class="text-warning me-1" style="width: 14px; height: 14px;"></i>
-                                                    <span><%= business.rating %> (<%= business.reviews %>)</span>
-                                                </div>
+                                            <div class="d-flex align-items-center">
+                                                <i data-lucide="star" class="text-warning me-1" style="width: 14px; height: 14px;"></i>
+                                                <span><%= business.rating %> (<%= business.reviews %>)</span>
+                                            </div>
                                             <% } else { %>
-                                                <span class="text-muted">No reviews</span>
+                                            <span class="text-muted">No reviews</span>
                                             <% } %>
                                         </td>
                                         <td><%= business.created %></td>
@@ -292,35 +338,17 @@
                                                     Actions
                                                 </button>
                                                 <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="/business/<%= business.id %>">
-                                                        <i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        View Business
-                                                    </a></li>
+                                                    <li><a class="dropdown-item" href="/business/<%= business.id %>"><i data-lucide="eye" class="me-2" style="width: 14px; height: 14px;"></i> View Business</a></li>
                                                     <% if (business.status === 'pending') { %>
-                                                    <li><a class="dropdown-item text-success" href="#" onclick="approveBusiness(<%= business.id %>)">
-                                                        <i data-lucide="check" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Approve
-                                                    </a></li>
-                                                    <li><a class="dropdown-item text-danger" href="#" onclick="rejectBusiness(<%= business.id %>)">
-                                                        <i data-lucide="x" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Reject
-                                                    </a></li>
+                                                        <li><a class="dropdown-item text-success" href="#" onclick="approveBusiness(<%= business.id %>)"><i data-lucide="check" class="me-2" style="width: 14px; height: 14px;"></i> Approve</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#" onclick="rejectBusiness(<%= business.id %>)"><i data-lucide="x" class="me-2" style="width: 14px; height: 14px;"></i> Reject</a></li>
                                                     <% } else if (business.status === 'active') { %>
-                                                    <li><a class="dropdown-item text-warning" href="#" onclick="suspendBusiness(<%= business.id %>)">
-                                                        <i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Suspend
-                                                    </a></li>
+                                                        <li><a class="dropdown-item text-warning" href="#" onclick="suspendBusiness(<%= business.id %>)"><i data-lucide="pause-circle" class="me-2" style="width: 14px; height: 14px;"></i> Suspend</a></li>
                                                     <% } else { %>
-                                                    <li><a class="dropdown-item text-success" href="#" onclick="reactivateBusiness(<%= business.id %>)">
-                                                        <i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Reactivate
-                                                    </a></li>
+                                                        <li><a class="dropdown-item text-success" href="#" onclick="reactivateBusiness(<%= business.id %>)"><i data-lucide="play-circle" class="me-2" style="width: 14px; height: 14px;"></i> Reactivate</a></li>
                                                     <% } %>
                                                     <li><hr class="dropdown-divider"></li>
-                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteBusiness(<%= business.id %>, '<%= business.name %>')">
-                                                        <i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i>
-                                                        Delete
-                                                    </a></li>
+                                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteBusiness(<%= business.id %>, '<%= business.name %>')"><i data-lucide="trash-2" class="me-2" style="width: 14px; height: 14px;"></i> Delete</a></li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -331,7 +359,6 @@
                         </div>
                     </div>
                     
-                    <!-- Reports Tab -->
                     <div class="tab-pane fade" id="reports" role="tabpanel">
                         <h5 class="fw-bold mb-4">Reports & Analytics</h5>
                         
@@ -357,14 +384,21 @@
                                                 <small class="text-muted">Review Growth</small>
                                             </div>
                                             <div class="col-6">
-                                                <div class="fw-bold text-warning">+12%</div>
-                                                <small class="text-muted">Revenue Growth</small>
+                                                <div class="stat-coming-soon">
+                                                    <div class="stat-content-blur">
+                                                        <div class="fw-bold text-warning">+12%</div>
+                                                        <small class="text-muted">Revenue Growth</small>
+                                                    </div>
+                                                    <div class="stat-overlay">
+                                                        <i data-lucide="lock" class="mb-1"></i>
+                                                        <small>Coming Soon</small>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="col-md-6">
                                 <div class="card border-0 bg-light">
                                     <div class="card-body">
