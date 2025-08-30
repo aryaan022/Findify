@@ -1,167 +1,183 @@
 <%- layout("/layouts/boilerplate") %>
 
 <style>
-    /* Styles for interactive form fields */
-    .form-group .form-control {
-        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    .form-group:focus-within label i {
-        color: var(--bs-primary);
-    }
-    .form-group:focus-within .form-control {
-        border-color: var(--bs-primary);
-        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
-    }
-    
-    /* Style for the submit button hover effect */
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(var(--bs-primary-rgb), 0.3);
+    html, body {
+        height: 100%;
+        overflow-x: hidden;
     }
 
-    /* NEW: Styling for the animated 'Coming Soon' button */
-    @keyframes pulse-glow {
-      0%, 100% {
-        box-shadow: 0 0 8px rgba(var(--bs-secondary-rgb), 0.2);
-      }
-      50% {
-        box-shadow: 0 0 16px rgba(var(--bs-secondary-rgb), 0.4);
-      }
+    .contact-wrapper {
+        display: flex;
+        width: 100%;
+        min-height: calc(100vh - 70px);
     }
-    .btn-coming-soon {
+
+    /* === LEFT PANEL (Contact Info) === */
+    .contact-info-panel {
+        flex: 0 0 45%;
+        background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1554755229-ca4470e22cb8?q=80&w=1887&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        animation: slideInFromLeft 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    .contact-info-panel h1 { font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    .contact-info-panel p { color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; }
+    .info-item { display: flex; align-items: center; margin-bottom: 1.5rem; opacity: 0; animation: fadeInUp 0.8s ease-out forwards; }
+    .info-item i { flex-shrink: 0; }
+    .info-item span { color: rgba(255, 255, 255, 0.8); }
+
+    /* === NEW: Styles for Locked Items === */
+    .locked-item {
+        position: relative;
         cursor: not-allowed;
-        animation: pulse-glow 2.5s infinite ease-in-out;
+    }
+    .locked-item .locked-content {
+        filter: blur(2px);
+        opacity: 0.5;
+        transition: filter 0.3s ease, opacity 0.3s ease;
+    }
+    .lock-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    .lock-icon {
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .locked-item:hover .lock-icon {
+        animation: jiggle 0.5s ease-in-out;
+    }
+
+    @keyframes jiggle {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-5deg); }
+        75% { transform: rotate(5deg); }
+    }
+    /* === END NEW STYLES === */
+
+    /* === RIGHT PANEL (Form) === */
+    .contact-form-panel {
+        flex: 1;
+        padding: 4rem;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        animation: slideInFromRight 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+        background-color: #fff;
+        padding: 0 0.25rem;
+        color: var(--bs-primary);
+    }
+    .btn-submit {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    }
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 20px rgba(var(--bs-primary-rgb), 0.3);
+    }
+
+    /* === ANIMATIONS === */
+    @keyframes slideInFromLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+    @keyframes slideInFromRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 992px) {
+        .contact-wrapper { flex-direction: column; }
+        .contact-info-panel, .contact-form-panel { padding: 2rem; }
     }
 </style>
 
-<section class="py-5 text-center bg-light fade-in-section">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <h1 class="display-4 fw-bold text-gradient mb-3">Get in Touch</h1>
-                <p class="lead text-muted">
-                    Have questions, feedback, or need support? We'd love to hear from you. 
-                    Our team is here to help you succeed.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
+<div class="contact-wrapper">
+    <div class="contact-info-panel">
+        <h1 class="display-5 mb-3" style="animation-delay: 0.2s;">Contact Us</h1>
+        <p class="mb-5" style="animation-delay: 0.4s;">We're here to help. Reach out to us anytime and we'll happily answer your questions.</p>
 
-<section class="py-5 fade-in-section" style="animation-delay: 0.2s;">
-    <div class="container">
-        <div class="row g-5">
-            <div class="col-lg-8">
-                <div class="card shadow-lg border-0 h-100">
-                    <div class="card-body p-4 p-md-5">
-                        <h3 class="fw-bold mb-4">Send Us a Message</h3>
-                        <form action="/contact" method="POST" id="contactForm">
-                            <div class="row g-4">
-                                <div class="col-md-6 form-group">
-                                    <label for="firstName" class="form-label"><i data-lucide="user" class="me-1"></i> First Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="e.g., John" required>
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="lastName" class="form-label"><i data-lucide="user" class="me-1"></i> Last Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="e.g., Doe" required>
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="email" class="form-label"><i data-lucide="mail" class="me-1"></i> Email Address <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" required>
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="phone" class="form-label"><i data-lucide="phone" class="me-1"></i> Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="(Optional)">
-                                </div>
-                                <div class="col-12 form-group">
-                                    <label for="subject" class="form-label"><i data-lucide="tag" class="me-1"></i> Subject <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="subject" name="subject" required>
-                                        <option value="">Please select a subject</option>
-                                        <option value="general">General Inquiry</option>
-                                        <option value="support">Technical Support</option>
-                                        <option value="business">Business Partnership</option>
-                                        <option value="feedback">Feedback & Suggestions</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="col-12 form-group">
-                                    <label for="message" class="form-label"><i data-lucide="message-square" class="me-1"></i> Message <span class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="message" name="message" rows="5" placeholder="Tell us how we can help you..." required></textarea>
-                                </div>
-                                <div class="col-12">
-                                    <div class="d-grid">
-                                        <button type="button" class="btn btn-secondary btn-lg btn-coming-soon" disabled 
-                                                data-bs-toggle="tooltip" data-bs-placement="top" 
-                                                title="Our team is working on it!">
-                                            <i data-lucide="lock" class="me-2"></i> Coming Soon
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+        <div class="info-item" style="animation-delay: 0.6s;">
+            <i data-lucide="map-pin" class="text-primary me-4"></i>
+            <div>
+                <strong class="d-block">Our Office</strong>
+                <span class="text-white-50">Lovely Professional University, Jalandhar Punjab, India</span>
+            </div>
+        </div>
+
+        <div class="info-item locked-item" style="animation-delay: 0.8s;" 
+             data-bs-toggle="tooltip" data-bs-placement="top" 
+             title="Our team is working on that!">
+            <div class="locked-content">
+                <i data-lucide="mail" class="text-primary me-4"></i>
+                <div>
+                    <strong class="d-block">Email Us</strong>
+                    <span class="text-decoration-none">@findify.live</span>
                 </div>
             </div>
-            
-            <div class="col-lg-4">
-                <div class="bg-light p-4 rounded-3 h-100">
-                    <h4 class="fw-bold mb-4">Contact Details</h4>
-                    <div class="d-flex mb-4">
-                        <i data-lucide="map-pin" class="text-primary me-3 mt-1" style="width: 20px;"></i>
-                        <div>
-                            <strong class="d-block">Our Office</strong>
-                            <span class="text-muted small">Lovely Professional University<br>Jalandhar Punjab, India</span>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-4">
-                        <i data-lucide="mail" class="text-primary me-3 mt-1" style="width: 20px;"></i>
-                        <div>
-                            <strong class="d-block">Email Us</strong>
-                            <a href="mailto:support@Findify.com" class="text-muted text-decoration-none small">support@Findify.com</a>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-4">
-                        <i data-lucide="phone" class="text-primary me-3 mt-1" style="width: 20px;"></i>
-                        <div>
-                            <strong class="d-block">Call Us</strong>
-                            <a href="tel:+917037169747" class="text-muted text-decoration-none small">+91 7037169747</a>
-                        </div>
-                    </div>
-                    <hr>
-                    <h6 class="fw-bold mb-3">Follow Us</h6>
-                    <div class="d-flex gap-2">
-                        <a href="#" class="btn btn-outline-secondary btn-sm"><i data-lucide="facebook"></i></a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm"><i data-lucide="twitter"></i></a>
-                        <a href="https://www.instagram.com/findify_official/" class="btn btn-outline-secondary btn-sm"><i data-lucide="instagram"></i></a>
-                        <a href="www.linkedin.com/in/aryan022" class="btn btn-outline-secondary btn-sm"><i data-lucide="linkedin"></i></a>
-                    </div>
+            <div class="lock-overlay">
+                <i data-lucide="lock" class="lock-icon"></i>
+            </div>
+        </div>
+        
+        <div class="info-item locked-item" style="animation-delay: 1s;"
+             data-bs-toggle="tooltip" data-bs-placement="top" 
+             title="Our team is working on that!">
+            <div class="locked-content">
+                <i data-lucide="phone" class="text-primary me-4"></i>
+                <div>
+                    <strong class="d-block">Call Us</strong>
+                    <span class="text-decoration-none">+91 99999999</span>
                 </div>
+            </div>
+            <div class="lock-overlay">
+                <i data-lucide="lock" class="lock-icon"></i>
             </div>
         </div>
     </div>
-</section>
+
+    <div class="contact-form-panel">
+        <h2 class="fw-bold mb-4">Send a Message</h2>
+        <form action="/contact" method="POST" id="contactForm">
+            <div class="row g-3">
+                <div class="col-md-6 form-floating mb-3"><input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required><label for="firstName">First Name <span class="text-danger">*</span></label></div>
+                <div class="col-md-6 form-floating mb-3"><input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required><label for="lastName">Last Name <span class="text-danger">*</span></label></div>
+                <div class="col-12 form-floating mb-3"><input type="email" class="form-control" id="email" name="email" placeholder="Email Address" required><label for="email">Email Address <span class="text-danger">*</span></label></div>
+                <div class="col-12 form-floating mb-3"><select class="form-select" id="subject" name="subject" required><option value="" selected disabled>Please select a subject</option><option value="General Inquiry">General Inquiry</option><option value="Technical Support">Technical Support</option><option value="Business Partnership">Business Partnership</option></select><label for="subject">Subject <span class="text-danger">*</span></label></div>
+                <div class="col-12 form-floating mb-3"><textarea class="form-control" id="message" name="message" rows="5" placeholder="Message" required style="height: 120px;"></textarea><label for="message">Your Message <span class="text-danger">*</span></label></div>
+                <div class="col-12"><button type="submit" id="submitBtn" class="btn btn-primary btn-lg btn-submit w-100"><span class="btn-text"><i data-lucide="send" class="me-2"></i> Send Message</span><span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span></button></div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
-    // Initialize Lucide icons
     lucide.createIcons();
-    
-    // NEW: Initialize Bootstrap Tooltips for the hover effect
+
+    const contactForm = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    contactForm.addEventListener('submit', function(e) {
+        if (!contactForm.checkValidity()) { return; }
+        submitBtn.setAttribute('disabled', 'true');
+        submitBtn.querySelector('.btn-text').textContent = 'Sending...';
+        submitBtn.querySelector('.spinner-border').classList.remove('d-none');
+    });
+
+    // === NEW: Initialize Bootstrap Tooltips for the hover effect on locked items ===
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl)
     })
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const sections = document.querySelectorAll('.fade-in-section');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animationPlayState = 'running';
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
-    sections.forEach(section => { observer.observe(section); });
-});
 </script>

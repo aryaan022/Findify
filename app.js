@@ -8,6 +8,7 @@ const MongoStore = require('connect-mongo');
 const path = require("path");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+const { Resend } = require('resend');
 const Business = require("./models/Business");
 const user = require("./models/User");
 const session = require("express-session");
@@ -307,19 +308,47 @@ app.get("/contact", (req, res) => {
 
 
 // contact form submission
-app.post("/contact", (req, res) => {
-  try {
-    const { firstName, lastName, email, phone, subject, message, newsletter, agreeTerms } = req.body;
-    console.log("Contact submission:", { firstName, lastName, email, phone, subject, messageLength: message?.length, newsletter: !!newsletter, agreeTerms: !!agreeTerms });
-    req.flash("success", "Thanks for reaching out! We'll get back to you within 24 hours.");
-    res.redirect("/contact");
-  } catch (err) {
-    console.error("Contact submit error", err);
-    req.flash("error", "Something went wrong. Please try again.");
-    res.redirect("/contact");
-  }
-});
+app.post("/contact", async (req, res) => {
+    try {
+        const { firstName, lastName, email, phone, subject, message } = req.body;
+        
+        // Initialize Resend with your API key from the .env file
+        const resend = new Resend(process.env.RESEND_API_KEY);
 
+        // Send the email using the data from the form
+        const { data, error } = await resend.emails.send({
+            from: 'no-reply@findify.live', // Use your verified domain here
+            to: 'aryankhokhar022@gmail.com',   // <<< CHANGE THIS to your personal email
+            subject: `New Findify Contact: ${subject}`,
+            reply_to: email, // Sets the "reply" button in your email client to the user's email
+            html: `
+                <h2>New Message from Findify.live Contact Form</h2>
+                <hr>
+                <p><strong>Name:</strong> ${firstName} ${lastName}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+                <br>
+                <h3>Message:</h3>
+                <p>${message}</p>
+            `
+        });
+
+        // Handle potential errors from the email service
+        if (error) {
+            console.error({ error });
+            req.flash("error", "Sorry, there was an error sending your message. Please try again.");
+            return res.redirect("/contact");
+        }
+
+        req.flash("success", "Your message has been sent successfully! We'll be in touch soon.");
+        res.redirect("/contact");
+
+    } catch (err) {
+        console.error("Error in /contact route:", err);
+        req.flash("error", "An error occurred. Please try again.");
+        res.redirect("/contact");
+    }
+});
 
 
 // (edit + update)
