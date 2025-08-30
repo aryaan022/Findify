@@ -725,11 +725,9 @@ app.post("/contact", async (req, res) => {
 });
 
 
-
-
-
-
-
+app.get("/premium", (req, res) => {
+    res.render("Premium.ejs");
+});
 
 
 
