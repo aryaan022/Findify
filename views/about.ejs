@@ -92,6 +92,35 @@
     animation: fadeInUp 1s ease-out forwards;
     animation-play-state: paused;
 }
+
+.team-card-locked {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.4s;
+    cursor: pointer;
+    background: #f7fafc;
+}
+.team-card-locked:hover {
+    transform: scale(1.04) translateY(-8px);
+    background: #eceffe;
+    box-shadow: 0 12px 28px rgba(60,80,220,0.14);
+}
+.coming-soon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background: #e9ecef;
+    border-radius: 50%;
+    margin-bottom: 12px;
+}
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0px rgba(60,80,220, 0.15); }
+    60% { box-shadow: 0 0 0 18px rgba(60,80,220,0); }
+}
+.pulse-animation {
+    animation: pulse 1.6s infinite;
+}
+
 </style>
 
 <section class="py-5 text-center bg-light fade-in-section">
@@ -134,78 +163,26 @@
     </div>
 </section>
 
-
 <section class="py-5 bg-light fade-in-section" style="animation-delay: 0.4s;">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">Meet Our Team</h2>
-            <p class="text-muted">The passionate people behind Localify</p>
-        </div>
-        
-        <div class="row g-4 justify-content-center">
-            <% 
-            const team = [
-                { name: "Sarah Johnson", role: "Founder & CEO", image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-                { name: "Michael Chen", role: "Head of Technology", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-                { name: "Emily Rodriguez", role: "Community Manager", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-                { name: "David Kim", role: "Business Development", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" }
-            ];
-            %>
-            
-            <% team.forEach(member => { %>
-            <div class="col-lg-3 col-md-6">
-                <div class="card team-card border-0 shadow-sm text-center h-100">
-                    <div class="card-body p-4">
-                        <img src="<%= member.image %>" alt="<%= member.name %>" class="rounded-circle mb-3 shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
-                        <h5 class="fw-bold mb-1"><%= member.name %></h5>
-                        <p class="text-primary mb-3"><%= member.role %></p>
-                        <div class="d-flex justify-content-center gap-2 social-links">
-                            <a href="#" class="btn btn-outline-primary btn-sm btn-floating"><i data-lucide="linkedin" style="width: 16px;"></i></a>
-                            <a href="#" class="btn btn-outline-primary btn-sm btn-floating"><i data-lucide="twitter" style="width: 16px;"></i></a>
-                            <a href="#" class="btn btn-outline-primary btn-sm btn-floating"><i data-lucide="mail" style="width: 16px;"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <% }); %>
-        </div>
-    </div>
-</section>
-
-<section class="py-5 fade-in-section" style="animation-delay: 0.6s;">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="section-title">Our Values</h2>
-            <p class="text-muted">The principles that guide everything we do</p>
-        </div>
-        
-        <div class="row g-4 align-items-stretch">
-            <% 
-            const values = [
-                { title: "Community First", description: "Every decision we make prioritizes the health and growth of local communities", icon: "users" },
-                { title: "Transparency", description: "We believe in honest, open communication with our users and business partners", icon: "eye" },
-                { title: "Quality", description: "We maintain high standards for both our platform and the businesses we feature", icon: "award" },
-                { title: "Innovation", description: "We continuously improve and adapt to better serve our community's needs", icon: "lightbulb" }
-            ];
-            %>
-            
-            <% values.forEach(value => { %>
-            <div class="col-lg-6">
-                <div class="d-flex p-4 rounded-3 bg-light h-100">
-                    <div class="flex-shrink-0">
-                        <div class="bg-primary text-white rounded-3 p-3 me-4">
-                            <i data-lucide="<%= value.icon %>" style="width: 32px; height: 32px;"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-2"><%= value.title %></h5>
-                        <p class="text-muted mb-0"><%= value.description %></p>
-                    </div>
-                </div>
-            </div>
-            <% }); %>
-        </div>
-    </div>
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Meet Our Team</h2>
+            <p class="text-muted">The passionate people behind Localify</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-3 col-md-6">
+                <div class="card team-card-locked border-0 shadow-sm text-center h-100">
+                    <div class="card-body p-4 d-flex flex-column justify-content-center align-items-center">
+                        <div class="coming-soon-circle mb-3 pulse-animation">
+                            <i data-lucide="lock" style="width: 48px; height: 48px;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Coming Soon</h5>
+                        <p class="text-muted">Our team profiles will appear here soon!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <section class="py-5 bg-primary text-white fade-in-section" style="animation-delay: 0.8s;">
