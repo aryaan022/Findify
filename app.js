@@ -636,39 +636,55 @@ app.patch("/admin/businesses/:id/reactivate", isLoggedIn, isAdmin, async (req, r
 
 // Route to permanently delete a business and its reviews
 // Route to permanently delete a business, its image, and its reviews
+// Route to permanently delete a business, its image, and its reviews
 app.delete("/admin/businesses/:id", isLoggedIn, isAdmin, async (req, res) => {
-    try {
-        const { id } = req.params;
+    const { id } = req.params;
+    console.log(`[ADMIN DELETE] Received request to delete business ID: ${id}`); // Log entry point
 
-        [cite_start]// Step 1: Find the business document by its ID [cite: 1]
+    try {
+        // Step 1: Find the business document by its ID
+        console.log(`[ADMIN DELETE] Step 1: Finding business document...`);
         const businessToDelete = await Business.findById(id);
 
         if (!businessToDelete) {
+            console.log(`[ADMIN DELETE] Business with ID: ${id} not found.`);
             req.flash("error", "Business not found.");
             return res.redirect("/admin");
         }
+        console.log(`[ADMIN DELETE] Found business: "${businessToDelete.Name}"`);
 
-        [cite_start]// Step 2: If an image exists, delete it from Cloudinary [cite: 1, 3]
+        // Step 2: If an image exists, delete it from Cloudinary
         if (businessToDelete.Image && businessToDelete.Image.filename) {
+            console.log(`[ADMIN DELETE] Step 2: Deleting image from Cloudinary: ${businessToDelete.Image.filename}`);
             await cloudinary.uploader.destroy(businessToDelete.Image.filename);
+            console.log(`[ADMIN DELETE] Cloudinary image deleted successfully.`);
+        } else {
+            console.log(`[ADMIN DELETE] Step 2: No Cloudinary image to delete for this business.`);
         }
 
-        [cite_start]// Step 3: If there are associated reviews, delete them from the Review collection [cite: 1, 2]
-        if (businessToDelete.reviews.length > 0) {
+        // Step 3: If there are associated reviews, delete them
+        if (businessToDelete.reviews && businessToDelete.reviews.length > 0) {
+            console.log(`[ADMIN DELETE] Step 3: Deleting ${businessToDelete.reviews.length} associated reviews.`);
             await Review.deleteMany({ _id: { $in: businessToDelete.reviews } });
+            console.log(`[ADMIN DELETE] Reviews deleted successfully.`);
+        } else {
+            console.log(`[ADMIN DELETE] Step 3: No reviews to delete for this business.`);
         }
 
-        [cite_start]// Step 4: Finally, delete the business document from the database [cite: 1]
+        // Step 4: Finally, delete the business document from the database
+        console.log(`[ADMIN DELETE] Step 4: Deleting business document from database.`);
         await Business.findByIdAndDelete(id);
+        console.log(`[ADMIN DELETE] Business document deleted successfully.`);
 
         req.flash("success", "Business and all associated assets were successfully deleted.");
 
     } catch (err) {
-        console.error("Error during business deletion:", err);
-        req.flash("error", "An error occurred while deleting the business.");
+        console.error("[ADMIN DELETE] CRITICAL ERROR during business deletion:", err);
+        req.flash("error", "An error occurred while deleting the business. Check logs for details.");
     }
     
     // Step 5: Redirect back to the admin dashboard
+    console.log(`[ADMIN DELETE] Redirecting to /admin.`);
     res.redirect("/admin");
 });
 
