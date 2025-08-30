@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://findify.live/</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://findify.live/discover</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/login</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/aboutus</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/contact</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/register</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/show/68b2a225a84ca00776222a9e</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/show/68b2a809a84ca00776222b0f</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/show/68b2ac57a84ca00776222b7a</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://findify.live/show/68b2afc2a84ca00776222bfc</loc>
+  <lastmod>2025-08-30T12:54:24+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+
+</urlset>
