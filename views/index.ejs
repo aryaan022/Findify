@@ -1,6 +1,58 @@
 <%- layout('/layouts/boilerplate') %>
 
 <style>
+  /* Keyframe for the sweeping light effect */
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) skewX(-20deg); }
+        100% { transform: translateX(200%) skewX(-20deg); }
+    }
+
+    /* Keyframe for the subtle pulsing glow */
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.1); }
+        50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.25); }
+    }
+
+    /* The main container for the new search bar style */
+    .search-coming-soon-pro {
+        position: relative;
+        padding: 0.5rem; /* A little padding around the content */
+        background: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+        backdrop-filter: blur(8px); /* The "glass" effect */
+        border-radius: 50px; /* Pill shape */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden; /* Crucial for keeping the shimmer inside */
+        animation: glow 3s infinite ease-in-out;
+        cursor: not-allowed;
+    }
+
+    /* The content (icons and text) inside the search bar */
+    .search-overlay-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        padding: 0.75rem 1.5rem; /* Make it feel like a real search bar */
+    }
+
+    .search-overlay-content h5 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    /* The shimmer effect element */
+    .shimmer-effect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+        animation: shimmer 3s infinite linear;
+        pointer-events: none;
+     } /* Make sure it's not clickable */
   /* Styling for the new animated Shimmer Placeholder */
 .shimmer-wrapper {
     position: relative;
@@ -121,15 +173,22 @@
         <h1 class="display-3 fw-bold">Find & Connect With Local Businesses</h1>
         <p class="lead mb-4">Your trusted guide to the best services, shops, and restaurants right in your neighborhood.</p>
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <form action="/search" method="GET" class="d-flex gap-2 p-2 bg-white rounded-pill shadow-lg">
-                    <input type="text" name="query" class="form-control form-control-lg border-0" placeholder="What are you looking for? (e.g., 'cafe', 'bookstore')" required>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 d-flex align-items-center">
-                        <i data-lucide="search" class="me-2"></i> Search
-                    </button>
-                </form>
+<div class="col-lg-8">
+
+        <div class="search-coming-soon-pro">
+
+            <div class="search-overlay-content">
+                <i data-lucide="gem" style="width: 20px; height: 20px;"></i>
+                <h5 class="mb-0">Advanced Search Coming Soon</h5>
+                <i data-lucide="lock" style="width: 20px; height: 20px;"></i>
             </div>
+
+            <div class="shimmer-effect"></div>
+            
         </div>
+        
+    </div>
+</div>
     </div>
 </div>
 
