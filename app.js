@@ -321,7 +321,8 @@ app.post("/contact", (req, res) => {
 });
 
 
-//(edit + update )
+
+// (edit + update)
 app.put(
   "/edit/:id",
   isLoggedIn,
@@ -329,32 +330,41 @@ app.put(
   upload.single("image"),
   async (req, res) => {
     try {
-      let { id } = req.params;
-      let business = await Business.findById(id);
+      const { id } = req.params;
+      // Spread the business data from the form into a new object
+      const updatedData = { ...req.body };
+
+      // Find and update the text-based fields first
+      const updatedBusiness = await Business.findByIdAndUpdate(id, updatedData, { new: true });
+
+      // Check if a new file was uploaded
       if (req.file) {
-        if (business.Image && business.Image.filename) {
-          await cloudinary.uploader.destroy(business.Image.filename);
+        // If there was an old image, delete it from Cloudinary
+        if (updatedBusiness.Image && updatedBusiness.Image.filename) {
+          await cloudinary.uploader.destroy(updatedBusiness.Image.filename);
         }
+        
+        // Save the new image's data to the business document
+        updatedBusiness.Image = {
+          url: req.file.path,
+          filename: req.file.filename,
+        };
+        await updatedBusiness.save(); // Save the changes to the database
       }
-      let { Name, Category, description, Contact, address } = req.body;
-      let image = { url: req.file.path, filename: req.file.filename };
-      let updatedBusiness = await Business.findByIdAndUpdate(id, {
-        Name,
-        Category,
-        description,
-        Contact,
-        address,
-        Image: image,
-      });
-      console.log(updatedBusiness);
+      
+      req.flash("success", "Business updated successfully!");
       res.redirect(`/show/${id}`);
+
     } catch (err) {
       req.flash("error", "Something went wrong while updating the business.");
-      console.log(err);
-      res.redirect(`/show/${id}`);
+      console.error("Business Update Error:", err);
+      // It's safer to redirect back instead of to the show page on error
+      res.redirect("back"); 
     }
   }
 );
+
+
 //show route
 app.get("/show/:id", async (req, res) => {
   let { id } = req.params;
@@ -635,8 +645,6 @@ app.patch("/admin/businesses/:id/reactivate", isLoggedIn, isAdmin, async (req, r
 });
 
 // Route to permanently delete a business and its reviews
-// Route to permanently delete a business, its image, and its reviews
-// Route to permanently delete a business, its image, and its reviews
 app.delete("/admin/businesses/:id", isLoggedIn, isAdmin, async (req, res) => {
     const { id } = req.params;
     console.log(`[ADMIN DELETE] Received request to delete business ID: ${id}`); // Log entry point
