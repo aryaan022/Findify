@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/css/show-page.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -26,10 +26,105 @@
   <link rel="stylesheet" href="/css/loading.css" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
+<style>
+/* /public/css/navbar.css */
 
+/* --- Keyframes for Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Main Navbar Styling (Top of Page) --- */
+.navbar {
+  padding: 1rem 0;
+  /* Add a subtle dark gradient at the top to ensure text is always readable */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+  /* Smooth transition for all property changes */
+  transition: background-color 0.4s ease-in-out, backdrop-filter 0.4s ease-in-out, box-shadow 0.4s ease-in-out, padding 0.4s ease-in-out;
+}
+
+/* --- Style for When the User Scrolls Down --- */
+.navbar-scrolled {
+  background-color: rgba(13, 17, 23, 0.75); /* A professional, near-black glassy background */
+  backdrop-filter: blur(12px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  padding: 0.75rem 0; /* Make the navbar slightly slimmer on scroll */
+  background-image: none; /* Remove the gradient when scrolled */
+}
+
+/* --- Nav Link Styling & Hover Effect --- */
+.navbar .nav-link {
+  position: relative;
+  color: #ffffff;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 50px; /* Pill shape for the background hover */
+  z-index: 1;
+  transition: color 0.3s ease;
+  /* Add a text-shadow to make text pop on any background */
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+/* The background pill for hover/active states, initially hidden */
+.navbar .nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  transform: scale(0);
+  z-index: -1;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* On hover or when active, scale the pill into view */
+.navbar .nav-link:hover::before,
+.navbar .nav-link.active::before {
+  transform: scale(1);
+}
+
+.navbar .nav-link:hover {
+    color: #ffffff;
+}
+
+/* Style for the active page link */
+.navbar .nav-link.active {
+    font-weight: 600;
+}
+
+/* --- Button & Dropdown Styling --- */
+.navbar .btn {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.navbar .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.navbar .dropdown-menu {
+  background-color: rgba(25, 30, 40, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.navbar .dropdown-item {
+    color: #f0f0f0;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+</style>
 <body class="d-flex flex-column min-vh-100">
-  <!-- 🔹 Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-gradient bg-primary shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
       <a class="navbar-brand fw-bold" href="/">Findify</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -39,25 +134,13 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-lg-center">
           <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-          <li class="nav-item">
-            <a class="nav-link" href="/discover">Discover</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/dashboard">Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/aboutus">About Us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/contact">Get in Touch</a>
-          </li>
+          <li class="nav-item"><a class="nav-link" href="/discover">Discover</a></li>
+          <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/aboutus">About Us</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contact">Get in Touch</a></li>
           <% if (!currentUser) { %>
-            <li class="nav-item">
-              <a class="btn btn-outline-light ms-3" href="/login">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="btn btn-light text-primary ms-2" href="/register">Sign Up</a>
-            </li>
+            <li class="nav-item"><a class="btn btn-outline-light ms-3" href="/login">Login</a></li>
+            <li class="nav-item"><a class="btn btn-light text-primary ms-2" href="/register">Sign Up</a></li>
             <% } else { %>
               <li class="nav-item dropdown ms-3">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -65,9 +148,7 @@
                   <%= currentUser.username %>
                 </a>
                 <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item" href="/dashboard">My Dashboard</a>
-                  </li>
+                  <li><a class="dropdown-item" href="/dashboard">My Dashboard</a></li>
                   <li><a class="dropdown-item" href="/logout">Logout</a></li>
                 </ul>
               </li>
@@ -77,7 +158,7 @@
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container" style="padding-top: 70px;">
     <% if(success && success.length){ %>
       <div class="alert alert-success alert-dismissible fade show col-6 offset-3" role="alert">
         <%= success %>
@@ -90,77 +171,78 @@
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
           </div>
           <% } %>
-            <!-- 🔹 Main Content -->
-          </div>
-          <main class="flex-grow-1"><%- body %></main>
+  </div>
+  <main class="flex-grow-1"><%- body %></main>
 
-  <!-- 🔹 Footer -->
-<footer class="bg-dark text-white pt-5 pb-4 mt-auto">
+  <footer class="bg-dark text-white pt-5 pb-4 mt-auto">
     <div class="container text-center text-md-start">
-        <div class="row mt-3">
+      <div class="row mt-3">
 
-            <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-                <h5 class="text-uppercase fw-bold mb-4">
-                    <i data-lucide="map-pin" class="me-2"></i>Findify
-                </h5>
-                <p class="small text-white-50">
-                    Your guide to discovering and supporting the best local businesses. We're dedicated to connecting communities and helping local economies thrive across India.
-                </p>
-            </div>
-
-            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
-                <h6 class="text-uppercase fw-bold mb-4">
-                    Quick Links
-                </h6>
-                <p><a href="/" class="text-white-50 text-decoration-none">Home</a></p>
-                <p><a href="/discover" class="text-white-50 text-decoration-none">Discover</a></p>
-                <p><a href="/dashboard" class="text-white-50 text-decoration-none">Dashboard</a></p>
-                <p><a href="/new" class="text-white-50 text-decoration-none">List your Business</a></p>
-            </div>
-
-            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-                <h6 class="text-uppercase fw-bold mb-4">
-                    Support
-                </h6>
-                <p><a href="/aboutus" class="text-white-50 text-decoration-none">About Us</a></p>
-                <p><a href="/contact" class="text-white-50 text-decoration-none">Contact</a></p>
-                <p><a href="/terms" class="text-white-50 text-decoration-none">Terms of Service</a></p>
-                <p><a href="/privacy" class="text-white-50 text-decoration-none">Privacy Policy</a></p>
-            </div>
-
-            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-                <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
-                <p class="small text-white-50"><i data-lucide="home" class="me-3"></i>Jalandhar Punjab , India</p>
-                <p class="small text-white-50"><i data-lucide="mail" class="me-3"></i>support@Findify.com</p>
-                <p class="small text-white-50"><i data-lucide="phone" class="me-3"></i>+91 7037169747</p>
-            </div>
+        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+          <h5 class="text-uppercase fw-bold mb-4">
+            <i data-lucide="map-pin" class="me-2"></i>Findify
+          </h5>
+          <p class="small text-white-50">
+            Your guide to discovering and supporting the best local businesses. We're dedicated to connecting
+            communities and helping local economies thrive across India.
+          </p>
         </div>
 
-        <hr class="mb-4">
+        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+          <h6 class="text-uppercase fw-bold mb-4">
+            Quick Links
+          </h6>
+          <p><a href="/" class="text-white-50 text-decoration-none">Home</a></p>
+          <p><a href="/discover" class="text-white-50 text-decoration-none">Discover</a></p>
+          <p><a href="/dashboard" class="text-white-50 text-decoration-none">Dashboard</a></p>
+          <p><a href="/new" class="text-white-50 text-decoration-none">List your Business</a></p>
+        </div>
 
-        <div class="row align-items-center">
-            <div class="col-md-7 col-lg-8">
-                <p class="small text-center text-md-start mb-0">
-                    © <%= new Date().getFullYear() %> Findify. All Rights Reserved.&nbsp;|&nbsp;
-                    Made by 
-            <a href="https://github.com/aryaan022/findify" target="_blank" class="text-white fw-semibold text-decoration-none">
+        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+          <h6 class="text-uppercase fw-bold mb-4">
+            Support
+          </h6>
+          <p><a href="/aboutus" class="text-white-50 text-decoration-none">About Us</a></p>
+          <p><a href="/contact" class="text-white-50 text-decoration-none">Contact</a></p>
+          <p><a href="/terms" class="text-white-50 text-decoration-none">Terms of Service</a></p>
+          <p><a href="/privacy" class="text-white-50 text-decoration-none">Privacy Policy</a></p>
+        </div>
+
+        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+          <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+          <p class="small text-white-50"><i data-lucide="home" class="me-3"></i>Jalandhar Punjab , India</p>
+          <p class="small text-white-50"><i data-lucide="mail" class="me-3"></i>support@Findify.com</p>
+          <p class="small text-white-50"><i data-lucide="phone" class="me-3"></i>+91 7037169747</p>
+        </div>
+      </div>
+
+      <hr class="mb-4">
+
+      <div class="row align-items-center">
+        <div class="col-md-7 col-lg-8">
+          <p class="small text-center text-md-start mb-0">
+            © <%= new Date().getFullYear() %> Findify. All Rights Reserved.&nbsp;|&nbsp;
+              Made by
+              <a href="https://github.com/aryaan022/findify" target="_blank"
+                class="text-white fw-semibold text-decoration-none">
                 Findify <i class="fab fa-github ms-1"></i>
-            </a>
-                </p>
-            </div>
-            <div class="col-md-5 col-lg-4">
-                <div class="text-center text-md-end">
-                    <a href="#" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-twitter"></i></a>
-                    <a href="https://www.instagram.com/findify_official/" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-instagram"></i></a>
-                    <a href="www.linkedin.com/in/aryan022" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-linkedin-in"></i></a>
-                </div>
-            </div>
+              </a>
+          </p>
         </div>
+        <div class="col-md-5 col-lg-4">
+          <div class="text-center text-md-end">
+            <a href="#" class="btn btn-outline-light btn-floating m-1" role="button"><i
+                class="fab fa-facebook-f"></i></a>
+            <a href="#" class="btn btn-outline-light btn-floating m-1" role="button"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.instagram.com/findify_official/" class="btn btn-outline-light btn-floating m-1"
+              role="button"><i class="fab fa-instagram"></i></a>
+            <a href="www.linkedin.com/in/aryan022" class="btn btn-outline-light btn-floating m-1" role="button"><i
+                class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+      </div>
     </div>
-</footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </footer>
 </body>
 
 </html>
