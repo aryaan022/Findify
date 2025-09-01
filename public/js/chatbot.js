@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Send message to the backend server
-            const response = await fetch('/chat', {
+            const response = await fetch('/chatbot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: userMessage }),

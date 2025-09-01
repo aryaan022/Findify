@@ -7,6 +7,7 @@ const app = express();
 const MongoStore = require('connect-mongo');
 const path = require("path");
 const ejs = require("ejs");
+const axios = require('axios');
 const mongoose = require("mongoose");
 const { Resend } = require('resend');
 const Business = require("./models/Business");
@@ -30,6 +31,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(MethodOverride("_method"));
+app.use(express.json());
 app.engine("ejs", ejsMate);
 
 app.use(flash());
@@ -759,8 +761,25 @@ app.get("/premium", (req, res) => {
 });
 
 
+app.post("/chatbot", async (req, res) => {
+  try {
+    const { message } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
 
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      {
+        contents: [{ parts: [{ text: message }] }]
+      }
+    );
 
+    const botResponse = response.data.candidates[0]?.content?.parts[0]?.text || "Sorry, I couldn't understand.";
+    res.json({ reply: botResponse });
+  } catch (error) {
+    console.error("Error response from Gemini API:", JSON.stringify(error.response?.data, null, 2) || error.message);
+    res.status(error.response?.status || 500).json(error.response?.data || { error: "Internal Server Error" });
+  }
+});
 
 
 
