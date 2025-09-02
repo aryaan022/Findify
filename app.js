@@ -738,40 +738,69 @@ app.delete("/admin/businesses/:id", isLoggedIn, isAdmin, async (req, res) => {
 
 
 app.get("/premium", isLoggedIn, (req, res) => {
-  res.render("Premium.ejs", { currentUser: req.user });
+    // Pass the Razorpay Key ID to the EJS template
+    res.render("Premium.ejs", { 
+        currentUser: req.user,
+        razorpayKeyId: process.env.RAZORPAY_KEY_ID 
+    });
 });
 
 
 
 // Create order route
-app.post('/create-order',isLoggedIn, async (req, res) => {
+// Route to create a new order
+app.post('/create-order', isLoggedIn, async (req, res) => {
+    const options = {
+        amount: 9900, // Amount in paise (₹99.00)
+        currency: "INR",
+        receipt: `receipt_order_${new Date().getTime()}`,
+    };
+
     try {
-        const options = {
-            amount: 9900, // Amount in paise (e.g., ₹99.00)
-            currency: "INR",
-            receipt: "order_rcptid_11"
-        };
         const order = await razorpay.orders.create(options);
-        res.json(order);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Order creation failed" });
+        
+        // Securely bundle user details from the server session
+        const userDetails = {
+            name: req.user.username,
+            email: req.user.email,
+            contact: req.user.contact || '' // Assumes contact field on User model
+        };
+        
+        // Send both the order and user details back to the frontend
+        res.json({ order, userDetails });
+        
+    } catch (error) {
+        console.error("Error creating Razorpay order:", error);
+        res.status(500).send("Error creating order");
     }
 });
 
-// Verify payment route
-app.post('/verify-payment',isLoggedIn, (req, res) => {
-    const { order_id, payment_id, signature } = req.body;
-    const generated_signature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-        .update(order_id + "|" + payment_id)
-        .digest('hex');
 
-    if (generated_signature === signature) {
-        // Payment is verified
-        res.json({ status: 'success' });
-    } else {
-        // Verification failed
-        res.json({ status: 'failure' });
+
+// STEP 3: Ensure the /verify-payment POST route is correct and robust
+app.post('/verify-payment', isLoggedIn, (req, res) => {
+    try {
+        const { order_id, payment_id, signature } = req.body;
+        const key_secret = process.env.RAZORPAY_KEY_SECRET;
+        const body = order_id + "|" + payment_id;
+
+        const expectedSignature = crypto
+            .createHmac('sha256', key_secret)
+            .update(body.toString())
+            .digest('hex');
+
+        if (expectedSignature === signature) {
+            console.log("Payment verified successfully for user:", req.user.username);
+            // Here you would update the user's status in the database
+            req.flash("success", "Payment Successful! Your account is now Premium.");
+            res.json({ status: 'success' });
+        } else {
+            req.flash("error", "Payment verification failed. Please contact support.");
+            res.status(400).json({ status: 'failure' });
+        }
+    } catch (error) {
+        console.error("Error verifying payment:", error);
+        res.status(500).send("Internal Server Error");
     }
 });
 

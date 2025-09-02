@@ -1,30 +1,32 @@
 document.addEventListener("DOMContentLoaded", () => {
     const payButton = document.getElementById('pay-button');
+    console.log("Script loaded. Pay button found:", payButton); // Log 1
 
-    // Only run this script if the pay button exists on the page
     if (payButton) {
+        const razorpayKeyId = payButton.dataset.key;
+        console.log("Razorpay Key ID found on button:", razorpayKeyId); // Log 2
+
         payButton.addEventListener('click', async function (e) {
             e.preventDefault();
-            payButton.disabled = true; // Disable button to prevent multiple clicks
+            console.log("Pay button clicked!"); // Log 3
+            payButton.disabled = true;
             payButton.textContent = 'Processing...';
 
             try {
-                // 1. Create the Order by calling your backend
                 const response = await fetch('/create-order', { method: 'POST' });
-                if (!response.ok) throw new Error('Failed to create order');
-                const order = await response.json();
+                if (!response.ok) throw new Error('Failed to create order. You might not be logged in.');
 
-                // 2. Set up Razorpay Checkout options
+                const { order, userDetails } = await response.json();
+                console.log("Server response received:", { order, userDetails }); // Log 4: CRITICAL CHECK
+
                 const options = {
-                    key: window.RAZORPAY_KEY_ID, // Pass key from server-side
+                    key: razorpayKeyId,
                     amount: order.amount,
                     currency: order.currency,
                     name: "Findify",
                     description: "Premium Plan",
                     order_id: order.id,
                     handler: async function (response) {
-                        // 3. This function runs after payment is successful
-                        //    Send payment details to your server for verification
                         const verificationResponse = await fetch('/verify-payment', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -37,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         const result = await verificationResponse.json();
                         if (result.status === 'success') {
-                            // Redirect to dashboard where a flash message will be shown
                             window.location.href = '/dashboard';
                         } else {
                             alert("Payment verification failed. Please contact support.");
@@ -46,21 +47,20 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     },
                     prefill: {
-                        // Ideally, get this from the logged-in user's data
-                        name: window.USER_INFO.username,
-                        email: window.USER_INFO.email,
-                        role: window.USER_INFO.role,
+                        name: userDetails.name,
+                        email: userDetails.email,
+                        contact: userDetails.contact
                     },
                     theme: {
-                        color: "#4f46e5" // Your site's primary color
+                        color: "#4f46e5"
                     }
                 };
                 
-                // 4. Create a new Razorpay instance and open the checkout
+                console.log("Final options sent to Razorpay:", options); // Log 5: CRITICAL CHECK
                 const rzp = new Razorpay(options);
 
                 rzp.on('payment.failed', function (response){
-                        alert("Payment failed. " + response.error.description);
+                        alert("Payment failed: " + response.error.description);
                         payButton.disabled = false;
                         payButton.textContent = 'Upgrade Now';
                 });
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } catch (error) {
                 console.error("Payment failed:", error);
-                alert("Please Login to continue.If logged in please contact support.");
+                alert("Could not start payment. Please ensure you are logged in.");
                 payButton.disabled = false;
                 payButton.textContent = 'Upgrade Now';
             }

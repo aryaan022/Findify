@@ -190,15 +190,10 @@
         <div class="text-center mt-5 py-5">
             <p class="fs-4 text-body-secondary mb-2">Unlock all premium features</p>
             <p class="display-4 fw-bolder text-dark mb-4">₹99 / month</p>
-
-            <button id="pay-button"
-                class="btn btn-lg d-inline-flex align-items-center gap-2 px-5 py-3 rounded-4 fw-bold shadow-lg premium-pay-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path
-                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
-                    </path>
-                </svg>
+            
+            <!-- THE FIX: Add the data-key attribute, populated by the variable from your app.js route -->
+            <button id="pay-button" data-key="<%= razorpayKeyId %>" class="btn btn-lg d-inline-flex align-items-center gap-2 px-5 py-3 rounded-4 fw-bold shadow-lg premium-pay-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
                 <span>Upgrade Now</span>
             </button>
             <p class="text-secondary mt-3"><small>Secure payments powered by Razorpay.</small></p>
