@@ -24,6 +24,15 @@ const { storage, cloudinary } = require("./cloudconfig");
 const upload = multer({ storage });
 const { isLoggedIn, isOwner, isVendor, isAdmin } = require("./middleware");
 
+
+const Razorpay = require("razorpay")
+const crypto = require("crypto")
+
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
 const dbUrl = process.env.DB_URL;
 
 app.set("view engine", "ejs");
@@ -728,38 +737,43 @@ app.delete("/admin/businesses/:id", isLoggedIn, isAdmin, async (req, res) => {
 });
 
 
-app.post("/contact", async (req, res) => {
+app.get("/premium", isLoggedIn, (req, res) => {
+  res.render("Premium.ejs", { currentUser: req.user });
+});
+
+
+
+// Create order route
+app.post('/create-order',isLoggedIn, async (req, res) => {
     try {
-        const { firstName, lastName, email, phone, subject, message } = req.body;
-
-        // Create the email content
-        const mailOptions = {
-            subject: `New Contact Form Submission: ${subject}`, // Subject line
-            html: `
-                <h2>New Message from Localify Contact Form</h2>
-                <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-                <hr>
-                <p><strong>Message:</strong></p>
-                <p>${message}</p>
-            ` // HTML body
+        const options = {
+            amount: 9900, // Amount in paise (e.g., ₹99.00)
+            currency: "INR",
+            receipt: "order_rcptid_11"
         };
-        req.flash("success", "Your message has been sent successfully! We'll get back to you soon.");
-        res.redirect("/contact");
-
+        const order = await razorpay.orders.create(options);
+        res.json(order);
     } catch (err) {
-        console.error("Error sending email:", err);
-        req.flash("error", "Sorry, there was an error sending your message. Please try again later.");
-        res.redirect("/contact");
+        console.error(err);
+        res.status(500).json({ error: "Order creation failed" });
     }
 });
 
+// Verify payment route
+app.post('/verify-payment',isLoggedIn, (req, res) => {
+    const { order_id, payment_id, signature } = req.body;
+    const generated_signature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(order_id + "|" + payment_id)
+        .digest('hex');
 
-app.get("/premium", (req, res) => {
-    res.render("Premium.ejs");
+    if (generated_signature === signature) {
+        // Payment is verified
+        res.json({ status: 'success' });
+    } else {
+        // Verification failed
+        res.json({ status: 'failure' });
+    }
 });
-
 
 
 
