@@ -1,26 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
     const payButton = document.getElementById('pay-button');
-    console.log("Script loaded. Pay button found:", payButton); // Log 1
 
     if (payButton) {
+        // Read the key directly from the button's data attribute
         const razorpayKeyId = payButton.dataset.key;
-        console.log("Razorpay Key ID found on button:", razorpayKeyId); // Log 2
 
         payButton.addEventListener('click', async function (e) {
             e.preventDefault();
-            console.log("Pay button clicked!"); // Log 3
             payButton.disabled = true;
             payButton.textContent = 'Processing...';
 
             try {
+                // 1. Create the Order by calling your backend
                 const response = await fetch('/create-order', { method: 'POST' });
-                if (!response.ok) throw new Error('Failed to create order. You might not be logged in.');
+                if (!response.ok) {
+                    throw new Error('Failed to create order. You might not be logged in.');
+                }
 
+                // 2. Correctly destructure BOTH order and userDetails from the JSON response
                 const { order, userDetails } = await response.json();
-                console.log("Server response received:", { order, userDetails }); // Log 4: CRITICAL CHECK
 
+                // 3. Set up Razorpay Checkout options
                 const options = {
-                    key: razorpayKeyId,
+                    key: razorpayKeyId, // Use the key read from the button
                     amount: order.amount,
                     currency: order.currency,
                     name: "Findify",
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         const result = await verificationResponse.json();
                         if (result.status === 'success') {
+                            // On success, redirect to the dashboard to see the flash message
                             window.location.href = '/dashboard';
                         } else {
                             alert("Payment verification failed. Please contact support.");
@@ -55,14 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         color: "#4f46e5"
                     }
                 };
-                
-                console.log("Final options sent to Razorpay:", options); // Log 5: CRITICAL CHECK
+
                 const rzp = new Razorpay(options);
 
-                rzp.on('payment.failed', function (response){
-                        alert("Payment failed: " + response.error.description);
-                        payButton.disabled = false;
-                        payButton.textContent = 'Upgrade Now';
+                rzp.on('payment.failed', function (response) {
+                    alert("Payment failed: " + response.error.description);
+                    payButton.disabled = false;
+                    payButton.textContent = 'Upgrade Now';
                 });
 
                 rzp.open();
