@@ -761,25 +761,6 @@ app.get("/premium", (req, res) => {
 });
 
 
-app.post("/chatbot", async (req, res) => {
-  try {
-    const { message } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-      {
-        contents: [{ parts: [{ text: message }] }]
-      }
-    );
-
-    const botResponse = response.data.candidates[0]?.content?.parts[0]?.text || "Sorry, I couldn't understand.";
-    res.json({ reply: botResponse });
-  } catch (error) {
-    console.error("Error response from Gemini API:", JSON.stringify(error.response?.data, null, 2) || error.message);
-    res.status(error.response?.status || 500).json(error.response?.data || { error: "Internal Server Error" });
-  }
-});
 
 
 
