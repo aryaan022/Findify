@@ -21,7 +21,11 @@ const UserSchema = new Schema({
     favorites:[{
         type:Schema.Types.ObjectId,
         ref:"Business"
-    }]
+    }],
+    PremiumUser:{
+        type:Boolean,
+        default:false
+    },
 })
 
 UserSchema.plugin(passportLocalMongoose);

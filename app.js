@@ -777,8 +777,8 @@ app.post('/create-order', isLoggedIn, async (req, res) => {
 
 
 
-// STEP 3: Ensure the /verify-payment POST route is correct and robust
-app.post('/verify-payment', isLoggedIn, (req, res) => {
+// STEP 3: Ensure the /verify-payment 
+app.post('/verify-payment', isLoggedIn, async(req, res) => {
     try {
         const { order_id, payment_id, signature } = req.body;
         const key_secret = process.env.RAZORPAY_KEY_SECRET;
@@ -792,6 +792,7 @@ app.post('/verify-payment', isLoggedIn, (req, res) => {
         if (expectedSignature === signature) {
             console.log("Payment verified successfully for user:", req.user.username);
             // Here you would update the user's status in the database
+            await user.findByIdAndUpdate(req.user._id, { PremiumUser: true });
             req.flash("success", "Payment Successful! Your account is now Premium.");
             res.json({ status: 'success' });
         } else {
@@ -800,7 +801,8 @@ app.post('/verify-payment', isLoggedIn, (req, res) => {
         }
     } catch (error) {
         console.error("Error verifying payment:", error);
-        res.status(500).send("Internal Server Error");
+        req.flash("error", "Payment verification failed. Please contact support.");
+        res.status(400).json({ status: 'failure' });
     }
 });
 
@@ -823,8 +825,7 @@ app.use((req, res, next) => {
   res.render("error.ejs", { url: req.originalUrl });
 });
 
-// Generic error handler - any thrown/rejected errors
-// eslint-disable-next-line no-unused-vars
+// General error handler - catch all errors
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(err.status || 500);
