@@ -805,6 +805,14 @@ app.post('/verify-payment', isLoggedIn, (req, res) => {
 });
 
 
+app.get("/privacy", (req, res) => {
+  res.render("Privacy.ejs", { currentUser: req.user });
+});
+app.get("/terms", (req, res) => {
+    res.render("Terms.ejs", { currentUser: req.user });
+});
+
+
 
 
 
