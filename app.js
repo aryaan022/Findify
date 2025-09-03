@@ -751,7 +751,7 @@ app.get("/premium", isLoggedIn, (req, res) => {
 // Route to create a new order
 app.post('/create-order', isLoggedIn, async (req, res) => {
     const options = {
-        amount: 10000, // Amount in paise (₹99.00)
+        amount: 1000, // Amount in paise (₹10.00)
         currency: "INR",
         receipt: `receipt_order_${new Date().getTime()}`,
     };
