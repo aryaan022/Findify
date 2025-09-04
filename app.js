@@ -80,16 +80,27 @@ app.use((req, res, next) => {
 app.get("/", async (req, res) => {
     const business = await Business.find({ status: 'active' }).lean();
 
+     const featuredBusinesses = await Business.aggregate([
+        { $match: { status: "active" } },
+        { $sample: { size: 6 } } // pick 6 random
+    ]);
+
+     await Business.populate(featuredBusinesses, { path: "Owner", select: "username premiumExpiresAt" });
+
+
     // NEW: Fetch the top 6 businesses based on rating and review count
-    const topRatedBusinesses = await Business.find({ status: 'active' })
-        .sort({ avgRating: -1, reviewCount: -1 }) // Sort by rating then by review count
-        .limit(6) // Get only the top 6
+     const topRatedBusinesses = await Business.find({ status: 'active' })
+        .sort({ avgRating: -1, reviewCount: -1 })
+        .limit(6)
+        .populate("Owner", "username premiumExpiresAt")
         .lean();
 
     res.render("index.ejs", { 
         business, 
+        featuredBusinesses, //featured businesses data to the template
         topRatedBusinesses, //top-rated businesses data to the template
-        query: undefined 
+        query: undefined ,
+        user: req.user // Pass the user object to the template
     });
 });
 

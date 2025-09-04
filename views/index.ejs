@@ -53,8 +53,8 @@
         background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
         animation: shimmer 3s infinite linear;
         pointer-events: none;
-     } /* Make sure it's not clickable */
-  /* Styling for the new animated Shimmer Placeholder */
+     } /* Make sure it's not interactive */
+
 .shimmer-wrapper {
     position: relative;
     overflow: hidden;
@@ -129,44 +129,7 @@
     100% { transform: translateX(100%); }
 }
 
-    /* Styling for the new animated 'Coming Soon' section */
-    .coming-soon-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        overflow: hidden;
-        position: relative;
-        padding: 2rem;
-        color: white;
-    }
 
-    .coming-soon-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
-
-    .coming-soon-card .lock-icon {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 1.5rem;
-        opacity: 0.5;
-    }
-
-    .coming-soon-card .card-title-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: #0d6efd; /* Bootstrap Primary Blue */
-        background: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
 </style>
 
 <div class="hero-section text-white text-center" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat; height: 70vh; display: flex; align-items: center; justify-content: center;">
@@ -227,85 +190,137 @@
         </div>
     </div>
 </section>
-<section class="py-5 shimmer-wrapper">
-    <div class="container" style="opacity: 0.5;">
-        <h2 class="fw-bold text-center mb-4 text-dark">Featured Businesses</h2>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4">
-                <div class="skeleton-card">
-                    <div class="skeleton img"></div>
-                    <div class="skeleton title"></div>
-                    <div class="skeleton text"></div>
-                    <div class="skeleton text"></div>
-                    <div class="skeleton text text-short"></div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 d-none d-md-block">
-                <div class="skeleton-card">
-                    <div class="skeleton img"></div>
-                    <div class="skeleton title"></div>
-                    <div class="skeleton text"></div>
-                    <div class="skeleton text"></div>
-                    <div class="skeleton text text-short"></div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 d-none d-lg-block">
-                <div class="skeleton-card">
-                    <div class="skeleton img"></div>
-                    <div class="skeleton title"></div>
-                    <div class="skeleton text"></div>
-                    <div class="skeleton text"></div>
-                    <div class="skeleton text text-short"></div>
-                </div>
-            </div>
-        </div>
+<section class="py-5 position-relative animated-bg">
+  <div class="container">
+    <!-- Stylish Heading -->
+    <div class="text-center mb-5">
+      <h2 class="fw-bold display-5 glowing-title">
+        🌟 Featured Businesses
+      </h2>
+      <p class="text-light mt-2">Discover the most exciting local businesses near you</p>
     </div>
 
-    <div class="shimmer-overlay"></div>
-    
-    <div class="coming-soon-badge">
-        <i data-lucide="gem" class="mb-2"></i>
-        <h5 class="fw-bold">Premium 'Featured' Placements</h5>
-        <p class="mb-0 small">A new paid feature for businesses is coming soon!</p>
-    </div>
+    <% if (featuredBusinesses && featuredBusinesses.length > 0) { %>
+      <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000" data-bs-pause="hover">
+        <div class="carousel-inner shadow-lg rounded-4 p-3 bg-white">
+          <% featuredBusinesses.forEach((b, index) => { %>
+            <% if (index % 3 === 0) { %>
+              <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                <div class="row g-4 justify-content-center">
+            <% } %>
+
+            <div class="col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm border-0 position-relative hover-card">
+
+                <!-- Premium Badge -->
+                <% if (b.Owner && b.Owner.premiumExpiresAt && new Date(b.Owner.premiumExpiresAt) > new Date()) { %>
+                  <span class="badge bg-warning text-dark shadow-sm position-absolute top-0 start-0 m-2">
+                    🌟 Premium
+                  </span>
+                <% } %>
+
+                <img src="<%= (b.Image && b.Image.url) ? b.Image.url : 'https://via.placeholder.com/400x200?text=No+Image' %>" 
+                     class="card-img-top" 
+                     alt="<%= b.Name %>" 
+                     style="height: 200px; object-fit: cover; border-top-left-radius: .75rem; border-top-right-radius: .75rem;">
+
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title fw-bold"><%= b.Name %></h5>
+                  <p class="text-primary small mb-2"><%= b.Category %></p>
+
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-warning text-dark me-2">
+                      <i data-lucide="star" style="width:14px; height:14px;"></i>
+                      <%= b.avgRating %>
+                    </span>
+                    <span class="text-muted small">(<%= b.reviewCount %> reviews)</span>
+                  </div>
+
+                  <p class="small text-muted mb-2 flex-grow-1">
+                    <i data-lucide="map-pin" class="me-2" style="width:16px;"></i>
+                    <%= b.address %>
+                  </p>
+
+                  <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100 mt-auto">View Details</a>
+                </div>
+              </div>
+            </div>
+
+            <% if ((index + 1) % 3 === 0 || index === featuredBusinesses.length - 1) { %>
+                </div>
+              </div>
+            <% } %>
+          <% }) %>
+        </div>
+
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+    <% } else { %>
+      <p class="text-center text-light">No featured businesses yet.</p>
+    <% } %>
+  </div>
 </section>
-<section class="py-5">
+
+<section class="py-5 position-relative top-rated-section">
   <div class="container">
-    <h2 class="fw-bold text-center mb-4">Top Rated by the Community</h2>
+    <!-- Heading -->
+    <div class="text-center mb-5">
+      <h2 class="fw-bold display-5 top-rated-heading">
+        ⭐ Top Rated by the Community
+      </h2>
+      <p class="text-muted mt-2">The most loved businesses chosen by our users</p>
+    </div>
+
     <div class="row g-4">
       <% if (topRatedBusinesses && topRatedBusinesses.length > 0) { %>
         <% topRatedBusinesses.forEach(b => { %>
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100 shadow-sm border-0">
-            <img src="<%= (b.Image && b.Image.url) ? b.Image.url : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&auto=format&fit=crop&q=60' %>" class="card-img-top" alt="<%= b.Name %>" style="height: 200px; object-fit: cover;">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title fw-bold"><%= b.Name %></h5>
-              <p class="text-primary small mb-2"><%= b.Category %></p>
-              
-              <div class="d-flex align-items-center mb-3">
-                  <span class="badge bg-warning text-dark me-2">
-                      <i data-lucide="star" style="width:14px; height:14px; fill:currentColor;" class="me-1"></i><%= b.avgRating %>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+              <img src="<%= (b.Image && b.Image.url) ? b.Image.url : 'https://via.placeholder.com/400x200?text=No+Image' %>" 
+                   class="card-img-top rounded-top" 
+                   alt="<%= b.Name %>" 
+                   style="height: 200px; object-fit: cover;">
+
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title fw-bold"><%= b.Name %></h5>
+                <p class="text-primary small mb-2"><%= b.Category %></p>
+
+                <div class="d-flex align-items-center mb-3">
+                  <span class="badge bg-primary me-2">
+                    <i data-lucide="star" style="width:14px; height:14px;"></i>
+                    <%= b.avgRating %>
                   </span>
                   <span class="text-muted small">(<%= b.reviewCount %> reviews)</span>
-              </div>
+                </div>
 
-              <p class="small text-muted mb-2 flex-grow-1"><i data-lucide="map-pin" class="me-2" style="width:16px;"></i> <%= b.address %></p>
-              <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100 mt-auto">View Details</a>
+                <p class="small text-muted mb-2 flex-grow-1">
+                  <i data-lucide="map-pin" class="me-2" style="width:16px;"></i>
+                  <%= b.address %>
+                </p>
+
+                <a href="/show/<%= b._id %>" class="btn btn-outline-primary w-100 mt-auto">View Details</a>
+              </div>
             </div>
           </div>
-        </div>
         <% }) %>
       <% } else { %>
-        <p class="text-center text-muted">No rated businesses found yet. Be the first to leave a review!</p>
+        <p class="text-center text-muted">No top-rated businesses yet.</p>
       <% } %>
     </div>
   </div>
 </section>
 
+
 <section class="py-5" style="background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);">
     <div class="container text-white">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">The Future of Localify is Bright</h2>
+            <h2 class="fw-bold">The Future of Findify is Bright</h2>
             <p class="lead text-white-50">We're constantly working on new features to make discovering local businesses even better.</p>
         </div>
         <div class="row g-4">

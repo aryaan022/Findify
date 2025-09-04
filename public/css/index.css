@@ -1,0 +1,71 @@
+
+  .animated-bg {
+    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad390, #fbc531);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* 🌟 Glowing Gradient Heading */
+.glowing-title {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8),
+               0 0 20px rgba(255,255,255,0.6),
+               0 0 30px rgba(255,255,255,0.4);
+  animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { text-shadow: 0 0 10px rgba(255,255,255,0.6); }
+  100% { text-shadow: 0 0 25px rgba(255,255,255,1); }
+}
+
+
+  /* ✨ Card Hover Zoom */
+  .hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.2);
+  }
+
+
+
+
+  /* top rated */
+  /* Light Gradient Background */
+  .top-rated-section {
+    background: linear-gradient(135deg, #f9f9f9, #eef2f3);
+  }
+
+  /* Heading with Underline Accent */
+  .top-rated-heading {
+    position: relative;
+    display: inline-block;
+  }
+  .top-rated-heading::after {
+    content: "";
+    display: block;
+    width: 60%;
+    height: 4px;
+    margin: 8px auto 0;
+    background: linear-gradient(90deg, #007bff, #00c6ff);
+    border-radius: 2px;
+  }
+
+  /* Card Hover */
+  .hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 0.75rem;
+  }
+  .hover-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.2);
+  }
