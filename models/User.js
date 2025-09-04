@@ -26,6 +26,10 @@ const UserSchema = new Schema({
         type:Boolean,
         default:false
     },
+    premiumExpiresAt: [{
+        type: Date,
+        default: null
+    }],
 })
 
 UserSchema.plugin(passportLocalMongoose);

@@ -785,16 +785,19 @@ app.post('/verify-payment', isLoggedIn, async(req, res) => {
         const body = order_id + "|" + payment_id;
 
         const expectedSignature = crypto
-            .createHmac('sha256', key_secret)
-            .update(body.toString())
-            .digest('hex');
+            .createHmac('sha256', key_secret)//sha256 is hashing algorithm
+            .update(body.toString())// body ko update krna hai
+            .digest('hex');//digest is final output in hexadecimal format
 
         if (expectedSignature === signature) {
             console.log("Payment verified successfully for user:", req.user.username);
-            // Here you would update the user's status in the database
-            await user.findByIdAndUpdate(req.user._id, { PremiumUser: true });
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30);
+            await user.findByIdAndUpdate(req.user._id, {
+                premiumExpiresAt: expiryDate
+            });
             req.flash("success", "Payment Successful! Your account is now Premium.");
-            res.json({ status: 'success' });
+            res.json({ status: 'success' }); // Send success response to client side js 
         } else {
             req.flash("error", "Payment verification failed. Please contact support.");
             res.status(400).json({ status: 'failure' });
