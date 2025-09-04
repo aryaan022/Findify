@@ -26,12 +26,21 @@ const UserSchema = new Schema({
         type:Boolean,
         default:false
     },
-    premiumExpiresAt: [{
+    premiumExpiresAt: {
         type: Date,
         default: null
-    }],
+    },
+    
 })
 
+UserSchema.virtual('isPremium').get(function() {//virtual property will not be stored in DB it is calculated on the fly 
+    // 'this' refers to the user document
+    // If premiumExpiresAt is not null and is a date in the future, they are premium.
+    return this.premiumExpiresAt && this.premiumExpiresAt > new Date();
+});
+
+UserSchema.set('toJSON', { virtuals: true });
+UserSchema.set('toObject', { virtuals: true });
 UserSchema.plugin(passportLocalMongoose);
 const User = mongoose.model("User",UserSchema);
 module.exports = User;  
