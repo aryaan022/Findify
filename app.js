@@ -414,7 +414,7 @@ app.get("/show/:id", async (req, res) => {
   )
     .populate({
       path: "reviews",
-      populate: { path: "author", select: "username" } // populate review authors
+      populate: { path: "author", select: "username premiumExpiresAt" } // populate review authors
     });
   res.render("show.ejs", { business });
 });

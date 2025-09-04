@@ -93,7 +93,28 @@
 
 <section class="py-4">
     <div class="container">
-        <div class="row align-items-center mb-4">
+
+        <% if (user && user.isPremium) { %>
+            <div class="alert alert-success d-flex align-items-center shadow-sm" role="alert">
+                <i data-lucide="award" class="me-3"></i>
+                <div>
+                    <h5 class="alert-heading mb-0">Premium Vendor Status: Active</h5>
+                    Your premium benefits expire on: <strong><%= new Date(user.premiumExpiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></strong>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="alert alert-info d-flex align-items-center justify-content-between shadow-sm" role="alert">
+                <div class="d-flex align-items-center">
+                    <i data-lucide="gem" class="me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-0">Unlock Analytics & Boost Your Business!</h5>
+                        Upgrade to Premium to see detailed analytics and get your business featured.
+                    </div>
+                </div>
+                <a href="/premium" class="btn btn-primary fw-bold">Upgrade to Premium</a>
+            </div>
+        <% } %>
+        <div class="row align-items-center my-4">
             <div class="col">
                 <h2 class="section-title mb-1">Vendor Dashboard</h2>
                 <p class="text-muted mb-0">
@@ -173,8 +194,15 @@
                         <div class="card business-card h-100">
                             <div class="position-relative">
                                 <img src="<%= bus.Image && bus.Image.url ? bus.Image.url.replace('/upload', '/upload/w_400,h_300,c_fill') : 'https://images.unsplash.com/photo-1585503468331-597f38515d19?ixlib=rb-4.0.3&auto=format&fit=crop&w_400&q_80' %>" class="card-img-top" alt="<%= bus.Name %>" style="height: 200px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 m-3">
-                                    <span class="badge bg-success">Active</span>
+                                
+                                <div class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+                                    <% if (user && user.isPremium) { %>
+                                        <span class="badge bg-warning text-dark shadow-sm">
+                                            <i data-lucide="star" style="width: 12px; height: 12px; fill: currentColor;"></i>
+                                            Premium
+                                        </span>
+                                    <% } %>
+                                    <span class="badge bg-success shadow-sm">Active</span>
                                 </div>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -203,8 +231,8 @@
                                     <div class="d-flex gap-2">
                                         <form action="/edit/<%= bus._id %>" method="POST" class="flex-fill">
                                              <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                <i data-lucide="edit" class="me-1" style="width: 14px; height: 14px;"></i> Edit
-                                            </button>
+                                                 <i data-lucide="edit" class="me-1" style="width: 14px; height: 14px;"></i> Edit
+                                             </button>
                                         </form>
 
                                         <a href="/show/<%= bus._id %>" class="btn btn-outline-secondary btn-sm">
@@ -249,8 +277,8 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteForm" method="POST">
                      <button type="submit" class="btn btn-danger">
-                        <i data-lucide="trash-2" class="me-2"></i> Delete Business
-                    </button>
+                         <i data-lucide="trash-2" class="me-2"></i> Delete Business
+                     </button>
                 </form>
             </div>
         </div>

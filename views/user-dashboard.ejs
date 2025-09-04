@@ -43,6 +43,27 @@
 
 <section class="py-4">
     <div class="container">
+
+        <% if (currentUser && currentUser.isPremium) { %>
+            <div class="alert alert-success d-flex align-items-center shadow-sm mb-4" role="alert">
+                <i data-lucide="award" class="me-3"></i>
+                <div>
+                    <h5 class="alert-heading mb-0">You are a Premium Member!</h5>
+                    Your premium access expires on: <strong><%= new Date(currentUser.premiumExpiresAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></strong>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="alert alert-info d-flex align-items-center justify-content-between shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i data-lucide="star" class="me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-0">Unlock Premium Features!</h5>
+                        Enhance your Findify experience and get exclusive access to new tools.
+                    </div>
+                </div>
+                <a href="/premium" class="btn btn-primary fw-bold">Upgrade Now</a>
+            </div>
+        <% } %>
         <div class="row align-items-center mb-4">
             <div class="col">
                 <h2 class="section-title mb-1">
@@ -184,6 +205,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>4
     </div>
 </section>
