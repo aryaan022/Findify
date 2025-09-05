@@ -32,19 +32,21 @@
 /* --- Main Navbar Styling (Top of Page) --- */
 .navbar {
   padding: 1rem 0;
-  /* Add a subtle dark gradient at the top to ensure text is always readable */
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+  /* Add a vibrant gradient at the top */
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   /* Smooth transition for all property changes */
-  transition: background-color 0.4s ease-in-out, backdrop-filter 0.4s ease-in-out, box-shadow 0.4s ease-in-out, padding 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out;
 }
 
 /* --- Style for When the User Scrolls Down --- */
 .navbar-scrolled {
-  background-color: rgba(13, 17, 23, 0.75); /* A professional, near-black glassy background */
-  backdrop-filter: blur(12px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
   padding: 0.75rem 0; /* Make the navbar slightly slimmer on scroll */
-  background-image: none; /* Remove the gradient when scrolled */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* --- Nav Link Styling & Hover Effect --- */
@@ -92,12 +94,38 @@
 
 /* --- Button & Dropdown Styling --- */
 .navbar .btn {
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  transition: all 0.3s ease;
+  border-radius: 25px;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
 }
 
-.navbar .btn:hover {
+.navbar .btn-outline-light {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar .btn-outline-light:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+}
+
+.navbar .btn-light {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  border: none;
+  color: #333;
+  font-weight: 700;
+}
+
+.navbar .btn-light:hover {
+  background: linear-gradient(135deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+  color: #333;
 }
 
 .navbar .dropdown-menu {
@@ -178,7 +206,7 @@
           <h5 class="text-uppercase fw-bold mb-4">
             <i data-lucide="map-pin" class="me-2"></i>Findify
           </h5>
-          <p class="small text-white-50">
+          <p class="small text-white">
             Your guide to discovering and supporting the best local businesses. We're dedicated to connecting
             communities and helping local economies thrive across India.
           </p>

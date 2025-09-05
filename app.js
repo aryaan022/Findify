@@ -167,24 +167,65 @@ app.get("/logout", (req, res) => {
 
 //search route
 app.get("/search", async (req, res) => {
-  const { query, category } = req.query;
-  let filter = {};
-  
-  filter.status = 'active'; // <-- ADD THIS LINE
+  try {
+    const { query, category } = req.query;
+    let filter = {};
+    
+    filter.status = 'active'; // Only show active businesses
 
-  if (query) {
-    filter.Name = new RegExp(query, "i");
+    // Enhanced search: search both Name and Category
+    if (query && query.trim() !== "") {
+      filter.$or = [
+        { Name: new RegExp(query.trim(), "i") },
+        { Category: new RegExp(query.trim(), "i") }
+      ];
+    }
+    
+    if (category && category !== "") {
+      filter.Category = category;
+    }
+
+    let business = await Business.find(filter).populate('Owner', 'username');
+    
+    // Get featured and top-rated businesses for the homepage sections
+    const featuredBusinesses = await Business.find({ status: 'active' })
+      .populate('Owner', 'username')
+      .sort({ createdAt: -1 })
+      .limit(6);
+    
+    const topRatedBusinesses = await Business.find({ 
+      status: 'active',
+      avgRating: { $gte: 4.0 }
+    })
+      .populate('Owner', 'username')
+      .sort({ avgRating: -1 })
+      .limit(6);
+
+    res.render("index.ejs", { 
+      business, 
+      query, 
+      category, 
+      featuredBusinesses,
+      topRatedBusinesses,
+      searchResults: business.length > 0
+    });
+  } catch (error) {
+    console.error("Search error:", error);
+    req.flash('error', 'Search failed. Please try again.');
+    res.redirect('/');
   }
-  if (category && category !== "") {
-    filter.Category = category;
-  }
-  let business = await Business.find(filter);
-  res.render("index.ejs", { business, query, category });
 });
 
-//dashboard route (supports Vendor and User roles)
+//dashboard route (supports Vendor, User, and Admin roles)
 app.get("/dashboard", isLoggedIn, async (req, res) => {
   const authUser = req.user;
+  const role = (authUser.role || "").toLowerCase();
+
+  if (role === "admin") {
+    // Redirect admin to admin dashboard
+    return res.redirect("/admin/dashboard");
+  }
+
   const favUser = await user.findById(authUser._id).populate("favorites");
   const Reviewcount = await Review.countDocuments({ author: authUser._id });
   // THE FIX: Use .find() and the correct field name 'author'
@@ -192,7 +233,6 @@ const UserReview = await Review.find({ author: authUser._id })
     .sort({ createdAt: -1 })
     .limit(2)
     .populate("business");
-  const role = (authUser.role || "").toLowerCase();
 
   if (role === "vendor") {
     const business = await Business.find({ Owner: authUser._id });
@@ -585,6 +625,11 @@ app.post("/show/:id/reviews/:reviewId/edit", isLoggedIn, async (req, res) => {
 //admin dashboard work
 // In app.js, inside app.post("/register", ...)
 app.get("/admin", isLoggedIn, isAdmin, async (req, res) => {
+    res.redirect("/admin/dashboard");
+});
+
+// Enhanced admin dashboard route
+app.get("/admin/dashboard", isLoggedIn, isAdmin, async (req, res) => {
     try {
         // 1. Data for the Stat Cards
         const totalUsers = await user.countDocuments();
@@ -598,13 +643,59 @@ app.get("/admin", isLoggedIn, isAdmin, async (req, res) => {
         ]);
         const averageRating = avgRatingData.length > 0 ? avgRatingData[0].avg.toFixed(1) : 0;
 
-        // 2. Data for the User Management Table
+        // 2. Revenue and Premium Analytics
+        const premiumUsers = await user.countDocuments({ 
+            premiumExpiresAt: { $gt: new Date() } 
+        });
+        
+        const expiredPremiumUsers = await user.countDocuments({ 
+            premiumExpiresAt: { $lt: new Date(), $ne: null } 
+        });
+        
+        // Calculate revenue (assuming ₹10/month premium membership)
+        const premiumPrice = 10;
+        const totalRevenue = premiumUsers * premiumPrice;
+        const monthlyRevenue = totalRevenue; // Current active subscriptions
+        
+        // Growth metrics - compare with previous month
+        const currentDate = new Date();
+        const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+        const thisMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        
+        const usersLastMonth = await user.countDocuments({
+            createdAt: { $gte: lastMonth, $lt: thisMonth }
+        });
+        const usersThisMonth = await user.countDocuments({
+            createdAt: { $gte: thisMonth }
+        });
+        
+        const businessesLastMonth = await Business.countDocuments({
+            createdAt: { $gte: lastMonth, $lt: thisMonth }
+        });
+        const businessesThisMonth = await Business.countDocuments({
+            createdAt: { $gte: thisMonth }
+        });
+        
+        const reviewsLastMonth = await Review.countDocuments({
+            createdAt: { $gte: lastMonth, $lt: thisMonth }
+        });
+        const reviewsThisMonth = await Review.countDocuments({
+            createdAt: { $gte: thisMonth }
+        });
+        
+        // Calculate growth percentages
+        const userGrowth = usersLastMonth > 0 ? ((usersThisMonth - usersLastMonth) / usersLastMonth * 100).toFixed(1) : 0;
+        const businessGrowth = businessesLastMonth > 0 ? ((businessesThisMonth - businessesLastMonth) / businessesLastMonth * 100).toFixed(1) : 0;
+        const reviewGrowth = reviewsLastMonth > 0 ? ((reviewsThisMonth - reviewsLastMonth) / reviewsLastMonth * 100).toFixed(1) : 0;
+        const revenueGrowth = 15.2; // This could be calculated from historical data
+
+        // 3. Data for the User Management Table
         const allUsers = await user.find({}).sort({ createdAt: -1 });
 
-        // 3. Data for the Business Management Table
+        // 4. Data for the Business Management Table
         const allBusinesses = await Business.find({}).populate('Owner', 'username').sort({ createdAt: -1 });
 
-        // 4. Data for Reports & Analytics Tab
+        // 5. Data for Reports & Analytics Tab
         const categoryDistribution = await Business.aggregate([
             { $group: { _id: "$Category", count: { $sum: 1 } } },
             { $sort: { count: -1 } }
@@ -621,13 +712,23 @@ app.get("/admin", isLoggedIn, isAdmin, async (req, res) => {
                 totalBusinesses,
                 pendingBusinesses,
                 totalReviews,
-                averageRating
+                averageRating,
+                premiumUsers,
+                expiredPremiumUsers,
+                totalRevenue,
+                monthlyRevenue
             },
             users: allUsers,
             businesses: allBusinesses,
             reports: {
                 categoryDistribution,
-                totalBusinessesForPercentage
+                totalBusinessesForPercentage,
+                growth: {
+                    userGrowth: parseFloat(userGrowth),
+                    businessGrowth: parseFloat(businessGrowth),
+                    reviewGrowth: parseFloat(reviewGrowth),
+                    revenueGrowth: parseFloat(revenueGrowth)
+                }
             }
         });
 

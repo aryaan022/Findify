@@ -95,6 +95,20 @@
         .stat-coming-soon .stat-overlay i {
             animation: float 2.5s infinite ease-in-out;
         }
+
+        /* New stat card styling */
+        .stat-card {
+            padding: 1rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
     </style>
 
     <section class="py-4">
@@ -132,6 +146,11 @@
                                 <%= stats.totalUsers %>
                             </h3>
                             <p class="text-muted mb-0">Total Users</p>
+                            <div class="mt-2">
+                                <span class="badge bg-success">
+                                    <%= stats.premiumUsers %> premium
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -167,15 +186,15 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body text-center">
-                            <i data-lucide="message-square" class="text-warning mb-3"
+                            <i data-lucide="dollar-sign" class="text-success mb-3"
                                 style="width: 48px; height: 48px;"></i>
-                            <h3 class="fw-bold text-warning">
-                                <%= stats.totalReviews %>
+                            <h3 class="fw-bold text-success">
+                                ₹<%= stats.monthlyRevenue.toFixed(2) %>
                             </h3>
-                            <p class="text-muted mb-0">Total Reviews</p>
+                            <p class="text-muted mb-0">Monthly Revenue</p>
                             <div class="mt-2">
                                 <span class="badge bg-info">
-                                    <%= stats.averageRating %> avg rating
+                                    ₹<%= stats.totalRevenue.toFixed(2) %> total
                                 </span>
                             </div>
                         </div>
@@ -426,49 +445,88 @@
                                                     class="me-2 text-primary"></i> Growth Metrics</h6>
                                             <div class="row text-center">
                                                 <div class="col-6">
-                                                    <div class="stat-coming-soon">
-                                                        <div class="stat-content-blur">
-                                                            <div class="fw-bold text-primary">+15%</div><small
-                                                                class="text-muted">User Growth</small>
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-primary">
+                                                            <%= reports.growth.userGrowth > 0 ? '+' : '' %><%= reports.growth.userGrowth %>%
                                                         </div>
-                                                        <div class="stat-overlay"><i data-lucide="lock"
-                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                        <small class="text-muted">User Growth</small>
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
-                                                    <div class="stat-coming-soon">
-                                                        <div class="stat-content-blur">
-                                                            <div class="fw-bold text-success">+22%</div><small
-                                                                class="text-muted">Business Growth</small>
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-success">
+                                                            <%= reports.growth.businessGrowth > 0 ? '+' : '' %><%= reports.growth.businessGrowth %>%
                                                         </div>
-                                                        <div class="stat-overlay"><i data-lucide="lock"
-                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                        <small class="text-muted">Business Growth</small>
                                                     </div>
                                                 </div>
                                                 <div class="col-6 mt-3">
-                                                    <div class="stat-coming-soon">
-                                                        <div class="stat-content-blur">
-                                                            <div class="fw-bold text-info">+8%</div><small
-                                                                class="text-muted">Review Growth</small>
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-info">
+                                                            <%= reports.growth.reviewGrowth > 0 ? '+' : '' %><%= reports.growth.reviewGrowth %>%
                                                         </div>
-                                                        <div class="stat-overlay"><i data-lucide="lock"
-                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                        <small class="text-muted">Review Growth</small>
                                                     </div>
                                                 </div>
                                                 <div class="col-6 mt-3">
-                                                    <div class="stat-coming-soon">
-                                                        <div class="stat-content-blur">
-                                                            <div class="fw-bold text-warning">+12%</div><small
-                                                                class="text-muted">Revenue Growth</small>
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-warning">
+                                                            <%= reports.growth.revenueGrowth > 0 ? '+' : '' %><%= reports.growth.revenueGrowth %>%
                                                         </div>
-                                                        <div class="stat-overlay"><i data-lucide="lock"
-                                                                class="mb-1"></i><small>Coming Soon</small></div>
+                                                        <small class="text-muted">Revenue Growth</small>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3"><i data-lucide="dollar-sign"
+                                                    class="me-2 text-success"></i> Revenue Analytics</h6>
+                                            
+                                            <div class="row text-center mb-3">
+                                                <div class="col-6">
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-success">
+                                                            ₹<%= stats.monthlyRevenue.toFixed(2) %>
+                                                        </div>
+                                                        <small class="text-muted">Monthly Revenue</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-primary">
+                                                            <%= stats.premiumUsers %>
+                                                        </div>
+                                                        <small class="text-muted">Active Premium</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row text-center">
+                                                <div class="col-6">
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-info">
+                                                            ₹<%= stats.totalRevenue.toFixed(2) %>
+                                                        </div>
+                                                        <small class="text-muted">Total Revenue</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="stat-card">
+                                                        <div class="fw-bold text-warning">
+                                                            <%= stats.expiredPremiumUsers %>
+                                                        </div>
+                                                        <small class="text-muted">Expired Premium</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="col-md-6">
                                     <div class="card border-0 bg-light">
                                         <div class="card-body">
@@ -495,7 +553,7 @@
                                                                     <div class="progress" style="height: 6px;">
                                                                         <div class="progress-bar bg-<%= barColor %>"
                                                                             role="progressbar"
-                                                                            style="width: <%= percentage %>%;"></div>
+                                                                            style="width: <%= percentage %>%"></div>
                                                                     </div>
                                                                 </div>
                                                                 <% }); %>
