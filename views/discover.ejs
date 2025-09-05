@@ -35,66 +35,108 @@
 </section>
 
 <script>
-  mapboxgl.accessToken = '<%= mapboxToken %>';
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v12',
-    center: [77.2090, 28.6139], // fallback Delhi
-    zoom: 10
-  });
-
-  map.addControl(new mapboxgl.NavigationControl());
-
-  const bounds = new mapboxgl.LngLatBounds();
-
-  // Render business markers
-  <% if (businesses && businesses.length > 0) { %>
-    <% businesses.forEach(b => { %>
-      <% if (b.geometry && b.geometry.coordinates) { %>
-        const coords = <%= JSON.stringify(b.geometry.coordinates) %>;
-        new mapboxgl.Marker({ color: 'red' })
-          .setLngLat(coords)
-          .setPopup(new mapboxgl.Popup().setHTML(`
-            <h6><%= b.Name %></h6>
-            <p><%= b.address %></p>
-            <a href="/show/<%= b._id %>">View Details</a>
-          `))
-          .addTo(map);
-        bounds.extend(coords);
-      <% } %>
-    <% }) %>
-  <% } %>
-
-  // Show user marker if lat/lng in URL
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has("lat") && urlParams.has("lng")) {
-    const userCoords = [parseFloat(urlParams.get("lng")), parseFloat(urlParams.get("lat"))];
-    new mapboxgl.Marker({ color: 'blue' })
-      .setLngLat(userCoords)
-      .setPopup(new mapboxgl.Popup().setHTML(`<b>You are here</b>`))
-      .addTo(map);
-    bounds.extend(userCoords);
-  }
-
-  if (!bounds.isEmpty()) {
-    map.fitBounds(bounds, { padding: 50 });
-  }
-
-  // Ask for user location if not already in URL
-  if (!urlParams.has("lat")) {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(position => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set("lat", lat);
-        currentUrl.searchParams.set("lng", lng);
-        window.location.href = currentUrl.toString();
-      }, () => {
-        alert("Location access denied. Cannot show nearby businesses.");
-      });
+  // Wait for DOM to be fully loaded before initializing map
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check if mapboxgl is available
+    if (typeof mapboxgl === 'undefined') {
+      console.error('Mapbox GL JS is not loaded');
+      return;
     }
-  }
+
+    // Check if mapbox token is available
+    if (!'<%= mapboxToken %>') {
+      console.error('Mapbox token is not available');
+      return;
+    }
+
+    mapboxgl.accessToken = '<%= mapboxToken %>';
+    
+    try {
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [77.2090, 28.6139], // fallback Delhi
+        zoom: 10
+      });
+
+      // Wait for map to load before adding controls and markers
+      map.on('load', function() {
+        map.addControl(new mapboxgl.NavigationControl());
+
+        const bounds = new mapboxgl.LngLatBounds();
+        let hasUserLocation = false;
+        let hasBusinesses = false;
+
+        // Show user marker if lat/lng in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("lat") && urlParams.has("lng")) {
+          const userCoords = [parseFloat(urlParams.get("lng")), parseFloat(urlParams.get("lat"))];
+          new mapboxgl.Marker({ color: 'blue' })
+            .setLngLat(userCoords)
+            .setPopup(new mapboxgl.Popup().setHTML(`<b>You are here</b>`))
+            .addTo(map);
+          bounds.extend(userCoords);
+          hasUserLocation = true;
+        }
+
+        // Render business markers
+        console.log('Total businesses found:', <%= businesses ? businesses.length : 0 %>);
+        <% if (businesses && businesses.length > 0) { %>
+          <% businesses.forEach((b, index) => { %>
+            console.log('Processing business <%= index + 1 %>: <%= b.Name %>');
+            console.log('  - Has geometry:', <%= b.geometry ? 'true' : 'false' %>);
+            console.log('  - Coordinates:', <%= b.geometry && b.geometry.coordinates ? JSON.stringify(b.geometry.coordinates) : 'null' %>);
+            <% if (b.geometry && b.geometry.coordinates) { %>
+              const coords<%= index %> = <%= JSON.stringify(b.geometry.coordinates) %>;
+              console.log('  - Creating marker for:', '<%= b.Name %>', 'at', coords<%= index %>);
+              new mapboxgl.Marker({ color: 'red' })
+                .setLngLat(coords<%= index %>)
+                .setPopup(new mapboxgl.Popup().setHTML(`
+                  <h6><%= b.Name %></h6>
+                  <p><%= b.address %></p>
+                  <a href="/show/<%= b._id %>">View Details</a>
+                `))
+                .addTo(map);
+              bounds.extend(coords<%= index %>);
+              hasBusinesses = true;
+            <% } else { %>
+              console.log('  - Skipping business (no geometry):', '<%= b.Name %>');
+            <% } %>
+          <% }) %>
+        <% } else { %>
+          console.log('No businesses found or businesses array is empty');
+        <% } %>
+
+        // Fit map to show all markers
+        if (hasUserLocation || hasBusinesses) {
+          map.fitBounds(bounds, { padding: 50 });
+        } else {
+          // Fallback to Delhi if no location data
+          map.setCenter([77.2090, 28.6139]);
+          map.setZoom(10);
+        }
+      });
+
+      // Ask for user location if not already in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!urlParams.has("lat")) {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(position => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set("lat", lat);
+            currentUrl.searchParams.set("lng", lng);
+            window.location.href = currentUrl.toString();
+          }, () => {
+            alert("Location access denied. Cannot show nearby businesses.");
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
+  });
 </script>
 
 <style>

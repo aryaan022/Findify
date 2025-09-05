@@ -282,6 +282,15 @@ app.get("/discover", async (req, res) => {
 
       status : 'active'
     });
+    
+    // Debug logging
+    console.log(`Found ${businesses.length} businesses near ${lat}, ${lng}`);
+    businesses.forEach((business, index) => {
+      console.log(`Business ${index + 1}: ${business.Name}`);
+      console.log(`  - Has geometry: ${!!business.geometry}`);
+      console.log(`  - Coordinates: ${business.geometry ? business.geometry.coordinates : 'N/A'}`);
+      console.log(`  - Status: ${business.status}`);
+    });
   }
 
   res.render("discover.ejs", {
