@@ -1,21 +1,12 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const bcrypt = require("bcrypt");
+
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const UserSchema = new Schema({
     email:{
         type:String,
         required:true,
-        unique:true
-    },
-    username:{
-        type:String,
-        required:true,
-        unique:true
-    },
-    password:{
-        type:String,
-        required:true
     },
     role:{
         type:String,
@@ -41,16 +32,6 @@ const UserSchema = new Schema({
     },
     
 })
-
-
-UserSchema.pre("save", async function(next){
-    if(!this.isModified("password")){
-        return next();
-    }
-    this.password = await bcrypt.hash(this.password,10);
-    next();
-})
-
 
 UserSchema.virtual('isPremium').get(function() {//virtual property will not be stored in DB it is calculated on the fly 
     // 'this' refers to the user document

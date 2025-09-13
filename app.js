@@ -111,20 +111,26 @@ app.get("/register", async (req, res) => {
 
 //register route
 app.post("/register", async (req, res, next) => {
-  const{ username, email, role, password } = req.body;
   try {
-    const existingUser = await user.findOne({ username});
-    if(existingUser){
-      return res.status(400).json({ message: "Username already exists"});
-    }
+    let { username, email, role, password } = req.body;
+    
     //SECURITY: Prevent users from making themselves admins ++
     if (role === 'admin') {
       role = 'user'; // Default them to 'user' if they try to select 'admin'
     }
 
-    let newuser = new user({ email, username, role,password });
-    await newuser.save();
-    res.redirect("/login");
+    let newuser = new user({ email, username, role });
+    const registeredUser = await user.register(newuser, password);
+    // ... rest of the code remains the same
+    console.log(registeredUser);
+    req.login(registeredUser, (err) => {
+      if (err) {
+        return next(err);
+      } else {
+        req.flash("success", "Welcome to Local Business Finder!");
+        res.redirect("/");
+      }
+    });
   } catch (e) {
     req.flash("error", e.message); // Also a good idea to flash the actual error
     res.redirect("/register");
