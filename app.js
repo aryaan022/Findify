@@ -184,7 +184,7 @@ app.get("/search", async (req, res) => {
     if (category && category !== "") {
       filter.Category = category;
     }
-
+n
     let business = await Business.find(filter).populate('Owner', 'username');
     
     // Get featured and top-rated businesses for the homepage sections
@@ -421,6 +421,643 @@ app.post("/contact", async (req, res) => {
     }
 });
 
+
+// -------------------- Enhanced Professional Chatbot backend --------------------
+// Advanced in-memory rate limiter per IP (resets every minute)
+const chatRateLimit = new Map();
+function isRateLimited(ip) {
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 1 minute
+  const maxRequests = 30; // Increased limit
+  const entry = chatRateLimit.get(ip);
+  if (!entry || now > entry.resetAt) {
+    chatRateLimit.set(ip, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  entry.count += 1;
+  if (entry.count > maxRequests) return true;
+  return false;
+}
+
+// Clean up old rate limit entries periodically (every 5 minutes)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of chatRateLimit.entries()) {
+    if (now > entry.resetAt) {
+      chatRateLimit.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// -------------------- Real-time Chatbot Analytics --------------------
+// In-memory analytics storage (in production, use Redis or database)
+const chatbotAnalytics = {
+  totalQueries: 0,
+  queriesLastHour: 0,
+  queriesLastMinute: 0,
+  successfulSearches: 0,
+  aiFallbacks: 0,
+  quickReplies: 0,
+  businessResults: 0,
+  uniqueUsers: new Set(),
+  queriesByHour: new Array(24).fill(0),
+  popularQueries: new Map(), // query -> count
+  responseTypes: {
+    quickReply: 0,
+    businessSearch: 0,
+    aiGenerated: 0,
+    fallback: 0
+  },
+  sentiment: {
+    positive: 0,
+    neutral: 0,
+    negative: 0
+  },
+  startTime: Date.now(),
+  lastQueryTime: null,
+  averageResponseTime: 0,
+  responseTimes: []
+};
+
+// Reset hourly stats every hour
+setInterval(() => {
+  chatbotAnalytics.queriesLastHour = 0;
+  chatbotAnalytics.queriesLastMinute = 0;
+}, 60 * 60 * 1000);
+
+// Reset minute stats every minute
+setInterval(() => {
+  chatbotAnalytics.queriesLastMinute = 0;
+}, 60 * 1000);
+
+// Track query in analytics
+function trackChatbotQuery(query, responseType, responseTime, userId = null, foundBusinesses = false) {
+  const now = new Date();
+  const hour = now.getHours();
+  
+  chatbotAnalytics.totalQueries++;
+  chatbotAnalytics.queriesLastHour++;
+  chatbotAnalytics.queriesLastMinute++;
+  chatbotAnalytics.queriesByHour[hour]++;
+  chatbotAnalytics.lastQueryTime = now.toISOString();
+  
+  if (userId) {
+    chatbotAnalytics.uniqueUsers.add(userId.toString());
+  }
+  
+  // Track popular queries
+  const normalizedQuery = query.toLowerCase().trim().slice(0, 50);
+  chatbotAnalytics.popularQueries.set(
+    normalizedQuery,
+    (chatbotAnalytics.popularQueries.get(normalizedQuery) || 0) + 1
+  );
+  
+  // Track response types
+  if (responseType === 'quickReply') {
+    chatbotAnalytics.quickReplies++;
+    chatbotAnalytics.responseTypes.quickReply++;
+  } else if (responseType === 'businessSearch') {
+    chatbotAnalytics.businessResults += foundBusinesses ? 1 : 0;
+    chatbotAnalytics.responseTypes.businessSearch++;
+    chatbotAnalytics.successfulSearches++;
+  } else if (responseType === 'aiGenerated') {
+    chatbotAnalytics.aiFallbacks++;
+    chatbotAnalytics.responseTypes.aiGenerated++;
+  } else {
+    chatbotAnalytics.responseTypes.fallback++;
+  }
+  
+  // Track response time
+  if (responseTime) {
+    chatbotAnalytics.responseTimes.push(responseTime);
+    if (chatbotAnalytics.responseTimes.length > 100) {
+      chatbotAnalytics.responseTimes.shift(); // Keep last 100
+    }
+    const sum = chatbotAnalytics.responseTimes.reduce((a, b) => a + b, 0);
+    chatbotAnalytics.averageResponseTime = sum / chatbotAnalytics.responseTimes.length;
+  }
+  
+  // Simple sentiment analysis (basic keyword-based)
+  const lowerQuery = query.toLowerCase();
+  if (/(thank|great|awesome|love|perfect|amazing|good|nice|helpful)/.test(lowerQuery)) {
+    chatbotAnalytics.sentiment.positive++;
+  } else if (/(bad|wrong|error|failed|not working|hate|disappointed)/.test(lowerQuery)) {
+    chatbotAnalytics.sentiment.negative++;
+  } else {
+    chatbotAnalytics.sentiment.neutral++;
+  }
+}
+
+// Get top popular queries
+function getTopQueries(limit = 10) {
+  const sorted = Array.from(chatbotAnalytics.popularQueries.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([query, count]) => ({ query, count }));
+  return sorted;
+}
+
+// API endpoint for real-time analytics
+app.get("/api/chatbot/analytics", async (req, res) => {
+  try {
+    const uptime = Date.now() - chatbotAnalytics.startTime;
+    const uptimeHours = (uptime / (1000 * 60 * 60)).toFixed(2);
+    const queriesPerMinute = chatbotAnalytics.queriesLastMinute;
+    const queriesPerHour = chatbotAnalytics.queriesLastHour;
+    const successRate = chatbotAnalytics.totalQueries > 0 
+      ? ((chatbotAnalytics.successfulSearches / chatbotAnalytics.totalQueries) * 100).toFixed(1)
+      : 0;
+    
+    const topQueries = getTopQueries(10);
+    const totalUsers = chatbotAnalytics.uniqueUsers.size;
+    
+    // Calculate peak hour
+    const peakHour = chatbotAnalytics.queriesByHour.indexOf(
+      Math.max(...chatbotAnalytics.queriesByHour)
+    );
+    
+    res.json({
+      overview: {
+        totalQueries: chatbotAnalytics.totalQueries,
+        uniqueUsers: totalUsers,
+        queriesPerMinute,
+        queriesPerHour,
+        successRate: parseFloat(successRate),
+        averageResponseTime: chatbotAnalytics.averageResponseTime.toFixed(2),
+        uptimeHours: parseFloat(uptimeHours),
+        lastQueryTime: chatbotAnalytics.lastQueryTime
+      },
+      responseTypes: {
+        quickReplies: chatbotAnalytics.responseTypes.quickReply,
+        businessSearches: chatbotAnalytics.responseTypes.businessSearch,
+        aiGenerated: chatbotAnalytics.responseTypes.aiGenerated,
+        fallbacks: chatbotAnalytics.responseTypes.fallback
+      },
+      performance: {
+        successfulSearches: chatbotAnalytics.successfulSearches,
+        businessResults: chatbotAnalytics.businessResults,
+        aiFallbacks: chatbotAnalytics.aiFallbacks,
+        quickReplies: chatbotAnalytics.quickReplies
+      },
+      sentiment: {
+        positive: chatbotAnalytics.sentiment.positive,
+        neutral: chatbotAnalytics.sentiment.neutral,
+        negative: chatbotAnalytics.sentiment.negative,
+        total: chatbotAnalytics.sentiment.positive + 
+               chatbotAnalytics.sentiment.neutral + 
+               chatbotAnalytics.sentiment.negative
+      },
+      popularQueries: topQueries,
+      queriesByHour: chatbotAnalytics.queriesByHour.map((count, hour) => ({ hour, count })),
+      peakHour
+    });
+  } catch (error) {
+    console.error("Analytics error:", error);
+    res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+});
+
+// Utility to clean and normalize text
+function normalizeText(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[\n\r]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Extract search terms from natural phrases like "find a bakery near me"
+function extractSearchTerms(message) {
+  const msg = normalizeText(message);
+  // remove common intent/stop words
+  const cleaned = msg
+    .replace(/\b(find|search|look for|show me|show|please|can you|help me|i need|near me|nearby)\b/g, " ")
+    .replace(/\b(in|at|on|for|to|a|an|the|me|my|of)\b/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned) return [];
+  const tokens = cleaned.split(" ").filter(Boolean);
+  // naive singularization for common plurals
+  const normalized = tokens.map(t => t.endsWith("ies") ? t.slice(0, -3) + "y" : (t.endsWith("s") ? t.slice(0, -1) : t));
+  return Array.from(new Set(normalized)).slice(0, 5); // cap to 5 terms
+}
+
+// Helper for greeting detection
+const greetings = ["hi", "hello", "hey", "yo", "hola", "greetings", "good morning", "good afternoon", "good evening"];
+
+// Enhanced intent-based quick replies with professional responses
+function getQuickReply(message, currentUser) {
+  const msg = normalizeText(message);
+  const name = currentUser?.username ? `, ${currentUser.username}` : "";
+  
+  // Greetings with personalized response
+  if (greetings.includes(msg) || /^(hi|hello|hey|greetings|good morning|good afternoon|good evening)\b/.test(msg)) {
+    const suggestions = "💡 **Try asking:**\n• \"Find restaurants near me\"\n• \"Show me top-rated cafes\"\n• \"What categories are available?\"";
+    return `Hello${name}! 👋 I'm Findify Assistant, your intelligent guide to discovering local businesses. I can help you search, explore categories, answer questions, and more.\n\n${suggestions}`;
+  }
+  
+  // Help and guidance
+  if (/(help|guide|assistance|how can you help|what can you do)/.test(msg)) {
+    return `**How I Can Help You:**\n\n🔍 **Search & Discovery:** Ask me to find businesses by name or category\n📊 **Information:** Learn about ratings, premium features, or how Findify works\n💼 **Business Owners:** Get help listing your business or managing your account\n📞 **Support:** Direct you to contact forms or answer FAQs\n\n**Examples:**\n• "Find coffee shops"\n• "Show me gyms nearby"\n• "How does premium work?"\n• "What is Findify?"`;
+  }
+  
+  // Customer support requests
+  if (/(customer\s*support|talk to support|talk to (an )?agent|support team|human|representative|live chat|real person)/.test(msg)) {
+    return `For direct support from our team, please visit our **Contact** page: [/contact](/contact)\n\nYou can:\n• Fill out our contact form\n• Send us a detailed message\n• We typically respond within 24 hours\n\nFor quick answers, I'm here to help! What would you like to know?`;
+  }
+  
+  // Premium features
+  if (/(premium|subscription|premium features|upgrade|benefits)/.test(msg)) {
+    return `**Findify Premium** 🎯\n\n**Price:** ₹10/month\n**Benefits:**\n✨ Enhanced business discovery\n📊 Advanced dashboard features\n🚀 Priority support\n💎 Exclusive premium badge\n\n**Get Started:** Visit [/premium](/premium) to subscribe\n\nHave questions about premium? Just ask!`;
+  }
+  
+  // Contact information
+  if (/(contact|reach out|get in touch|email|phone)/.test(msg)) {
+    return `**Contact Findify:**\n\n📧 **Contact Form:** [/contact](/contact)\n💬 **Chat Assistant:** That's me! I'm here 24/7\n\n**Best for:**\n• Business inquiries\n• Technical support\n• General questions\n• Partnership opportunities\n\nUse the contact form for detailed messages that need a human response.`;
+  }
+  
+  // Dashboard help
+  if (/(dashboard|my account|profile|my listings|manage)/.test(msg)) {
+    const role = currentUser?.role?.toLowerCase();
+    const dashboardInfo = role === 'vendor' 
+      ? "**Vendor Dashboard Features:**\n• Manage your business listings\n• View analytics and reviews\n• Update business information\n• Track performance"
+      : role === 'admin'
+      ? "**Admin Dashboard:** Access all administrative features"
+      : "**User Dashboard Features:**\n• View your favorite businesses\n• Manage your reviews\n• Track your activity";
+    
+    return `**Your Dashboard** 📊\n\nAccess it at: [/dashboard](/dashboard)\n\n${dashboardInfo}\n\n${!currentUser ? '**Note:** You need to be logged in to access your dashboard.' : ''}`;
+  }
+  
+  // Categories information
+  if (/(categories|suggest categories|what categories|list categories|types of businesses)/.test(msg)) {
+    return `**Popular Business Categories on Findify:**\n\n🍕 **Food & Dining:** Restaurants, Cafes, Bakeries\n🔧 **Services:** Plumbers, Electricians, Contractors\n💆 **Beauty & Wellness:** Salons, Spas, Gyms\n📚 **Education:** Tutors, Coaching Centers\n🏥 **Healthcare:** Clinics, Pharmacies\n🛒 **Retail:** Shops, Stores\n\n**Try searching:**\n• "Find [category] near me"\n• "Show me top-rated [category]"\n• "Search for [category]"`;
+  }
+  
+  // Ratings and reviews
+  if (/(rating|ratings|reviews|review system|how rating|how reviews work)/.test(msg)) {
+    return `**How Ratings Work:** ⭐\n\n**User Reviews:** Customers leave ratings (1-5 stars) and comments\n**Average Rating:** Calculated from all reviews\n**Review Count:** Total number of reviews displayed\n\n**Features:**\n✅ Verified reviews from real users\n✅ Detailed feedback and photos\n✅ Helps you make informed decisions\n\n**Leave a Review:** Visit any business page and share your experience!`;
+  }
+  
+  // About Findify
+  if (/(what is findify|about findify|who are you|tell me about findify|what does findify do)/.test(msg)) {
+    return `**About Findify** 🌟\n\nFindify is your trusted platform for discovering and reviewing local businesses in your area.\n\n**Key Features:**\n🔍 **Smart Search:** Find businesses by name, category, or location\n📍 **Location-Based Discovery:** Explore businesses near you\n⭐ **Ratings & Reviews:** Read authentic customer experiences\n💼 **Business Listings:** Comprehensive business information\n❤️ **Favorites:** Save your favorite businesses\n\n**Get Started:** Explore businesses on our homepage or ask me to find something specific!`;
+  }
+  
+  // How it works
+  if (/(how does it work|how findify works|how to use|getting started|tutorial)/.test(msg)) {
+    return `**How to Use Findify:** 📖\n\n**1. Search & Discover**\n   • Use the search bar to find businesses\n   • Browse featured and top-rated businesses\n   • Use the Discover page for location-based search\n\n**2. Explore Business Details**\n   • Click on any business to see full details\n   • View ratings, reviews, contact info, and location\n\n**3. Engage (Login Required)**\n   • Save favorites to your dashboard\n   • Leave reviews and ratings\n   • Help others discover great businesses\n\n**4. For Business Owners**\n   • Register as a vendor\n   • Add your business listing\n   • Manage reviews and analytics\n\n**Ready to explore?** Try asking: "Find coffee shops" or "Show me restaurants"`;
+  }
+  
+  // Business listing help
+  if (/(add my business|list my business|become vendor|register business|post my business|sell on findify)/.test(msg)) {
+    return `**List Your Business on Findify** 💼\n\n**Steps to Get Started:**\n\n1. **Create Account** → [/register](/register)\n   • Select "Vendor" as your role\n\n2. **Log In** → [/login](/login)\n\n3. **Add Business** → [/new](/new)\n   • Fill in business details\n   • Upload images\n   • Add location\n\n4. **Await Approval**\n   • Our team reviews your listing\n   • You'll be notified once approved\n\n**Benefits:**\n✨ Increased visibility\n📊 Analytics dashboard\n⭐ Customer reviews\n💬 Direct customer contact\n\nNeed help? Ask me anything!`;
+  }
+  
+  // Registration help
+  if (/(how to register|create account|sign up|signup|register|new account)/.test(msg)) {
+    return `**Create Your Findify Account** 👤\n\n**Get Started:**\n1. Visit [/register](/register)\n2. Choose your role (User or Vendor)\n3. Fill in your details\n4. Verify and start exploring!\n\n**Already have an account?** → [/login](/login)\n\n**Account Types:**\n👤 **User:** Browse, review, and save favorites\n💼 **Vendor:** List and manage your business\n\n**Questions?** I'm here to help!`;
+  }
+  
+  // Pricing and payments
+  if (/(refund|payment|pricing|price|cost|subscription|billing|invoice)/.test(msg)) {
+    return `**Pricing & Payments** 💳\n\n**Free Features:**\n✅ Browse all businesses\n✅ Search and discover\n✅ Read reviews\n✅ Basic dashboard\n\n**Premium:** ₹10/month\n✨ Enhanced features (see /premium)\n\n**Payment:**\n• Secure payment via Razorpay\n• Monthly subscription model\n• Auto-renewal (cancel anytime)\n\n**Billing Support:**\n• Manage subscription: [/premium](/premium)\n• Contact support: [/contact](/contact)\n• Refunds processed within 5-7 business days`;
+  }
+  
+  // Thank you responses
+  if (/(thank|thanks|thx|appreciate|grateful)/.test(msg)) {
+    return `You're welcome${name}! 😊 I'm always here to help. Feel free to ask me anything about Findify or finding local businesses. Happy exploring!`;
+  }
+  
+  // Goodbye responses
+  if (/(bye|goodbye|see you|farewell|later)/.test(msg)) {
+    return `Goodbye${name}! 👋 Thanks for using Findify. Come back anytime if you need help finding businesses or have any questions!`;
+  }
+  
+  return null;
+}
+
+// Try to find relevant businesses based on the user's message
+async function searchBusinessesForMessage(message, page = 1, pageSize = 5) {
+  const terms = extractSearchTerms(message);
+  // If no terms extracted, fall back to broad regex on full message
+  if (terms.length === 0) {
+    const queryText = message.trim();
+    if (!queryText) return [];
+    const regex = new RegExp(queryText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    const results = await Business.find({
+      status: "active",
+      $or: [
+        { Name: regex },
+        { Category: regex },
+        { address: regex },
+      ],
+    })
+      .select("Name Category address avgRating reviewCount _id")
+      .sort({ avgRating: -1, reviewCount: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .lean();
+    return results;
+  }
+
+  // Build AND-of-terms where each term must appear in any of the fields
+  const andClauses = terms.map(t => {
+    const rx = new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    return { $or: [{ Name: rx }, { Category: rx }, { address: rx }] };
+  });
+
+  const results = await Business.find({
+    status: "active",
+    $and: andClauses,
+  })
+    .select("Name Category address avgRating reviewCount _id")
+    .sort({ avgRating: -1, reviewCount: -1 })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize)
+    .lean();
+  return results;
+}
+
+// Enhanced OpenAI fallback with better context and formatting
+async function generateAiReply(messages, userContext = {}) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return null;
+  try {
+    // Enhanced system prompt with context awareness
+    const enhancedSystemPrompt = {
+      role: "system",
+      content: `You are Findify's professional AI assistant. You help users discover local businesses and navigate the Findify platform.
+
+**Platform Context:**
+- Findify is a local business discovery and review platform
+- Users can search businesses by name, category, or location
+- Features include: Search, Discover (location-based), Dashboard, Premium (₹10/month), Reviews & Ratings
+- Business owners can register as vendors and list their businesses
+
+**Your Role:**
+- Provide helpful, concise, and professional responses
+- Guide users to relevant features (use markdown links: [/route](/route))
+- Format responses with markdown for readability (use **bold**, lists, emojis sparingly)
+- Keep responses under 150 words when possible
+- Be friendly but professional
+- If asked about finding businesses, suggest specific search terms or categories
+
+**Response Format:**
+- Use markdown for formatting
+- Include links in format: [Link Text](/route)
+- Use bullet points for lists
+- Keep it conversational but informative
+
+**Current User:** ${userContext.username || 'Guest'} (${userContext.role || 'User'})`
+    };
+
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-4o-mini",
+        messages: [enhancedSystemPrompt, ...messages],
+        temperature: 0.3,
+        max_tokens: 300,
+        presence_penalty: 0.2,
+        frequency_penalty: 0.2,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 12000,
+      }
+    );
+    const choice = response?.data?.choices?.[0]?.message?.content;
+    return choice || null;
+  } catch (err) {
+    console.error("OpenAI error:", err?.response?.data || err?.message || err);
+    return null;
+  }
+}
+
+app.post("/chatbot", async (req, res) => {
+  const startTime = Date.now();
+  let responseType = 'fallback';
+  let foundBusinesses = false;
+  let responseTime = 0;
+  
+  try {
+    if (isRateLimited(req.ip)) {
+      return res.status(429).json({ 
+        reply: "⏳ You're sending messages too fast. Please wait a moment and try again.",
+        type: "error"
+      });
+    }
+
+    const { message } = req.body || {};
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ 
+        reply: "Please provide a valid message.",
+        type: "error"
+      });
+    }
+
+    const trimmed = message.slice(0, 500).trim();
+    if (!trimmed) {
+      return res.status(400).json({ 
+        reply: "Please enter a non-empty message.",
+        type: "error"
+      });
+    }
+
+    // Initialize conversation history in session if not exists
+    if (!req.session.chatHistory) {
+      req.session.chatHistory = [];
+    }
+    
+    // Store user message in history (keep last 10 messages)
+    req.session.chatHistory.push({ role: "user", content: trimmed });
+    if (req.session.chatHistory.length > 10) {
+      req.session.chatHistory = req.session.chatHistory.slice(-10);
+    }
+
+    // Pagination: if user says "more", fetch next page from session
+    const normalized = normalizeText(trimmed);
+    if ((normalized === "more" || normalized.includes("more results")) && req.session?.chatQuery) {
+      const nextPage = (req.session.chatPage || 1) + 1;
+      const businesses = await searchBusinessesForMessage(req.session.chatQuery, nextPage, 5);
+      if (businesses.length === 0) {
+        return res.json({ 
+          reply: "No more results available. Try a different search term or ask me to refine the search.",
+          type: "info",
+          businesses: []
+        });
+      }
+      req.session.chatPage = nextPage;
+      
+      // Format businesses with links
+      const businessCards = businesses.map((b) => ({
+        id: b._id.toString(),
+        name: b.Name,
+        category: b.Category,
+        rating: b.avgRating || "N/A",
+        reviewCount: b.reviewCount || 0,
+        link: `/show/${b._id}`
+      }));
+      
+      const lines = businesses.map((b, i) => {
+        const rating = b.avgRating ? `⭐ ${b.avgRating}` : "";
+        const reviews = b.reviewCount ? `(${b.reviewCount} reviews)` : "";
+        const num = (nextPage - 1) * 5 + i + 1;
+        return `${num}. **${b.Name}** - ${b.Category} ${rating} ${reviews}`;
+      });
+      
+      return res.json({ 
+        reply: `**More Results:**\n${lines.join("\n")}\n\n💡 Say 'more' for additional results, or click any business to view details.`,
+        type: "businesses",
+        businesses: businessCards,
+        hasMore: businesses.length === 5
+      });
+    }
+
+    // 1) Quick intent replies
+    const quick = getQuickReply(trimmed, req.user);
+    if (quick) {
+      responseType = 'quickReply';
+      responseTime = Date.now() - startTime;
+      try {
+        trackChatbotQuery(trimmed, responseType, responseTime, req.user?._id, false);
+      } catch (err) {
+        console.error("Analytics tracking error:", err);
+      }
+      req.session.chatHistory.push({ role: "assistant", content: quick });
+      return res.json({ reply: quick, type: "text" });
+    }
+
+    // 2) Try business search based on the user's message
+    const businesses = await searchBusinessesForMessage(trimmed, 1, 5);
+    if (businesses.length > 0) {
+      // Remember query for pagination
+      if (req.session) {
+        req.session.chatQuery = trimmed;
+        req.session.chatPage = 1;
+      }
+      
+      // Format businesses as cards with links
+      const businessCards = businesses.map((b) => ({
+        id: b._id.toString(),
+        name: b.Name,
+        category: b.Category,
+        rating: b.avgRating || "N/A",
+        reviewCount: b.reviewCount || 0,
+        link: `/show/${b._id}`
+      }));
+      
+      const lines = businesses.map((b, i) => {
+        const rating = b.avgRating ? `⭐ ${b.avgRating}` : "";
+        const reviews = b.reviewCount ? `(${b.reviewCount} reviews)` : "";
+        return `${i + 1}. **${b.Name}** - ${b.Category} ${rating} ${reviews}`;
+      });
+      
+      const reply = `**Found ${businesses.length} businesses:**\n${lines.join("\n")}\n\n💡 **Next Steps:**\n• Click any business to view details\n• Say 'more' for additional results\n• Visit [/search](/search) or [/discover](/discover) for advanced search`;
+      
+      responseType = 'businessSearch';
+      foundBusinesses = businesses.length > 0;
+      responseTime = Date.now() - startTime;
+      try {
+        trackChatbotQuery(trimmed, responseType, responseTime, req.user?._id, foundBusinesses);
+      } catch (err) {
+        console.error("Analytics tracking error:", err);
+      }
+      req.session.chatHistory.push({ role: "assistant", content: reply });
+      
+      return res.json({ 
+        reply,
+        type: "businesses",
+        businesses: businessCards,
+        hasMore: businesses.length === 5
+      });
+    }
+
+    // 3) AI fallback with conversation context
+    const conversationContext = req.session.chatHistory.slice(-4); // Last 4 messages for context
+    const userContext = {
+      username: req.user?.username,
+      role: req.user?.role,
+      email: req.user?.email
+    };
+    
+    const aiMessages = [
+      ...conversationContext,
+      { role: "user", content: trimmed }
+    ];
+    
+    const ai = await generateAiReply(aiMessages, userContext);
+    if (ai) {
+      responseType = 'aiGenerated';
+      responseTime = Date.now() - startTime;
+      try {
+        trackChatbotQuery(trimmed, responseType, responseTime, req.user?._id, false);
+      } catch (err) {
+        console.error("Analytics tracking error:", err);
+      }
+      req.session.chatHistory.push({ role: "assistant", content: ai });
+      return res.json({ reply: ai, type: "text" });
+    }
+
+    // 4) Final fallback with helpful suggestions
+    const fallback = `I couldn't find an exact match for "${trimmed}".\n\n**Here's what I can help with:**\n\n🔍 **Search Businesses:**\n• "Find [category]" (e.g., "Find cafes", "Find plumbers")\n• "Show me [business type]" (e.g., "Show me restaurants")\n• "Search for [name]"\n\n📚 **Learn About Findify:**\n• "What is Findify?"\n• "How does it work?"\n• "What categories are available?"\n• "How do ratings work?"\n\n💼 **Business Owners:**\n• "How to add my business?"\n• "Become a vendor"\n\n📞 **Support:**\n• "Contact support" → [/contact](/contact)\n• "Help" → General assistance\n\nTry rephrasing your question or use one of the suggestions above!`;
+    
+    responseTime = Date.now() - startTime;
+    try {
+      trackChatbotQuery(trimmed, responseType, responseTime, req.user?._id, false);
+    } catch (err) {
+      console.error("Analytics tracking error:", err);
+    }
+    req.session.chatHistory.push({ role: "assistant", content: fallback });
+    
+    return res.json({ 
+      reply: fallback,
+      type: "text"
+    });
+  } catch (error) {
+    console.error("/chatbot error:", error);
+    responseTime = Date.now() - startTime;
+    try {
+      trackChatbotQuery(message || 'error', 'error', responseTime, req.user?._id, false);
+    } catch (err) {
+      console.error("Analytics tracking error:", err);
+    }
+    return res.status(500).json({ 
+      reply: "Sorry, something went wrong on our end. Please try again in a moment. If the issue persists, contact us via [/contact](/contact).",
+      type: "error"
+    });
+  }
+});
+// ------------------ End Chatbot backend ------------------
+
+// Clear chat history endpoint
+app.post("/chatbot/clear-history", (req, res) => {
+  try {
+    // Clear session history
+    if (req.session.chatHistory) {
+      req.session.chatHistory = [];
+    }
+    if (req.session.chatQuery) {
+      delete req.session.chatQuery;
+    }
+    if (req.session.chatPage) {
+      delete req.session.chatPage;
+    }
+    res.json({ success: true, message: "Chat history cleared" });
+  } catch (error) {
+    console.error("Error clearing chat history:", error);
+    res.status(500).json({ success: false, error: "Failed to clear chat history" });
+  }
+});
+
+// Chatbot Analytics Dashboard Route - Admin Only
+app.get("/chatbot/analytics", isLoggedIn, isAdmin, (req, res) => {
+  res.render("chatbot-analytics.ejs");
+});
 
 // (edit + update)
 app.put(

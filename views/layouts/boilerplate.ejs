@@ -128,6 +128,22 @@
   color: #333;
 }
 
+/* Refined CTA for Sign Up */
+.navbar .btn-cta {
+  background: #ffffff;
+  color: #5e46c4; /* match gradient tone */
+  border: 0;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.25);
+}
+
+.navbar .btn-cta:hover {
+  color: #4a38a0;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(255, 255, 255, 0.35);
+}
+
 .navbar .dropdown-menu {
   background-color: rgba(25, 30, 40, 0.98);
   backdrop-filter: blur(10px);
@@ -162,8 +178,8 @@
           <li class="nav-item"><a class="nav-link" href="/aboutus">About Us</a></li>
           <li class="nav-item"><a class="nav-link" href="/contact">Get in Touch</a></li>
           <% if (!currentUser) { %>
-            <li class="nav-item"><a class="btn btn-outline-light ms-3" href="/login">Login</a></li>
-            <li class="nav-item"><a class="btn btn-light text-primary ms-2" href="/register">Sign Up</a></li>
+            <li class="nav-item"><a class="btn btn-outline-light ms-3 px-3" href="/login">Login</a></li>
+            <li class="nav-item"><a class="btn btn-cta ms-2 px-3" href="/register">Sign Up</a></li>
             <% } else { %>
               <li class="nav-item dropdown ms-3">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">

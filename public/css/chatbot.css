@@ -122,6 +122,15 @@ body.chat-open::after {
     border-bottom: 1px solid var(--glass-border);
 }
 
+#chat-header a {
+    transition: all 0.2s ease;
+}
+
+#chat-header a:hover {
+    background: rgba(106, 90, 249, 0.2);
+    color: var(--text-primary);
+}
+
 #close-chat {
     background: none; border: none; color: var(--text-secondary);
     font-size: 24px; cursor: pointer; transition: color 0.2s;
@@ -161,14 +170,93 @@ body.chat-open::after {
 }
 
 /* --- Typing Indicator --- */
-.typing-indicator { display: none; } /* We will use the old JS, this is just to prevent errors if it exists in HTML */
+.typing-indicator {
+    display: flex;
+    gap: 6px;
+    padding: 12px 18px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.typing-indicator.hidden {
+    display: none;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    animation: typing-bounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing-bounce {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
 
 /* --- Glowing Input Form --- */
 #chat-form {
-    display: flex;
-    align-items: center;
     padding: 15px 20px;
     border-top: 1px solid var(--glass-border);
+}
+
+#chat-form > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#voice-btn {
+    background: rgba(106, 90, 249, 0.2);
+    border: 1px solid rgba(106, 90, 249, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+#voice-btn:hover {
+    background: rgba(106, 90, 249, 0.3);
+    border-color: rgba(106, 90, 249, 0.5);
+    transform: scale(1.1);
+}
+
+#voice-btn:active {
+    transform: scale(0.95);
+}
+
+#voice-status {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
 #user-input {
@@ -203,4 +291,201 @@ body.chat-open::after {
 #chat-form button:hover {
     transform: scale(1.1) rotate(-15deg);
     box-shadow: 0 0 25px rgba(106, 90, 249, 0.8);
+}
+
+/* --- Message Enhancements --- */
+.message strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.message ul {
+    margin: 8px 0;
+    padding-left: 20px;
+    list-style: none;
+}
+
+.message ul li {
+    margin: 4px 0;
+    position: relative;
+    padding-left: 16px;
+}
+
+.message ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--user-message-bg);
+}
+
+.message .chat-link {
+    color: var(--user-message-bg);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(106, 90, 249, 0.3);
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.message .chat-link:hover {
+    color: #8a7df8;
+    border-bottom-color: #8a7df8;
+}
+
+/* --- Suggestion Buttons --- */
+.suggestion-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.suggestion-btn {
+    background: rgba(106, 90, 249, 0.15);
+    border: 1px solid rgba(106, 90, 249, 0.3);
+    color: var(--text-primary);
+    padding: 8px 14px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.suggestion-btn:hover {
+    background: rgba(106, 90, 249, 0.25);
+    border-color: rgba(106, 90, 249, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(106, 90, 249, 0.2);
+}
+
+/* --- Business Cards --- */
+.business-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.business-card {
+    background: rgba(106, 90, 249, 0.1);
+    border: 1px solid rgba(106, 90, 249, 0.2);
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.business-card:hover {
+    background: rgba(106, 90, 249, 0.15);
+    border-color: rgba(106, 90, 249, 0.4);
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(106, 90, 249, 0.2);
+}
+
+.business-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.business-card-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.business-category {
+    background: rgba(106, 90, 249, 0.2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-left: 8px;
+}
+
+.business-card-info {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.business-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #ffd700;
+}
+
+.business-reviews {
+    color: var(--text-secondary);
+}
+
+.business-card-link {
+    display: inline-block;
+    color: var(--user-message-bg);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+.business-card-link:hover {
+    color: #8a7df8;
+    transform: translateX(4px);
+}
+
+/* --- Scrollbar Styling --- */
+#chat-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-box::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+#chat-box::-webkit-scrollbar-thumb {
+    background: rgba(106, 90, 249, 0.3);
+    border-radius: 3px;
+}
+
+#chat-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 90, 249, 0.5);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 480px) {
+    #chat-container {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 120px);
+        max-height: 80vh;
+        right: 20px;
+        bottom: 20px;
+    }
+    
+    .business-card-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .business-category {
+        margin-left: 0;
+        align-self: flex-start;
+    }
+    
+    .suggestion-buttons {
+        flex-direction: column;
+    }
+    
+    .suggestion-btn {
+        width: 100%;
+        text-align: left;
+    }
 }

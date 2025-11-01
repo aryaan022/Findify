@@ -1,10 +1,22 @@
 <div id="chat-container" class="hidden">
     <div id="chat-header">
-        <span>Chat with Findify AI</span>
-        <button id="close-chat">✕</button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Findify Assistant</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.role && currentUser.role.toLowerCase() === 'admin') { %>
+                <a href="/chatbot/analytics" target="_blank" title="View Analytics Dashboard" id="analytics-link" style="color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem; padding: 4px 8px; border-radius: 8px; transition: all 0.2s;">
+                    📊 Analytics
+                </a>
+            <% } %>
+            <button id="close-chat" aria-label="Close chat">✕</button>
+        </div>
     </div>
     <div id="chat-box">
-        <div class="message bot-message">Hello! How can I assist you with Findify today? This Feature is Currently In Developemt Mode Our Team is Working On this</div>
+        <!-- Messages will be dynamically added here -->
         <div id="typing-indicator" class="typing-indicator hidden">
             <span></span>
             <span></span>
@@ -12,13 +24,26 @@
         </div>
     </div>
     <form id="chat-form">
-        <input type="text" id="user-input" placeholder="Ask a question..." autocomplete="off" required>
-        <button type="submit" aria-label="Send">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: white;">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-        </button>
+        <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+            <button type="button" id="voice-btn" aria-label="Voice input" title="Click to speak">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </button>
+            <input type="text" id="user-input" placeholder="Ask a question or find businesses..." autocomplete="off" required>
+            <button type="submit" aria-label="Send message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: white;">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+        <div id="voice-status" style="display: none; font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 5px; text-align: center;">
+            Listening...
+        </div>
     </form>
 </div>
 
