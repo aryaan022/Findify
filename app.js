@@ -15,6 +15,8 @@ const user = require("./models/User");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GitHubStrategy = require("passport-github2").Strategy;
 const flash = require("connect-flash");
 const MethodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
@@ -25,6 +27,7 @@ const Conversation = require("./models/Conversation");
 const { storage, cloudinary } = require("./cloudconfig");
 const upload = multer({ storage });
 const { isLoggedIn, isOwner, isVendor, isAdmin } = require("./middleware");
+const { generateOTP, sendOTP, getOTPExpiry, verifyOTP, clearOTP } = require("./utils/otp");
 
 
 const Razorpay = require("razorpay")
@@ -67,6 +70,96 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(user.authenticate()));
 
+// Google OAuth Strategy
+passport.use(new GoogleStrategy(
+  {
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "/auth/google/callback"
+  },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      let existingUser = await user.findOne({ googleId: profile.id });
+      
+      if (existingUser) {
+        return done(null, existingUser);
+      }
+
+      // Check if email already exists
+      let userByEmail = await user.findOne({ email: profile.emails[0].value });
+      if (userByEmail) {
+        userByEmail.googleId = profile.id;
+        userByEmail.provider = 'google';
+        userByEmail.profilePicture = profile.photos[0]?.value;
+        userByEmail.isEmailVerified = true;
+        await userByEmail.save();
+        return done(null, userByEmail);
+      }
+
+      // Create new user
+      const newUser = new user({
+        username: profile.displayName || profile.emails[0].value.split('@')[0],
+        email: profile.emails[0].value,
+        googleId: profile.id,
+        provider: 'google',
+        profilePicture: profile.photos[0]?.value,
+        isEmailVerified: true,
+        role: 'user'
+      });
+
+      await newUser.save();
+      return done(null, newUser);
+    } catch (error) {
+      return done(error, null);
+    }
+  }
+));
+
+// GitHub OAuth Strategy
+passport.use(new GitHubStrategy(
+  {
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: "/auth/github/callback"
+  },
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      let existingUser = await user.findOne({ githubId: profile.id });
+      
+      if (existingUser) {
+        return done(null, existingUser);
+      }
+
+      // Check if email already exists
+      let userByEmail = await user.findOne({ email: profile.emails[0]?.value });
+      if (userByEmail) {
+        userByEmail.githubId = profile.id;
+        userByEmail.provider = 'github';
+        userByEmail.profilePicture = profile.photos[0]?.value;
+        userByEmail.isEmailVerified = true;
+        await userByEmail.save();
+        return done(null, userByEmail);
+      }
+
+      // Create new user
+      const newUser = new user({
+        username: profile.username,
+        email: profile.emails[0]?.value || `${profile.username}@github.local`,
+        githubId: profile.id,
+        provider: 'github',
+        profilePicture: profile.photos[0]?.value,
+        isEmailVerified: true,
+        role: 'user'
+      });
+
+      await newUser.save();
+      return done(null, newUser);
+    } catch (error) {
+      return done(error, null);
+    }
+  }
+));
+
 passport.serializeUser(user.serializeUser()); //user ki info session me save kraneka mtlb hai serialized user and unstore krane ka mtlb hai deserialized user.
 passport.deserializeUser(user.deserializeUser());
 
@@ -106,42 +199,192 @@ app.get("/", async (req, res) => {
     });
 });
 
-//regiter route
+//register route - GET (show registration form)
 app.get("/register", async (req, res) => {
-  res.render("register.ejs");
+  res.render("register.ejs", { errors: [] });
 });
 
-//register route
+// Register route - POST (send OTP)
 app.post("/register", async (req, res, next) => {
   try {
     let { username, email, role, password } = req.body;
-    
-    //SECURITY: Prevent users from making themselves admins ++
-    if (role === 'admin') {
-      role = 'user'; // Default them to 'user' if they try to select 'admin'
+
+    // Validate inputs
+    if (!username || !email || !role || !password) {
+      req.flash("error", "All fields are required");
+      return res.redirect("/register");
     }
 
-    let newuser = new user({ email, username, role });
-    const registeredUser = await user.register(newuser, password);
-    // ... rest of the code remains the same
-    console.log(registeredUser);
-    req.login(registeredUser, (err) => {
-      if (err) {
-        return next(err);
-      } else {
-        req.flash("success", "Welcome to Local Business Finder!");
-        res.redirect("/");
-      }
+    // Check if user already exists
+    const existingUser = await user.findOne({ email });
+    if (existingUser) {
+      req.flash("error", "Email already registered. Please login or use a different email.");
+      return res.redirect("/register");
+    }
+
+    // Prevent admin role
+    if (role === 'admin') {
+      role = 'user';
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpiry = getOTPExpiry('signup');
+
+    // Create temporary user with OTP (not yet registered with password)
+    let newUser = new user({
+      username,
+      email,
+      role,
+      otp,
+      otpExpiry,
+      isEmailVerified: false,
+      provider: 'local'
     });
+
+    // Hash and set password
+    await user.register(newUser, password);
+
+    // Save the OTP to the user
+    const userWithOTP = await user.findOne({ email });
+    userWithOTP.otp = otp;
+    userWithOTP.otpExpiry = otpExpiry;
+    userWithOTP.isEmailVerified = false;
+    await userWithOTP.save();
+
+    // Send OTP via email
+    const otpResult = await sendOTP(email, otp, 'signup');
+
+    if (!otpResult.success) {
+      req.flash("error", "Failed to send OTP. Please try again.");
+      return res.redirect("/register");
+    }
+
+    req.flash("success", "OTP sent to your email. Please verify to complete registration.");
+    res.render("verify-otp.ejs", { email });
   } catch (e) {
-    req.flash("error", e.message); // Also a good idea to flash the actual error
+    console.error("Registration error:", e);
+    req.flash("error", e.message || "Registration failed. Please try again.");
     res.redirect("/register");
   }
 });
 
+// Verify OTP route - POST
+app.post("/verify-otp", async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      req.flash("error", "Email and OTP are required");
+      return res.render("verify-otp.ejs", { email });
+    }
+
+    const userDoc = await user.findOne({ email });
+
+    if (!userDoc) {
+      req.flash("error", "User not found. Please register again.");
+      return res.redirect("/register");
+    }
+
+    // Verify OTP
+    const otpVerification = verifyOTP(otp, userDoc.otp, userDoc.otpExpiry);
+
+    if (!otpVerification.valid) {
+      req.flash("error", otpVerification.message);
+      return res.render("verify-otp.ejs", { email });
+    }
+
+    // Mark email as verified and clear OTP
+    userDoc.isEmailVerified = true;
+    clearOTP(userDoc, 'signup');
+    await userDoc.save();
+
+    // Log in the user
+    req.login(userDoc, (err) => {
+      if (err) {
+        return next(err);
+      }
+      req.flash("success", "Email verified! Welcome to Local Business Finder!");
+      res.redirect("/");
+    });
+  } catch (e) {
+    console.error("OTP verification error:", e);
+    req.flash("error", e.message || "OTP verification failed");
+    res.render("verify-otp.ejs", { email: req.body.email });
+  }
+});
+
+// Resend OTP route - POST
+app.post("/resend-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      req.flash("error", "Email is required");
+      return res.redirect("/register");
+    }
+
+    const userDoc = await user.findOne({ email });
+
+    if (!userDoc) {
+      req.flash("error", "User not found");
+      return res.redirect("/register");
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpiry = getOTPExpiry('signup');
+
+    userDoc.otp = otp;
+    userDoc.otpExpiry = otpExpiry;
+    await userDoc.save();
+
+    // Send OTP via email
+    const otpResult = await sendOTP(email, otp, 'signup');
+
+    if (!otpResult.success) {
+      req.flash("error", "Failed to send OTP. Please try again.");
+    } else {
+      req.flash("success", "New OTP sent to your email");
+    }
+
+    res.render("verify-otp.ejs", { email });
+  } catch (e) {
+    console.error("Resend OTP error:", e);
+    req.flash("error", e.message || "Failed to resend OTP");
+    res.redirect("/register");
+  }
+});
+
+// Google OAuth Routes
+app.get("/auth/google", 
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get("/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  (req, res) => {
+    req.flash("success", `Welcome ${req.user.username}!`);
+    res.redirect("/");
+  }
+);
+
+// GitHub OAuth Routes
+app.get("/auth/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
+
+app.get("/auth/github/callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  (req, res) => {
+    req.flash("success", `Welcome ${req.user.username}!`);
+    res.redirect("/");
+  }
+);
+
 //login route
 app.get("/login", (req, res) => {
-  res.render("login.ejs");
+  res.render("login.ejs", { errors: [] });
 });
 
 app.post(
@@ -165,6 +408,164 @@ app.get("/logout", (req, res) => {
     req.flash("success", "Goodbye!");
     res.redirect("/");
   });
+});
+
+// Forgot Password Routes
+app.get("/forgot-password", (req, res) => {
+  res.render("forgot-password.ejs", { errors: [] });
+});
+
+app.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      req.flash("error", "Email is required");
+      return res.redirect("/forgot-password");
+    }
+
+    const userDoc = await user.findOne({ email });
+
+    if (!userDoc) {
+      // Don't reveal if email exists (security best practice)
+      req.flash("success", "If an account exists with this email, you will receive a password reset link.");
+      return res.redirect("/login");
+    }
+
+    // Generate OTP for password reset
+    const resetOtp = generateOTP();
+    const resetOtpExpiry = getOTPExpiry('reset');
+
+    userDoc.resetOtp = resetOtp;
+    userDoc.resetOtpExpiry = resetOtpExpiry;
+    await userDoc.save();
+
+    // Send OTP via email
+    const otpResult = await sendOTP(email, resetOtp, 'reset');
+    console.log("OTP Send Result:", otpResult);
+
+    if (!otpResult.success) {
+      req.flash("error", "Failed to send reset OTP. Please try again.");
+      return res.redirect("/forgot-password");
+    }
+
+    req.flash("success", "OTP sent to your email. Check your inbox.");
+    res.render("reset-password.ejs", { email, errors: [] });
+  } catch (e) {
+    console.error("Forgot password error:", e);
+    req.flash("error", e.message || "Failed to process forgot password request");
+    res.redirect("/forgot-password");
+  }
+});
+
+// Reset Password Routes
+app.post("/reset-password", async (req, res) => {
+  try {
+    const { email, otp, password, confirmPassword } = req.body;
+
+    console.log("Reset password attempt:", { email, otp, password: password ? "***" : "none" });
+
+    if (!email || !otp || !password || !confirmPassword) {
+      req.flash("error", "All fields are required");
+      return res.render("reset-password.ejs", { email, errors: [] });
+    }
+
+    if (password !== confirmPassword) {
+      req.flash("error", "Passwords do not match");
+      return res.render("reset-password.ejs", { email, errors: [] });
+    }
+
+    if (password.length < 8) {
+      req.flash("error", "Password must be at least 8 characters long");
+      return res.render("reset-password.ejs", { email, errors: [] });
+    }
+
+    const userDoc = await user.findOne({ email });
+
+    if (!userDoc) {
+      req.flash("error", "User not found");
+      return res.redirect("/login");
+    }
+
+    // Verify OTP
+    const otpVerification = verifyOTP(otp, userDoc.resetOtp, userDoc.resetOtpExpiry);
+    console.log("OTP Verification Result:", otpVerification);
+
+    if (!otpVerification.valid) {
+      req.flash("error", otpVerification.message);
+      return res.render("reset-password.ejs", { email, errors: [] });
+    }
+
+    // Clear reset OTP first
+    clearOTP(userDoc, 'reset');
+    
+    // Set new password using setPassword
+    userDoc.setPassword(password, async (err) => {
+      try {
+        if (err) {
+          console.error("SetPassword error:", err);
+          req.flash("error", "Failed to reset password");
+          return res.render("reset-password.ejs", { email, errors: [] });
+        }
+
+        await userDoc.save();
+        console.log("Password reset successful for:", email);
+
+        req.flash("success", "Password reset successfully! Please log in with your new password.");
+        res.redirect("/login");
+      } catch (saveErr) {
+        console.error("Save error after setPassword:", saveErr);
+        req.flash("error", "Failed to save new password");
+        res.render("reset-password.ejs", { email, errors: [] });
+      }
+    });
+  } catch (e) {
+    console.error("Reset password error:", e);
+    req.flash("error", e.message || "Failed to reset password");
+    res.render("reset-password.ejs", { email: req.body.email, errors: [] });
+  }
+});
+
+// Resend Reset OTP
+app.post("/resend-reset-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      req.flash("error", "Email is required");
+      return res.redirect("/forgot-password");
+    }
+
+    const userDoc = await user.findOne({ email });
+
+    if (!userDoc) {
+      req.flash("error", "User not found");
+      return res.redirect("/login");
+    }
+
+    // Generate new reset OTP
+    const resetOtp = generateOTP();
+    const resetOtpExpiry = getOTPExpiry('reset');
+
+    userDoc.resetOtp = resetOtp;
+    userDoc.resetOtpExpiry = resetOtpExpiry;
+    await userDoc.save();
+
+    // Send OTP via email
+    const otpResult = await sendOTP(email, resetOtp, 'reset');
+
+    if (!otpResult.success) {
+      req.flash("error", "Failed to send OTP. Please try again.");
+    } else {
+      req.flash("success", "New OTP sent to your email");
+    }
+
+    res.render("reset-password.ejs", { email });
+  } catch (e) {
+    console.error("Resend reset OTP error:", e);
+    req.flash("error", e.message || "Failed to resend OTP");
+    res.redirect("/forgot-password");
+  }
 });
 
 //search route
