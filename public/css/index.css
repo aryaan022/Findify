@@ -329,3 +329,268 @@
     background: linear-gradient(135deg, #f8d7da, #f5c6cb);
     color: #721c24;
   }
+
+/* ===== ADVANCED UI IMPROVEMENTS ===== */
+
+/* Enhanced Hero Section */
+.hero-section {
+  position: relative;
+  animation: slideUp 0.8s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Floating Animation for Elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Image Hover Effects */
+.card-img-top {
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-img-top::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.hover-card:hover .card-img-top {
+  transform: scale(1.1) rotate(1deg);
+}
+
+.hover-card:hover .card-img-top::after {
+  left: 100%;
+}
+
+/* Text Fade-in Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-title,
+.card-text {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Icon Animation */
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+[data-lucide] {
+  transition: all 0.3s ease;
+}
+
+.hover-card:hover [data-lucide] {
+  animation: iconPulse 0.6s ease-out;
+  color: #667eea;
+}
+
+/* Button Ripple Effect */
+.btn-primary,
+.btn-outline-primary {
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.btn-primary:active::after,
+.btn-outline-primary:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Smooth Scroll Behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced Carousel Controls */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: rgba(102, 126, 234, 0.8);
+  border-radius: 50%;
+  backdrop-filter: blur(5px);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 25px;
+  height: 25px;
+  filter: brightness(1.5);
+}
+
+#featuredCarousel:hover .carousel-control-prev,
+#featuredCarousel:hover .carousel-control-next {
+  opacity: 1;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  background: rgba(102, 126, 234, 1);
+}
+
+/* Section Spacing Improvements */
+section {
+  position: relative;
+}
+
+section > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Enhanced Dividers */
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #667eea, transparent);
+  margin: 2rem 0;
+}
+
+/* Smooth Transitions for All Interactive Elements */
+button,
+input,
+select,
+textarea {
+  transition: all 0.3s ease;
+}
+
+/* Enhanced Focus States */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+}
+
+/* Skeleton Loading Animation Enhancement */
+@keyframes shimmerEnhanced {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background-image: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmerEnhanced 2s infinite;
+}
+
+/* Enhanced Responsive Cards */
+@media (max-width: 768px) {
+  .hover-card:hover {
+    transform: translateY(-8px) scale(1.01);
+  }
+  
+  .card-img-top {
+    height: 160px !important;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Loading Spinner Animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Glow Effect for Important Elements */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+  }
+}
+
+.highlighted-card {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Smooth Page Load Animation */
+@keyframes pageLoad {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+body {
+  animation: pageLoad 0.5s ease-out;
+}
