@@ -181,6 +181,12 @@
             <li class="nav-item"><a class="btn btn-outline-light ms-3 px-3" href="/login">Login</a></li>
             <li class="nav-item"><a class="btn btn-cta ms-2 px-3" href="/register">Sign Up</a></li>
             <% } else { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/messages" id="messagesLink">
+                  <i class="fa fa-envelope"></i> Messages
+                  <span class="badge bg-danger" id="msgBadge" style="display: none;">0</span>
+                </a>
+              </li>
               <li class="nav-item dropdown ms-3">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                   <i class="fa fa-user-circle"></i>
@@ -284,6 +290,36 @@
     </div>
   </footer>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Update unread message count in navbar -->
+    <script>
+      // Function to update unread message count
+      async function updateUnreadCount() {
+        try {
+          const response = await fetch('/api/messages/unread-count');
+          const data = await response.json();
+          const badge = document.getElementById('msgBadge');
+          
+          if (data.unreadCount > 0) {
+            badge.textContent = data.unreadCount;
+            badge.style.display = 'inline-block';
+          } else {
+            badge.style.display = 'none';
+          }
+        } catch (err) {
+          console.log('Could not fetch unread count');
+        }
+      }
+
+      // Check if user is logged in and update count
+      <% if (currentUser) { %>
+        // Update on page load
+        updateUnreadCount();
+        
+        // Update every 10 seconds
+        setInterval(updateUnreadCount, 10000);
+      <% } %>
+    </script>
     <script src="/js/chatbot.js"></script>
     <script src="/js/premium.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

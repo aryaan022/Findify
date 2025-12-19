@@ -99,6 +99,11 @@
                 </button>
               </form>
               <% } %>
+              <% if(currentUser && currentUser.role == "user") { %>
+              <a href="/messages/start/<%= business.Owner._id %>?businessId=<%= business._id %>" class="btn btn-success">
+                <i data-lucide="message-circle" class="me-2"></i> Message Vendor
+              </a>
+              <% } %>
             </div>
           </div>
         </div>

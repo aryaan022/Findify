@@ -1,0 +1,231 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="row h-100" style="height: calc(100vh - 150px);">
+        <!-- Chat Header -->
+        <div class="col-12 border-bottom pb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">
+                        💬 
+                        <%= otherParticipant.username %>
+                        <span class="badge bg-<%= otherParticipant.role === 'Vendor' ? 'success' : 'secondary' %>">
+                            <%= otherParticipant.role %>
+                        </span>
+                    </h4>
+                    <% if (conversation.businessId) { %>
+                        <small class="text-muted">Business: <%= conversation.businessId.Name %></small>
+                    <% } %>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-danger" id="blockBtn">
+                        🚫 Block Conversation
+                    </button>
+                    <a href="/messages" class="btn btn-sm btn-secondary">Back</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Display -->
+        <div class="col-12 flex-grow-1 overflow-auto mt-3" id="messagesContainer" style="max-height: calc(100vh - 350px);">
+            <div class="d-flex flex-column">
+                <% if (messages && messages.length > 0) { %>
+                    <% messages.forEach(msg => { %>
+                        <% if (!msg.isDeleted) { %>
+                            <div class="mb-3 d-flex <%= msg.sender._id.toString() === currentUser._id.toString() ? 'justify-content-end' : 'justify-content-start' %>">
+                                <div class="<%= msg.sender._id.toString() === currentUser._id.toString() ? 'bg-primary text-white' : 'bg-light text-dark' %> p-3 rounded" style="max-width: 60%;">
+                                    <p class="mb-1"><%= msg.content %></p>
+                                    <small class="text-muted">
+                                        <% const msgTime = new Date(msg.createdAt); %>
+                                        <%= msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                                        <% if (msg.sender._id.toString() === currentUser._id.toString() && msg.isRead) { %>
+                                            ✓✓ seen
+                                        <% } %>
+                                    </small>
+                                    
+                                    <!-- Delete button for own messages -->
+                                    <% if (msg.sender._id.toString() === currentUser._id.toString()) { %>
+                                        <button class="btn btn-sm btn-link text-white p-0 ms-2 delete-msg" data-msg-id="<%= msg._id %>">
+                                            ✕
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <div class="text-center text-muted mt-5">
+                        <p>No messages yet. Start the conversation!</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Message Input Form -->
+        <div class="col-12 border-top mt-3 pt-3 pb-3">
+            <form id="messageForm" class="d-flex gap-2">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    class="form-control" 
+                    placeholder="Type a message..." 
+                    maxlength="5000"
+                    required
+                />
+                <button type="submit" class="btn btn-primary">
+                    📤 Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const conversationId = '<%= conversation._id %>';
+    const currentUserId = '<%= currentUser._id %>';
+    const messagesContainer = document.getElementById('messagesContainer');
+
+    // Scroll to bottom when page loads
+    setTimeout(() => {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 100);
+
+    // Send message via AJAX
+    document.getElementById('messageForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const content = document.getElementById('messageInput').value;
+
+        if (!content.trim()) return;
+
+        try {
+            const response = await fetch(`/messages/${conversationId}/send`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Clear input
+                document.getElementById('messageInput').value = '';
+
+                // Add message to DOM
+                const messageHTML = `
+                    <div class="mb-3 d-flex justify-content-end">
+                        <div class="bg-primary text-white p-3 rounded" style="max-width: 60%;">
+                            <p class="mb-1">${data.message.content}</p>
+                            <small class="text-muted">
+                                ${new Date(data.message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </small>
+                            <button class="btn btn-sm btn-link text-white p-0 ms-2 delete-msg" data-msg-id="${data.message._id}">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                messagesContainer.innerHTML += messageHTML;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // Attach delete listener to new message
+                attachDeleteListener();
+            } else {
+                alert('Error: ' + (data.error || 'Could not send message'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to send message');
+        }
+    });
+
+    // Delete message function
+    function attachDeleteListener() {
+        document.querySelectorAll('.delete-msg').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const messageId = btn.getAttribute('data-msg-id');
+
+                if (confirm('Delete this message?')) {
+                    try {
+                        const response = await fetch(`/messages/${conversationId}/delete/${messageId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            btn.closest('.mb-3').remove();
+                        } else {
+                            alert('Could not delete message');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            });
+        });
+    }
+
+    // Attach initial delete listeners
+    attachDeleteListener();
+
+    // Block conversation
+    document.getElementById('blockBtn').addEventListener('click', async () => {
+        if (confirm('Block this conversation? You won\'t be able to message this user.')) {
+            try {
+                const response = await fetch(`/messages/${conversationId}/block`, {
+                    method: 'PATCH'
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert(data.blocked ? 'Conversation blocked' : 'Conversation unblocked');
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    });
+
+    // Auto-refresh messages every 3 seconds (optional: for real-time feel)
+    setInterval(() => {
+        fetch(`/messages/${conversationId}`)
+            .then(res => res.text())
+            .then(html => {
+                // This is a simple refresh - in production, use WebSocket for true real-time
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+                const newMessages = newDoc.querySelector('#messagesContainer');
+                
+                // Only update if there are new messages
+                if (newMessages && newMessages.innerHTML !== messagesContainer.innerHTML) {
+                    messagesContainer.innerHTML = newMessages.innerHTML;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    attachDeleteListener();
+                }
+            })
+            .catch(err => console.log('Auto-refresh failed:', err));
+    }, 3000);
+</script>
+
+<style>
+    #messagesContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .bg-primary {
+        background-color: #0d6efd !important;
+        border-radius: 15px 15px 0 15px;
+    }
+
+    .bg-light {
+        border-radius: 15px 15px 15px 0;
+    }
+</style>

@@ -20,6 +20,8 @@ const MethodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const multer = require("multer");
 const Review = require("./models/Review");
+const Message = require("./models/Message");
+const Conversation = require("./models/Conversation");
 const { storage, cloudinary } = require("./cloudconfig");
 const upload = multer({ storage });
 const { isLoggedIn, isOwner, isVendor, isAdmin } = require("./middleware");
@@ -256,7 +258,9 @@ app.get("/aboutus", (req, res) => {
 
 //new form get request
 app.get("/new", isLoggedIn, isVendor, (req, res) => {
-  res.render("new.ejs");
+  res.render("new.ejs", { 
+    mapboxToken: process.env.MAP_ACCESS_TOKEN 
+  });
 });
 
 
@@ -267,38 +271,75 @@ app.post(
   isVendor,
   upload.single("image"),
   async (req, res) => {
-    let { Name, Category, description, Contact, address } = req.body;
-    let image = { url: req.file.path, filename: req.file.filename };
+    try {
+      let { Name, Category, description, Contact, address, latitude, longitude } = req.body;
+      let image = { url: req.file.path, filename: req.file.filename };
 
-    const geodata = await geocodingClient
-      .forwardGeocode({
-        query: address,
-        limit: 1,
-      })
-      .send();
+      // Validate that coordinates are provided
+      if (!latitude || !longitude) {
+        req.flash("error", "Please select exact location on the map before submitting.");
+        return res.redirect("/new");
+      }
 
-    if (!geodata.body.features || geodata.body.features.length === 0) {
-      req.flash("error", "Location not found. Try again.");
-      return res.redirect("/new");
+      // Parse coordinates as numbers
+      const lat = parseFloat(latitude);
+      const lng = parseFloat(longitude);
+
+      // Validate coordinates are valid numbers
+      if (isNaN(lat) || isNaN(lng)) {
+        req.flash("error", "Invalid coordinates. Please select location again.");
+        return res.redirect("/new");
+      }
+
+      // Validate latitude and longitude ranges
+      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        req.flash("error", "Invalid coordinates. Please select location again.");
+        return res.redirect("/new");
+      }
+
+      // Optional: Use reverse geocoding to get full address if not filled
+      let finalAddress = address;
+      if (!address || address.trim().length === 0) {
+        try {
+          const geocodeData = await geocodingClient
+            .reverseGeocode({
+              query: [lng, lat], // [longitude, latitude]
+            })
+            .send();
+
+          if (geocodeData.body.features && geocodeData.body.features.length > 0) {
+            finalAddress = geocodeData.body.features[0].place_name;
+          } else {
+            finalAddress = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+          }
+        } catch (error) {
+          console.log("Reverse geocoding failed, using coordinates as address");
+          finalAddress = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+      }
+
+      let business = new Business({
+        Name,
+        Owner: req.user._id,
+        Category,
+        description,
+        Contact,
+        address: finalAddress,
+        Image: image,
+        geometry: {
+          type: "Point",
+          coordinates: [lng, lat], // GeoJSON format is [longitude, latitude]
+        },
+      });
+
+      await business.save();
+      req.flash("success", "Business registered successfully with exact location!");
+      res.redirect("/");
+    } catch (error) {
+      console.error("Error creating business:", error);
+      req.flash("error", "Error registering business. Please try again.");
+      res.redirect("/new");
     }
-    const coords = geodata.body.features[0].center; // [lon, lat]
-
-    let business = new Business({
-      Name,
-      Owner: req.user._id,
-      Category,
-      description,
-      Contact,
-      address: geodata.body.features[0].text, //address
-      Image: image,
-      geometry: {
-        type: "Point",
-        coordinates: coords,
-      },
-    });
-    await business.save();
-    req.flash("success", "Business registered successfully!");
-    res.redirect("/");
   }
 );
 
@@ -1579,6 +1620,344 @@ app.get("/terms", (req, res) => {
 
 
 
+
+// ==================== MESSAGING SYSTEM ====================
+
+// Middleware to check if user is part of conversation
+const isConversationParticipant = async (req, res, next) => {
+  try {
+    const conversation = await Conversation.findById(req.params.conversationId);
+    if (!conversation) {
+      req.flash("error", "Conversation not found");
+      return res.redirect("/messages");
+    }
+    
+    // Check if current user is a participant
+    const isParticipant = conversation.participants.some(
+      p => p.toString() === req.user._id.toString()
+    );
+    
+    if (!isParticipant) {
+      req.flash("error", "You don't have access to this conversation");
+      return res.redirect("/messages");
+    }
+    
+    next();
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "An error occurred");
+    res.redirect("/messages");
+  }
+};
+
+// ==================== MESSAGING ROUTES ====================
+
+// GET: Messages dashboard - show all conversations
+app.get("/messages", isLoggedIn, async (req, res) => {
+  try {
+    const conversations = await Conversation.find({
+      participants: req.user._id,
+      isActive: true
+    })
+    .populate("participants", "username email") // Populate user data
+    .populate("lastMessageSender", "username")
+    .sort({ lastMessageTime: -1 })
+    .lean();
+
+    // Count unread messages for each conversation
+    const conversationsWithUnread = await Promise.all(
+      conversations.map(async (conv) => {
+        const unreadCount = await Message.countDocuments({
+          conversation: conv._id,
+          receiver: req.user._id,
+          isRead: false,
+          isDeleted: false
+        });
+        return { ...conv, unreadCount };
+      })
+    );
+
+    // Get total unread count across all conversations
+    const totalUnread = await Message.countDocuments({
+      receiver: req.user._id,
+      isRead: false,
+      isDeleted: false
+    });
+
+    res.render("messages.ejs", { 
+      conversations: conversationsWithUnread, 
+      currentUser: req.user,
+      totalUnread
+    });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Could not load messages");
+    res.redirect("/");
+  }
+});
+
+// POST: Start a new conversation (customer initiates with vendor)
+// GET: Start/open a conversation with a vendor
+app.get("/messages/start/:vendorId", isLoggedIn, async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+    const { businessId } = req.query; // Get businessId from query params
+
+    // Validate vendor exists and is a vendor
+    const vendor = await user.findById(vendorId);
+    if (!vendor || vendor.role !== "Vendor") {
+      req.flash("error", "Invalid vendor");
+      return res.redirect("back");
+    }
+
+    // Can't message yourself
+    if (vendorId === req.user._id.toString()) {
+      req.flash("error", "You cannot message yourself");
+      return res.redirect("back");
+    }
+
+    // Check if conversation already exists between these users
+    let conversation = await Conversation.findOne({
+      participants: { $all: [req.user._id, vendorId] },
+      vendorId: vendorId
+    });
+
+    // If not, create new conversation
+    if (!conversation) {
+      conversation = new Conversation({
+        participants: [req.user._id, vendorId],
+        vendorId: vendorId,
+        businessId: businessId || null
+      });
+      await conversation.save();
+    }
+
+    res.redirect(`/messages/${conversation._id}`);
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Could not start conversation");
+    res.redirect("back");
+  }
+});
+
+// POST: Alternative route for starting conversation (kept for backward compatibility)
+app.post("/messages/start/:vendorId", isLoggedIn, async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+    const { businessId } = req.body; // Optional: business being discussed
+
+    // Validate vendor exists and is a vendor
+    const vendor = await user.findById(vendorId);
+    if (!vendor || vendor.role !== "Vendor") {
+      req.flash("error", "Invalid vendor");
+      return res.redirect("back");
+    }
+
+    // Can't message yourself
+    if (vendorId === req.user._id.toString()) {
+      req.flash("error", "You cannot message yourself");
+      return res.redirect("back");
+    }
+
+    // Check if conversation already exists between these users
+    let conversation = await Conversation.findOne({
+      participants: { $all: [req.user._id, vendorId] },
+      vendorId: vendorId
+    });
+
+    // If not, create new conversation
+    if (!conversation) {
+      conversation = new Conversation({
+        participants: [req.user._id, vendorId],
+        vendorId: vendorId,
+        businessId: businessId || null
+      });
+      await conversation.save();
+    }
+
+    res.redirect(`/messages/${conversation._id}`);
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Could not start conversation");
+    res.redirect("back");
+  }
+});
+
+// GET: View conversation and messages
+app.get("/messages/:conversationId", isLoggedIn, isConversationParticipant, async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.conversationId)
+      .populate("participants", "username email role")
+      .populate("businessId", "Name")
+      .lean();
+
+    // Get all messages in conversation (pagination: get last 50)
+    const messages = await Message.find({
+      conversation: req.params.conversationId,
+      isDeleted: false
+    })
+    .populate("sender", "username email role")
+    .populate("receiver", "username email role")
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean();
+
+    // Reverse to show oldest first
+    messages.reverse();
+
+    // Get the other participant
+    const otherParticipant = conversation.participants.find(
+      p => p._id.toString() !== req.user._id.toString()
+    );
+
+    // Mark messages as read (only for current user as receiver)
+    await Message.updateMany(
+      {
+        conversation: req.params.conversationId,
+        receiver: req.user._id,
+        isRead: false
+      },
+      {
+        isRead: true,
+        readAt: new Date()
+      }
+    );
+
+    res.render("conversation.ejs", {
+      conversation,
+      messages,
+      otherParticipant,
+      currentUser: req.user
+    });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Could not load conversation");
+    res.redirect("/messages");
+  }
+});
+
+// POST: Send a message
+app.post("/messages/:conversationId/send", isLoggedIn, isConversationParticipant, async (req, res) => {
+  try {
+    const { content } = req.body;
+
+    // Validate content
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ error: "Message cannot be empty" });
+    }
+
+    if (content.length > 5000) {
+      return res.status(400).json({ error: "Message is too long (max 5000 characters)" });
+    }
+
+    const conversation = await Conversation.findById(req.params.conversationId);
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    // Check if conversation is blocked
+    if (conversation.blockedBy) {
+      return res.status(403).json({ error: "This conversation is blocked" });
+    }
+
+    // Find the receiver (the other participant)
+    const receiver = conversation.participants.find(
+      p => p.toString() !== req.user._id.toString()
+    );
+
+    // Create message
+    const message = new Message({
+      conversation: req.params.conversationId,
+      sender: req.user._id,
+      receiver: receiver,
+      content: content.trim()
+    });
+
+    await message.save();
+
+    // Populate for response
+    await message.populate("sender", "username");
+    await message.populate("receiver", "username");
+
+    // Return message for real-time display (JSON for AJAX)
+    res.json({
+      success: true,
+      message: message
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not send message" });
+  }
+});
+
+// DELETE: Delete a message (soft delete)
+app.delete("/messages/:conversationId/delete/:messageId", isLoggedIn, isConversationParticipant, async (req, res) => {
+  try {
+    const message = await Message.findById(req.params.messageId);
+
+    if (!message) {
+      return res.status(404).json({ error: "Message not found" });
+    }
+
+    // Only sender can delete their own message
+    if (message.sender.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "You can only delete your own messages" });
+    }
+
+    // Soft delete: mark as deleted but keep in database
+    message.isDeleted = true;
+    message.deletedAt = new Date();
+    await message.save();
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not delete message" });
+  }
+});
+
+// PATCH: Block/Unblock conversation
+app.patch("/messages/:conversationId/block", isLoggedIn, isConversationParticipant, async (req, res) => {
+  try {
+    const conversation = await Conversation.findById(req.params.conversationId);
+
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    // Toggle block status
+    if (conversation.blockedBy && conversation.blockedBy.toString() === req.user._id.toString()) {
+      // User already blocked it, unblock
+      conversation.blockedBy = null;
+    } else {
+      // Block it
+      conversation.blockedBy = req.user._id;
+    }
+
+    await conversation.save();
+
+    res.json({ success: true, blocked: conversation.blockedBy !== null });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not update conversation" });
+  }
+});
+
+// GET: Unread message count (for navbar/dashboard badge)
+app.get("/api/messages/unread-count", isLoggedIn, async (req, res) => {
+  try {
+    const unreadCount = await Message.countDocuments({
+      receiver: req.user._id,
+      isRead: false,
+      isDeleted: false
+    });
+
+    res.json({ unreadCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not fetch unread count" });
+  }
+});
 
 // 404 handler - catch unmatched routes
 app.use((req, res, next) => {

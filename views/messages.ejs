@@ -1,0 +1,73 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-5">
+    <div class="row h-100">
+        <!-- Conversations List (Left Sidebar) -->
+        <div class="col-md-4 border-end">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>💬 Messages</h3>
+                <% if (totalUnread > 0) { %>
+                    <span class="badge bg-danger"><%= totalUnread %> new</span>
+                <% } %>
+            </div>
+
+            <% if (conversations && conversations.length > 0) { %>
+                <div class="list-group" style="max-height: 600px; overflow-y: auto;">
+                    <% conversations.forEach(conv => { %>
+                        <a href="/messages/<%= conv._id %>" class="list-group-item list-group-item-action <% if (conv.unreadCount > 0) { %>fw-bold bg-light<% } %>">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <!-- Get the other participant's name -->
+                                    <% const otherUser = conv.participants.find(p => p._id.toString() !== currentUser._id.toString()); %>
+                                    <h6 class="mb-1">
+                                        <%= otherUser.username %>
+                                        <% if (conv.unreadCount > 0) { %>
+                                            <span class="badge bg-danger"><%= conv.unreadCount %></span>
+                                        <% } %>
+                                    </h6>
+                                    <p class="mb-0 text-muted small text-truncate">
+                                        <% if (conv.lastMessageSender._id.toString() === currentUser._id.toString()) { %>
+                                            You: 
+                                        <% } %>
+                                        <%= conv.lastMessage || 'No messages yet' %>
+                                    </p>
+                                </div>
+                                <small class="text-muted">
+                                    <% const date = new Date(conv.lastMessageTime); %>
+                                    <% const now = new Date(); %>
+                                    <% if (date.toDateString() === now.toDateString()) { %>
+                                        <%= date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                                    <% } else { %>
+                                        <%= date.toLocaleDateString([], { month: 'short', day: 'numeric' }) %>
+                                    <% } %>
+                                </small>
+                            </div>
+                        </a>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    No conversations yet. Start messaging with a vendor!
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Chat Area (Right Side) -->
+        <div class="col-md-8">
+            <div class="text-center text-muted py-5">
+                <p>👈 Select a conversation to start messaging</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-group-item.active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
