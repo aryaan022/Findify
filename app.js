@@ -1496,7 +1496,37 @@ app.post("/chatbot/clear-history", (req, res) => {
   }
 });
 
+// Chatbot Feedback/Reaction Endpoint
+app.post("/chatbot/feedback", (req, res) => {
+  try {
+    const { reaction, messageContent } = req.body;
+    const validReactions = ['👍', '👎', '😊', '❓'];
+    
+    if (!validReactions.includes(reaction)) {
+      return res.status(400).json({ success: false, error: "Invalid reaction" });
+    }
+    
+    // Track feedback for analytics
+    if (!chatbotAnalytics.feedbackCount) {
+      chatbotAnalytics.feedbackCount = {};
+    }
+    chatbotAnalytics.feedbackCount[reaction] = (chatbotAnalytics.feedbackCount[reaction] || 0) + 1;
+    
+    console.log(`[Chatbot Feedback] User gave "${reaction}" reaction to: "${messageContent}"`);
+    
+    res.json({ 
+      success: true, 
+      message: `Thank you for your feedback! ${reaction}`,
+      feedbackTracked: true
+    });
+  } catch (error) {
+    console.error("Error processing feedback:", error);
+    res.status(500).json({ success: false, error: "Failed to process feedback" });
+  }
+});
+
 // Chatbot Analytics Dashboard Route - Admin Only
+
 app.get("/chatbot/analytics", isLoggedIn, isAdmin, (req, res) => {
   res.render("chatbot-analytics.ejs");
 });

@@ -9,6 +9,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const typingIndicator = document.getElementById('typing-indicator');
     const voiceBtn = document.getElementById('voice-btn');
     const voiceStatus = document.getElementById('voice-status');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const exportChatBtn = document.getElementById('export-chat-btn');
+    
+    // Theme management
+    function initTheme() {
+        const savedTheme = localStorage.getItem('chatbot-theme') || 'dark';
+        document.documentElement.setAttribute('data-chat-theme', savedTheme);
+        updateThemeButton(savedTheme);
+    }
+    
+    function updateThemeButton(theme) {
+        if (themeToggleBtn) {
+            themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+    }
+    
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-chat-theme') || 'dark';
+        const newTheme = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-chat-theme', newTheme);
+        localStorage.setItem('chatbot-theme', newTheme);
+        updateThemeButton(newTheme);
+    }
+    
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', toggleTheme);
+    }
+    
+    // Export chat functionality
+    function exportChat() {
+        const messages = Array.from(chatBox.querySelectorAll('.message')).map(msg => {
+            const isUser = msg.classList.contains('user-message');
+            const sender = isUser ? 'You' : 'Assistant';
+            const text = msg.textContent;
+            return `[${new Date().toLocaleTimeString()}] ${sender}: ${text}`;
+        });
+        
+        if (messages.length === 0) {
+            alert('No messages to export!');
+            return;
+        }
+        
+        const content = `Findify Chat Export\nExported: ${new Date().toLocaleString()}\n\n${messages.join('\n')}`;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `findify-chat-${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    if (exportChatBtn) {
+        exportChatBtn.addEventListener('click', exportChat);
+    }
+    
+    // Initialize theme on load
+    initTheme();
     
     // Voice recognition setup
     let recognition = null;
@@ -494,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Check network connectivity before submitting
         if (!navigator.onLine) {
-            addMessage('⚠️ No internet connection. Please check your connection and try again.', 'bot-message');
+            addMessage('⚠️ No internet connection. Please check your connection and try again.', 'bot-message', true, true);
             return;
         }
 
@@ -537,9 +595,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Handle different response types
             if (data.type === 'businesses' && data.businesses && data.businesses.length > 0) {
-                addBusinessCards(data.businesses, data.reply);
+                addBusinessCards(data.businesses, data.reply, true);
             } else {
-                addMessage(data.reply, 'bot-message');
+                addMessage(data.reply, 'bot-message', true, true);
                 // Don't save to history - we're not keeping old chats
             }
 
@@ -564,37 +622,133 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorMsg = `⚠️ ${error.message}`;
             }
             
-            addMessage(errorMsg, 'bot-message');
+            addMessage(errorMsg, 'bot-message', true, true);
             // Don't save to history - we're not keeping old chats
         }
     });
 
     // --- Enhanced helper function to add a new message to the chat box ---
-    function addMessage(text, className, animate = true) {
+    function addMessage(text, className, animate = true, enableReactions = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${className}`;
+        messageDiv.style.position = 'relative';
         
-        // Parse markdown and set innerHTML
-        messageDiv.innerHTML = parseMarkdown(text);
-        
-        if (animate) {
+        // For bot messages, show typing simulation
+        if (className === 'bot-message' && animate) {
+            messageDiv.innerHTML = '<span class="typing-text"></span>';
+            const typingSpan = messageDiv.querySelector('.typing-text');
+            
+            chatBox.appendChild(messageDiv);
+            
+            // Simulate typing effect
+            const fullText = text;
+            let currentIndex = 0;
+            const typingSpeed = 15; // milliseconds per character
+            
+            function typeNextCharacter() {
+                if (currentIndex < fullText.length) {
+                    const char = fullText[currentIndex];
+                    if (char === '<') {
+                        // Handle HTML tags
+                        const endTag = fullText.indexOf('>', currentIndex);
+                        if (endTag !== -1) {
+                            currentIndex = endTag + 1;
+                        } else {
+                            currentIndex++;
+                        }
+                        typeNextCharacter();
+                    } else {
+                        currentIndex++;
+                        // Update innerHTML every few characters to render markdown
+                        const partialText = fullText.substring(0, currentIndex);
+                        typingSpan.innerHTML = parseMarkdown(partialText);
+                        scrollToBottom();
+                        setTimeout(typeNextCharacter, Math.random() * 10 + typingSpeed);
+                    }
+                } else {
+                    // Done typing - render full content
+                    typingSpan.innerHTML = parseMarkdown(fullText);
+                    if (enableReactions) {
+                        addReactionButtons(messageDiv);
+                    }
+                }
+            }
+            
             messageDiv.style.opacity = '0';
             messageDiv.style.transform = 'translateY(10px)';
-        }
-        
-        chatBox.appendChild(messageDiv);
-        
-        if (animate) {
+            
             requestAnimationFrame(() => {
                 messageDiv.style.transition = 'all 0.3s ease';
                 messageDiv.style.opacity = '1';
                 messageDiv.style.transform = 'translateY(0)';
+                setTimeout(typeNextCharacter, 100);
             });
+        } else {
+            // User messages and non-animated messages
+            messageDiv.innerHTML = parseMarkdown(text);
+            
+            if (animate) {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(10px)';
+            }
+            
+            chatBox.appendChild(messageDiv);
+            
+            if (animate) {
+                requestAnimationFrame(() => {
+                    messageDiv.style.transition = 'all 0.3s ease';
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                });
+            }
+            
+            if (enableReactions && className === 'bot-message') {
+                addReactionButtons(messageDiv);
+            }
         }
         
         scrollToBottom();
     }
-
+    
+    // Add reaction buttons to bot messages
+    function addReactionButtons(messageDiv) {
+        const reactionsContainer = document.createElement('div');
+        reactionsContainer.className = 'reaction-buttons';
+        reactionsContainer.innerHTML = `
+            <button class="reaction-btn" data-reaction="👍" title="Helpful">👍</button>
+            <button class="reaction-btn" data-reaction="👎" title="Not helpful">👎</button>
+            <button class="reaction-btn" data-reaction="😊" title="Great">😊</button>
+            <button class="reaction-btn" data-reaction="❓" title="Unclear">❓</button>
+        `;
+        
+        reactionsContainer.querySelectorAll('.reaction-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const reaction = this.getAttribute('data-reaction');
+                // Send feedback to server
+                fetch('/chatbot/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        reaction,
+                        messageContent: messageDiv.textContent.slice(0, 100)
+                    }),
+                    credentials: 'same-origin'
+                }).catch(err => console.error('Feedback error:', err));
+                
+                // Show visual feedback
+                btn.style.transform = 'scale(1.2)';
+                setTimeout(() => btn.style.transform = '', 200);
+                
+                // Disable reactions after voting
+                reactionsContainer.querySelectorAll('.reaction-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = '0.5';
+                });
+            });
+        });
+        
+        messageDiv.appendChild(reactionsContainer);
+    }
     // Smooth scroll to bottom
     function scrollToBottom() {
         setTimeout(() => {
