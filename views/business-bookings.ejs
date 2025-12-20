@@ -1,0 +1,215 @@
+<%- include('layouts/boilerplate') %>
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Manage Bookings</h1>
+            <p class="text-muted"><%= business.Name %></p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/business/dashboard/<%= business._id %>" class="btn btn-outline-primary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="btn-group" role="group">
+                <a href="/business/bookings/<%= business._id %>" class="btn btn-outline-secondary">All (<%= totalBookings %>)</a>
+                <a href="/business/bookings/<%= business._id %>?status=pending" class="btn btn-outline-warning">Pending</a>
+                <a href="/business/bookings/<%= business._id %>?status=confirmed" class="btn btn-outline-success">Confirmed</a>
+                <a href="/business/bookings/<%= business._id %>?status=completed" class="btn btn-outline-info">Completed</a>
+                <a href="/business/bookings/<%= business._id %>?status=cancelled" class="btn btn-outline-danger">Cancelled</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Bookings List</h5>
+                </div>
+                <div class="card-body p-0">
+                    <% if (bookings.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Service</th>
+                                        <th>Date & Time</th>
+                                        <th>Duration</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% bookings.forEach(booking => { %>
+                                        <tr>
+                                            <td>
+                                                <strong><%= booking.customerName %></strong><br>
+                                                <small class="text-muted"><%= booking.customerEmail %></small><br>
+                                                <small class="text-muted"><%= booking.customerPhone %></small>
+                                            </td>
+                                            <td><%= booking.serviceName %></td>
+                                            <td>
+                                                <strong><%= new Date(booking.bookingDate).toLocaleDateString() %></strong><br>
+                                                <small><%= booking.bookingTime %></small>
+                                            </td>
+                                            <td><%= booking.duration %> mins</td>
+                                            <td>
+                                                <strong>₹<%= booking.price %></strong><br>
+                                                <small class="<%= booking.paymentStatus === 'paid' ? 'text-success' : 'text-warning' %>">
+                                                    <%= booking.paymentStatus %>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <span class="badge" style="background-color: <%= getStatusColor(booking.status) %>;">
+                                                    <%= booking.status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info" onclick="editBooking('<%= booking._id %>', '<%= booking.status %>')">Edit</button>
+                                                <a href="#" class="btn btn-sm btn-secondary" onclick="viewDetails('<%= booking._id %>')">Details</a>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="p-4 text-center">
+                            <p class="text-muted">No bookings found</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Status Modal -->
+<div class="modal fade" id="editStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Booking Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="bookingId">
+                
+                <div class="mb-3">
+                    <label class="form-label">New Status</label>
+                    <select class="form-select" id="statusSelect">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="no-show">No Show</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" id="notesInput" rows="3" placeholder="Add notes for customer or internal use..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveStatusChange()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        border-radius: 8px 8px 0 0;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-group .btn {
+        border-radius: 5px;
+        margin-right: 5px;
+    }
+
+    h1 {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .badge {
+        padding: 0.35rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function getStatusColor(status) {
+        const colors = {
+            'pending': '#ff9800',
+            'confirmed': '#4caf50',
+            'completed': '#2196f3',
+            'cancelled': '#f44336',
+            'no-show': '#999'
+        };
+        return colors[status] || '#666';
+    }
+
+    function editBooking(bookingId, currentStatus) {
+        document.getElementById('bookingId').value = bookingId;
+        document.getElementById('statusSelect').value = currentStatus;
+        document.getElementById('notesInput').value = '';
+        new bootstrap.Modal(document.getElementById('editStatusModal')).show();
+    }
+
+    async function saveStatusChange() {
+        const bookingId = document.getElementById('bookingId').value;
+        const status = document.getElementById('statusSelect').value;
+        const notes = document.getElementById('notesInput').value;
+
+        try {
+            const response = await fetch(`/business/bookings/${bookingId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status, notes })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(`Booking ${status} successfully!`);
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to update booking');
+        }
+    }
+
+    function viewDetails(bookingId) {
+        console.log('View details for booking:', bookingId);
+        // This could open a detailed modal or redirect to a detail page
+    }
+</script>

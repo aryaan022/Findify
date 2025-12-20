@@ -1,0 +1,277 @@
+<%- include('layouts/boilerplate') %>
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><%= business.Name %></h1>
+            <p class="text-muted"><%= business.Category %> • <%= business.City %></p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/show/<%= business._id %>" class="btn btn-outline-primary">View Public Page</a>
+            <a href="/edit/<%= business._id %>" class="btn btn-outline-secondary">Edit Business</a>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Views</h6>
+                    <h2 class="card-text"><%= analytics.totalViews %></h2>
+                    <small class="text-success">+<%= analytics.viewsThisMonth %> this month</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total Clicks</h6>
+                    <h2 class="card-text"><%= analytics.totalClicks %></h2>
+                    <small class="text-success">+<%= analytics.clicksThisMonth %> this month</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Avg Rating</h6>
+                    <h2 class="card-text">
+                        <span style="color: #ffc107;">★</span>
+                        <%= parseFloat(analytics.avgRating).toFixed(1) %>
+                    </h2>
+                    <small><%= analytics.totalReviews %> reviews</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Messages</h6>
+                    <h2 class="card-text"><%= analytics.totalMessages %></h2>
+                    <small class="text-info"><%= unreadMessages %> unread</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Status -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📅 Booking Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h4><%= confirmedBookings %></h4>
+                            <p class="text-muted">Confirmed Bookings</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4 style="color: #ff9800;"><%= pendingBookings %></h4>
+                            <p class="text-muted">Pending Bookings</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4 style="color: #4caf50;"><%= bookingsThisMonth %></h4>
+                            <p class="text-muted">This Month</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="/business/bookings/<%= business._id %>" class="btn btn-primary">Manage All Bookings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📋 Recent Bookings</h5>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <% if (recentBookings.length > 0) { %>
+                        <% recentBookings.forEach(booking => { %>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1"><%= booking.customerName %></h6>
+                                        <p class="text-muted mb-1 small"><%= booking.serviceName %></p>
+                                        <small class="text-muted"><%= new Date(booking.bookingDate).toLocaleDateString() %> at <%= booking.bookingTime %></small>
+                                    </div>
+                                    <span class="badge" style="background-color: <%= booking.status === 'confirmed' ? '#4caf50' : (booking.status === 'pending' ? '#ff9800' : '#999') %>;">
+                                        <%= booking.status %>
+                                    </span>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted">No bookings yet</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Reviews -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">⭐ Recent Reviews</h5>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <% if (reviews.length > 0) { %>
+                        <% reviews.forEach(review => { %>
+                            <div class="mb-3 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div>
+                                            <% for(let i = 0; i < review.rating; i++) { %>
+                                                <span style="color: #ffc107;">★</span>
+                                            <% } %>
+                                        </div>
+                                        <p class="small mb-1"><strong><%= review.author.username %></strong></p>
+                                        <p class="small text-muted"><%= review.text.substring(0, 100) %>...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-muted">No reviews yet</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Chart Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📊 Analytics Chart</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="viewsChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">⚙️ Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-info me-2" onclick="loadAnalyticsData()">📈 Load Full Analytics</button>
+                    <a href="/business/bookings/<%= business._id %>" class="btn btn-warning me-2">📅 Manage Bookings</a>
+                    <a href="/messages" class="btn btn-secondary me-2">💬 View Messages (<%= unreadMessages %>)</a>
+                    <a href="/edit/<%= business._id %>" class="btn btn-secondary">✏️ Edit Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        border-radius: 8px 8px 0 0;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .badge {
+        padding: 0.35rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    h1 {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Load analytics chart data
+    async function loadAnalyticsData() {
+        try {
+            const response = await fetch('/business/analytics/<%= business._id %>');
+            const data = await response.json();
+
+            if (data.success && data.data) {
+                const chartData = data.data;
+                renderChart(chartData.dailyViewsChart);
+            }
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+            alert('Failed to load analytics data');
+        }
+    }
+
+    // Render views chart
+    function renderChart(dailyData) {
+        const ctx = document.getElementById('viewsChart').getContext('2d');
+        
+        if (window.viewsChart) {
+            window.viewsChart.destroy();
+        }
+
+        window.viewsChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dailyData.map(d => d.date),
+                datasets: [{
+                    label: 'Daily Views',
+                    data: dailyData.map(d => d.views),
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Views'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Load on page load
+    loadAnalyticsData();
+</script>

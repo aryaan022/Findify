@@ -87,7 +87,6 @@
                 <i data-lucide="phone" class="me-2"></i> Call Now
               </a>
               <% } %>
-              <% if(business.address){ %>
               <a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(business.address) %>" target="_blank" class="btn btn-outline-primary">
                 <i data-lucide="directions" class="me-2"></i> Get Directions
               </a>
@@ -237,13 +236,13 @@
         <% }) %>
       </div>
     </div>
-
     <!-- Back -->
     <div class="text-center mt-5">
       <a href="/discover" class="btn btn-outline-primary btn-lg">
         <i data-lucide="arrow-left" class="me-2"></i> Back to Discover
       </a>
     </div>
+
   </div>
 </section>
 

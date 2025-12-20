@@ -28,6 +28,7 @@ const { storage, cloudinary } = require("./cloudconfig");
 const upload = multer({ storage });
 const { isLoggedIn, isOwner, isVendor, isAdmin } = require("./middleware");
 const { generateOTP, sendOTP, getOTPExpiry, verifyOTP, clearOTP } = require("./utils/otp");
+const businessRoutes = require("./routes/business");
 
 
 const Razorpay = require("razorpay")
@@ -47,6 +48,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(MethodOverride("_method"));
 app.use(express.json());
 app.engine("ejs", ejsMate);
+
 
 app.use(flash());
 app.use(
@@ -2402,6 +2404,9 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.render("error.ejs", { url: req.originalUrl, message: err.message, status: err.status || 500 });
 });
+
+// ==================== Business Routes ====================
+app.use("/business", businessRoutes);
 
 main()
   .then(() => {
