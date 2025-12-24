@@ -41,6 +41,10 @@ const razorpay = new Razorpay({
 
 const dbUrl = process.env.DB_URL;
 
+// Trust proxy - CRITICAL for SSL/HTTPS behind reverse proxy
+// This fixes OAuth issues when behind nginx, cloudflare, load balancer, etc
+app.set('trust proxy', 1);
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
@@ -70,14 +74,48 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(user.authenticate()));
+
+// Configure LocalStrategy to support both username and email
+passport.use(new LocalStrategy({
+  usernameField: 'username',
+  passwordField: 'password',
+  passReqToCallback: false
+}, async (username, password, done) => {
+  try {
+    // Try to find user by username or email
+    let userDoc = await user.findOne({
+      $or: [
+        { username: username },
+        { email: username }
+      ]
+    });
+
+    if (!userDoc) {
+      return done(null, false, { message: 'User not found' });
+    }
+
+    // Use passport-local-mongoose's authenticate method
+    userDoc.authenticate(password, (err, authenticatedUser) => {
+      if (err) {
+        return done(err);
+      }
+      if (authenticatedUser) {
+        return done(null, authenticatedUser);
+      } else {
+        return done(null, false, { message: 'Invalid password' });
+      }
+    });
+  } catch (err) {
+    return done(err);
+  }
+}));
 
 // Google OAuth Strategy
 passport.use(new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback"
+    callbackURL: process.env.NODE_ENV === 'production' ? "https://findify.live/auth/google/callback" : "http://localhost:3000/auth/google/callback"
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
@@ -122,7 +160,8 @@ passport.use(new GitHubStrategy(
   {
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: "/auth/github/callback"
+    callbackURL: process.env.NODE_ENV === 'production' ? "https://findify.live/auth/github/callback" : "http://localhost:3000/auth/github/callback",
+    scope: ['user:email']
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
@@ -132,8 +171,13 @@ passport.use(new GitHubStrategy(
         return done(null, existingUser);
       }
 
+      // Get email - GitHub API returns emails, use the primary one
+      const email = profile.emails && profile.emails.length > 0 
+        ? profile.emails.find(e => e.primary)?.value || profile.emails[0].value 
+        : `${profile.username}@github.local`;
+
       // Check if email already exists
-      let userByEmail = await user.findOne({ email: profile.emails[0]?.value });
+      let userByEmail = await user.findOne({ email });
       if (userByEmail) {
         userByEmail.githubId = profile.id;
         userByEmail.provider = 'github';
@@ -146,7 +190,7 @@ passport.use(new GitHubStrategy(
       // Create new user
       const newUser = new user({
         username: profile.username,
-        email: profile.emails[0]?.value || `${profile.username}@github.local`,
+        email: email,
         githubId: profile.id,
         provider: 'github',
         profilePicture: profile.photos[0]?.value,
@@ -157,6 +201,7 @@ passport.use(new GitHubStrategy(
       await newUser.save();
       return done(null, newUser);
     } catch (error) {
+      console.error("GitHub OAuth error:", error);
       return done(error, null);
     }
   }
@@ -364,10 +409,19 @@ app.get("/auth/google",
 );
 
 app.get("/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/login" }),
+  passport.authenticate("google", { 
+    failureRedirect: "/login",
+    failureMessage: true 
+  }),
   (req, res) => {
-    req.flash("success", `Welcome ${req.user.username}!`);
-    res.redirect("/");
+    try {
+      req.flash("success", `Welcome ${req.user.username}!`);
+      res.redirect("/");
+    } catch (err) {
+      console.error("Google callback error:", err);
+      req.flash("error", "Error during Google login. Please try again.");
+      res.redirect("/login");
+    }
   }
 );
 
@@ -377,10 +431,19 @@ app.get("/auth/github",
 );
 
 app.get("/auth/github/callback",
-  passport.authenticate("github", { failureRedirect: "/login" }),
+  passport.authenticate("github", { 
+    failureRedirect: "/login",
+    failureMessage: true 
+  }),
   (req, res) => {
-    req.flash("success", `Welcome ${req.user.username}!`);
-    res.redirect("/");
+    try {
+      req.flash("success", `Welcome ${req.user.username}!`);
+      res.redirect("/");
+    } catch (err) {
+      console.error("GitHub callback error:", err);
+      req.flash("error", "Error during GitHub login. Please try again.");
+      res.redirect("/login");
+    }
   }
 );
 
@@ -501,26 +564,26 @@ app.post("/reset-password", async (req, res) => {
     // Clear reset OTP first
     clearOTP(userDoc, 'reset');
     
-    // Set new password using setPassword
-    userDoc.setPassword(password, async (err) => {
-      try {
-        if (err) {
-          console.error("SetPassword error:", err);
-          req.flash("error", "Failed to reset password");
-          return res.render("reset-password.ejs", { email, errors: [] });
-        }
+    // Set new password and save
+    try {
+      // Use async setPassword from passport-local-mongoose
+      await new Promise((resolve, reject) => {
+        userDoc.setPassword(password, (err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      
+      await userDoc.save();
+      console.log("Password reset successful for:", email);
 
-        await userDoc.save();
-        console.log("Password reset successful for:", email);
-
-        req.flash("success", "Password reset successfully! Please log in with your new password.");
-        res.redirect("/login");
-      } catch (saveErr) {
-        console.error("Save error after setPassword:", saveErr);
-        req.flash("error", "Failed to save new password");
-        res.render("reset-password.ejs", { email, errors: [] });
-      }
-    });
+      req.flash("success", "Password reset successfully! Please log in with your new password.");
+      res.redirect("/login");
+    } catch (err) {
+      console.error("Password reset error:", err);
+      req.flash("error", "Failed to reset password");
+      return res.render("reset-password.ejs", { email, errors: [] });
+    }
   } catch (e) {
     console.error("Reset password error:", e);
     req.flash("error", e.message || "Failed to reset password");
