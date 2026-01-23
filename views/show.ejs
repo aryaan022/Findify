@@ -90,7 +90,6 @@
               <a href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent(business.address) %>" target="_blank" class="btn btn-outline-primary">
                 <i data-lucide="directions" class="me-2"></i> Get Directions
               </a>
-              <% } %>
               <% if(currentUser && currentUser.role == "user"){ %>
               <form action="/favorite/<%= business._id %>" method="post">
                 <button class="btn btn-outline-secondary">

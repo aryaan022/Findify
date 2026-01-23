@@ -310,8 +310,30 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="/js/interactive.js"></script>
 
-    <!-- Update unread message count in navbar -->
+    <!-- Navbar Toggle Fix & Message Count Update -->
     <script>
+      // Fix navbar toggle button
+      document.querySelectorAll('.navbar-collapse .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          const navbarCollapse = document.querySelector('.navbar-collapse');
+          const navbarToggler = document.querySelector('.navbar-toggler');
+          if (navbarCollapse.classList.contains('show')) {
+            navbarToggler.click();
+          }
+        });
+      });
+
+      // Fix navbar toggle button also for buttons
+      document.querySelectorAll('.navbar-collapse .btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const navbarCollapse = document.querySelector('.navbar-collapse');
+          const navbarToggler = document.querySelector('.navbar-toggler');
+          if (navbarCollapse.classList.contains('show')) {
+            navbarToggler.click();
+          }
+        });
+      });
+
       // Function to update unread message count
       async function updateUnreadCount() {
         try {
