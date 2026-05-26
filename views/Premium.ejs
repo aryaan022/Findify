@@ -1,207 +1,48 @@
 <%- layout("layouts/boilerplate.ejs") %>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            /* slate-50 */
-            color: #334155;
-            /* slate-700 */
-            overflow-x: hidden;
-        }
 
-        /* Header text shimmer effect for light background */
-        .shimmer-text {
-            background-image: linear-gradient(-75deg, #4f46e5 30%, #7c3aed 50%, #4f46e5 70%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            animation: shimmer 4s linear infinite;
-        }
-
-        @keyframes shimmer {
-            to {
-                background-position: -200% center;
-            }
-        }
-
-        /* Premium Feature Card Styling for light background */
-        .feature-card-premium {
-            position: relative;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            /* slate-200 */
-            transition: all 0.4s ease;
-            transform: perspective(1000px);
-            height: 100%;
-        }
-
-        .feature-card-premium:hover {
-            transform: translateY(-10px) rotateX(5deg);
-            border-color: #4f46e5;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-card-premium .icon-container {
-            display: inline-block;
-            background-color: rgba(79, 70, 229, 0.1);
-            color: #4f46e5;
-            /* indigo-600 */
-            transition: all 0.4s ease;
-        }
-
-        .feature-card-premium:hover .icon-container {
-            transform: scale(1.1) translateY(-5px);
-            filter: drop-shadow(0 0 15px rgba(129, 140, 248, 0.5));
-        }
-        .premium-pay-btn {
-            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
-            color: #fff !important;
-            border: none;
-            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .premium-pay-btn:hover,
-        .premium-pay-btn:focus {
-            background: linear-gradient(90deg, #7c3aed 0%, #4f46e5 100%);
-            transform: translateY(-2px) scale(1.04);
-            box-shadow: 0 16px 32px rgba(79, 70, 229, 0.25);
-        }
-
-        .premium-pay-btn:active {
-            transform: scale(0.98);
-        }
-    </style>
-    <div class="container py-5">
-        <!-- Header Section -->
-        <header class="text-center col-lg-8 mx-auto my-5 py-5">
-            <h1 class="display-3 fw-bolder mb-4 shimmer-text">Go Premium</h1>
-            <p class="fs-5 text-body-secondary">Supercharge your business with exclusive features designed to help you
-                stand out and attract more customers.</p>
-        </header>
-
-        <!-- Features Grid -->
-        <div class="row gx-4 gy-4 justify-content-center">
-            <!-- Feature 1: Multiple Photos -->
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-premium p-5 rounded-4 text-center">
-                    <div class="icon-container p-4 rounded-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                    </div>
-                    <h3 class="h4 fw-bold text-dark mb-2">Showcase with Galleries</h3>
-                    <p class="text-body-secondary">Tell your story with more than just words. Upload multiple
-                        high-resolution photos to create beautiful, engaging galleries for your listing.</p>
-                </div>
-            </div>
-
-            <!-- Feature 2: Top Placement -->
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-premium p-5 rounded-4 text-center">
-                    <div class="icon-container p-4 rounded-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="19" x2="12" y2="5"></line>
-                            <polyline points="5 12 12 5 19 12"></polyline>
-                        </svg>
-                    </div>
-                    <h3 class="h4 fw-bold text-dark mb-2">Priority Placement</h3>
-                    <p class="text-body-secondary">Get seen first. Premium listings are featured at the top of search
-                        results and categories, dramatically increasing your visibility.</p>
-                </div>
-            </div>
-
-            <!-- Feature 3: Analytics -->
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-premium p-5 rounded-4 text-center">
-                    <div class="icon-container p-4 rounded-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2.5 2v6h6M21.5 22v-6h-6" />
-                            <path d="M22 11.5A10 10 0 0 0 3.5 12.5" />
-                            <path d="M2 12.5a10 10 0 0 0 18.5-1" />
-                        </svg>
-                    </div>
-                    <h3 class="h4 fw-bold text-dark mb-2">Insightful Analytics</h3>
-                    <p class="text-body-secondary">Make data-driven decisions. Access an exclusive dashboard to track
-                        your listing views, user engagement, and performance over time.</p>
-                </div>
-            </div>
-
-            <!-- Feature 4: Premium Badge -->
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-premium p-5 rounded-4 text-center">
-                    <div class="icon-container p-4 rounded-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="h4 fw-bold text-dark mb-2">Premium Profile Badge</h3>
-                    <p class="text-body-secondary">Build trust and stand out from the crowd with a special badge on your
-                        profile that identifies you as a premium Findify partner.</p>
-                </div>
-            </div>
-
-            <!-- Feature 5: Custom URL -->
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-premium p-5 rounded-4 text-center">
-                    <div class="icon-container p-4 rounded-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path>
-                        </svg>
-                    </div>
-                    <h3 class="h4 fw-bold text-dark mb-2">Custom Profile URL</h3>
-                    <p class="text-body-secondary">Create a professional, memorable link for your business (e.g.,
-                        findify.com/your-brand) that you can easily share with your customers.</p>
-                </div>
-            </div>
-
-            <!-- Feature 6: Priority Support -->
-            <div class="col-lg-4 col-md-6">
-                <div class="feature-card-premium p-5 rounded-4 text-center">
-                    <div class="icon-container p-4 rounded-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 18a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2" />
-                            <rect x="3" y="4" width="18" height="18" rx="2" />
-                            <path d="M12 8v4" />
-                            <path d="M12 12h.01" />
-                        </svg>
-                    </div>
-                    <h3 class="h4 fw-bold text-dark mb-2">Dedicated Support</h3>
-                    <p class="text-body-secondary">Get faster response times and priority assistance from our support
-                        team whenever you have a question or need help.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Call to Action Section -->
-        <div class="text-center mt-5 py-5">
-            <p class="fs-4 text-body-secondary mb-2">Unlock all premium features</p>
-            <p class="display-4 fw-bolder text-dark mb-4">₹10 / month</p>
-            
-            <!-- THE FIX: Add the data-key attribute, populated by the variable from your app.js route -->
-             <%if(currentUser && !currentUser.isPremium) { %>
-                <button id="pay-button" data-key="<%= razorpayKeyId %>" class="btn btn-lg d-inline-flex align-items-center gap-2 px-5 py-3 rounded-4 fw-bold shadow-lg premium-pay-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                    <span>Upgrade Now</span>
-                </button>
-            <%} %>
-                <button class="btn btn-lg d-inline-flex align-items-center gap-2 px-5 py-3 rounded-4 fw-bold shadow-lg premium-pay-btn" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"></path></svg>
-                    <span>You're a Premium Member</span>
-                </button>
-            <p class="text-secondary mt-3"><small>Secure payments powered by Razorpay.</small></p>
-        </div>
+<div class="premium-page main-content">
+  <div class="container">
+    <div class="premium-header">
+      <h1>Upgrade to Premium</h1>
+      <p style="color:var(--text-secondary);font-size:1.05rem;">Unlock powerful features to grow your business and stand out from the crowd.</p>
     </div>
+
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="pricing-card featured">
+          <div class="pricing-name">Premium</div>
+          <div class="pricing-price">₹499</div>
+          <div class="pricing-period">per month</div>
+
+          <ul class="pricing-features">
+            <li><i class="fa fa-check"></i> Priority Listing in Search</li>
+            <li><i class="fa fa-check"></i> Verified Business Badge</li>
+            <li><i class="fa fa-check"></i> Analytics Dashboard</li>
+            <li><i class="fa fa-check"></i> Priority Customer Support</li>
+            <li><i class="fa fa-check"></i> Featured on Homepage</li>
+            <li><i class="fa fa-check"></i> Business Hours Display</li>
+            <li><i class="fa fa-check"></i> Enhanced Messaging</li>
+          </ul>
+
+          <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+            <% if (!currentUser.isPremium || !currentUser.premiumExpiresAt || new Date(currentUser.premiumExpiresAt) <= new Date()) { %>
+              <button id="pay-button" data-key="<%= razorpayKeyId %>" class="btn btn-primary btn-lg w-100">
+                <i class="fa fa-crown me-2"></i>Get Premium Now
+              </button>
+            <% } else { %>
+              <div style="text-align:center;padding:20px;background:var(--success-subtle);border-radius:var(--radius-lg);border:1px solid rgba(52,211,153,0.2);">
+                <i class="fa fa-check-circle" style="font-size:2rem;color:var(--success);margin-bottom:8px;display:block;"></i>
+                <strong style="color:var(--success);font-size:1rem;">You are a Premium Member!</strong>
+                <p style="color:var(--text-muted);font-size:0.85rem;margin:8px 0 0;">Expires: <%= new Date(currentUser.premiumExpiresAt).toLocaleDateString() %></p>
+              </div>
+            <% } %>
+          <% } else { %>
+            <a href="/login" class="btn btn-primary btn-lg w-100">Sign In to Upgrade</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>

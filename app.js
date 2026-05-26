@@ -652,7 +652,7 @@ app.get("/search", async (req, res) => {
     if (category && category !== "") {
       filter.Category = category;
     }
-n
+
     let business = await Business.find(filter).populate('Owner', 'username');
     
     // Get featured and top-rated businesses for the homepage sections

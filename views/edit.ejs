@@ -1,35 +1,64 @@
 <%= layout("layouts/boilerplate") %>
-<h1 style="text-align:center;">Edit Business</h1>
-<form action="/edit/<%= business._id %>?_method=PUT" method="POST" class="centered-form" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="name">Business Name</label>
-        <input type="text" id="name" name="Name" class="form-control" value="<%= business.Name %>" required>
+
+<section class="form-page">
+  <h1>Edit Business</h1>
+  <p class="form-subtitle">Update your business information</p>
+
+  <form action="/edit/<%= business._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+    <div class="form-card">
+      <h2>Basic Information</h2>
+      <div class="row g-3">
+        <div class="col-md-8">
+          <label for="Name" class="form-label">Business Name</label>
+          <input type="text" class="form-control" id="Name" name="Name" value="<%= business.Name %>" required>
+        </div>
+        <div class="col-md-4">
+          <label for="Category" class="form-label">Category</label>
+          <select class="form-select" id="Category" name="Category" required>
+            <% ['Restaurant','Cafe','Retail','Books','Health','Beauty','Services','Automotive','Entertainment','Dealership','Shops','Other'].forEach(cat => { %>
+              <option value="<%= cat %>" <%= business.Category === cat ? 'selected' : '' %>><%= cat %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" id="description" name="description" rows="4" required><%= business.description %></textarea>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-        <label for="category">Category</label>
-        <select id="category" name="Category" class="form-control" required>
-            <option value="Restaurant" <%= business.Category === 'Restaurant' ? 'selected' : '' %>>Restaurant</option>
-            <option value="Services" <%= business.Category === 'Services' ? 'selected' : '' %>>Services</option>
-            <option value="Dealership" <%= business.Category === 'Dealership' ? 'selected' : '' %>>Dealership</option>
-            <option value="Cafe" <%= business.Category === 'Cafe' ? 'selected' : '' %>>Cafe</option>
-            <option value="Shops" <%= business.Category === 'Shops' ? 'selected' : '' %>>Shops</option>
-        </select>
+
+    <div class="form-card">
+      <h2>Contact & Location</h2>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="Contact" class="form-label">Phone</label>
+          <input type="tel" class="form-control" id="Contact" name="Contact" value="<%= business.Contact %>" required>
+        </div>
+        <div class="col-md-6">
+          <label for="address" class="form-label">Address</label>
+          <input type="text" class="form-control" id="address" name="address" value="<%= business.address %>" required>
+        </div>
+      </div>
     </div>
-    <div class="form-group">
-        <label for="description">Description</label>
-        <textarea id="description" name="description" class="form-control" required><%= business.description %></textarea>
+
+    <div class="form-card">
+      <h2>Business Image</h2>
+      <% if (business.Image && business.Image.url) { %>
+        <div style="margin-bottom:16px;">
+          <img src="<%= business.Image.url %>" alt="Current image" style="max-width:200px;border-radius:var(--radius-lg);border:1px solid var(--border-subtle);">
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">Current image</p>
+        </div>
+      <% } %>
+      <label for="image" class="form-label">Upload New Image</label>
+      <input type="file" class="form-control" id="image" name="image" accept="image/*">
+      <div class="form-text">Leave empty to keep current image</div>
     </div>
-    <div class="form-group">
-        <label for="Contact">Contact</label>
-        <input type="text" id="contact" name="Contact" class="form-control" value="<%= business.Contact %>" minlength="10" maxlength="10" required>
+
+    <div class="d-flex gap-3 justify-content-end">
+      <a href="/show/<%= business._id %>" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
     </div>
-    <div class="form-group">
-        <label for="address">Address</label>
-        <input type="text" id="address" name="address" class="form-control" value="<%= business.address %>" required>
-    </div>
-    <div class="form-group">
-        <label for="Image">Image URL</label>
-        <input type="file" id="Image" name="image" class="form-control" value="<%= business.Image ? business.Image.url : '' %>">
-    </div>
-    <button type="submit" class="btn btn-primary">Update Business</button>
-</form>
+  </form>
+</section>
+
+<script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>

@@ -1,152 +1,151 @@
 <%- layout('/layouts/boilerplate') %>
 
-<section class="py-5">
+<div class="discover-page main-content">
   <div class="container">
-    <h1 class="fw-bold mb-4">Discover Nearby Businesses</h1>
+    <div class="section-header" style="text-align:left;margin-bottom:24px;">
+      <h1 class="section-title" style="font-size:1.75rem;">Discover Businesses</h1>
+      <p class="section-subtitle" style="margin:0;">Find businesses near you on the map</p>
+    </div>
 
-    <!-- Map Section -->
-    <div id="map" style="width: 100%; height: 500px;" class="mb-4 rounded shadow-sm"></div>
+    <!-- Location Controls -->
+    <div class="d-flex gap-3 align-items-center flex-wrap" style="margin-bottom:16px;">
+      <button id="locateBtn" class="btn btn-primary btn-sm" onclick="getMyLocation()">
+        <i class="fa fa-crosshairs me-2"></i>Use My Location
+      </button>
+      <span id="locationStatus" style="color:var(--text-muted);font-size:0.85rem;">
+        <% if (businesses && businesses.length > 0) { %>
+          Showing <%= businesses.length %> businesses near you
+        <% } else { %>
+          Click "Use My Location" to find nearby businesses
+        <% } %>
+      </span>
+    </div>
 
-    <!-- Business List -->
-    <div class="row">
-      <% if (businesses && businesses.length > 0) { %>
-        <% businesses.forEach(business => { %>
-          <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-              <img
-                src="<%= business.Image && business.Image.url ? business.Image.url : 'https://via.placeholder.com/400x200?text=No+Image' %>"
-                class="card-img-top"
-                alt="<%= business.Name %>"
-              />
+    <div class="discover-map" id="map" style="height:450px;"></div>
+
+    <% if (businesses && businesses.length > 0) { %>
+      <div style="margin-top:32px;">
+        <h2 style="font-size:1.25rem;margin-bottom:16px;">Nearby Businesses (<%= businesses.length %>)</h2>
+        <div class="business-grid">
+          <% businesses.forEach(business => { %>
+            <div class="hover-card">
+              <div class="business-card-image">
+                <img src="<%= (business.Image && business.Image.url) ? business.Image.url : 'https://placehold.co/400x200/1e2030/5c5f73?text=No+Image' %>"
+                  class="card-img-top" alt="<%= business.Name %>">
+              </div>
               <div class="card-body">
                 <h5 class="card-title"><%= business.Name %></h5>
-                <p class="text-muted mb-2"><%= business.Category %></p>
-                <p class="small text-muted"><%= business.address %></p>
-                <a href="/show/<%= business._id %>" class="btn btn-primary btn-sm">View Details</a>
+                <span class="badge bg-primary mb-2"><%= business.Category %></span>
+                <p class="card-text" style="font-size:0.85rem;"><i class="fa fa-map-marker-alt me-1"></i><%= business.address %></p>
+                <a href="/show/<%= business._id %>" class="btn btn-outline-primary btn-sm w-100 mt-auto">View Details</a>
               </div>
             </div>
-          </div>
-        <% }) %>
-      <% } else { %>
-        <p class="text-muted">No businesses found nearby.</p>
-      <% } %>
-    </div>
+          <% }) %>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon"><i class="fa fa-compass"></i></div>
+        <h3>No nearby businesses found</h3>
+        <p>Allow location access or try a different area to find businesses near you</p>
+        <button class="btn btn-primary" onclick="getMyLocation()"><i class="fa fa-crosshairs me-2"></i>Find Businesses Near Me</button>
+      </div>
+    <% } %>
   </div>
-</section>
+</div>
+
+<link href='https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css' rel='stylesheet' />
 
 <script>
-  // Wait for DOM to be fully loaded before initializing map
-  document.addEventListener('DOMContentLoaded', function() {
-    // Check if mapboxgl is available
-    if (typeof mapboxgl === 'undefined') {
-      console.error('Mapbox GL JS is not loaded');
-      return;
-    }
+  mapboxgl.accessToken = '<%= mapboxToken %>';
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v11',
+    center: [77.2090, 28.6139],
+    zoom: 10
+  });
+  map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-    // Check if mapbox token is available
-    if (!'<%= mapboxToken %>') {
-      console.error('Mapbox token is not available');
-      return;
-    }
-
-    mapboxgl.accessToken = '<%= mapboxToken %>';
-    
-    try {
-      const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [77.2090, 28.6139], // fallback Delhi
-        zoom: 10
-      });
-
-      // Wait for map to load before adding controls and markers
-      map.on('load', function() {
-        map.addControl(new mapboxgl.NavigationControl());
-
-        const bounds = new mapboxgl.LngLatBounds();
-        let hasUserLocation = false;
-        let hasBusinesses = false;
-
-        // Show user marker if lat/lng in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("lat") && urlParams.has("lng")) {
-          const userCoords = [parseFloat(urlParams.get("lng")), parseFloat(urlParams.get("lat"))];
-          new mapboxgl.Marker({ color: 'blue' })
-            .setLngLat(userCoords)
-            .setPopup(new mapboxgl.Popup().setHTML(`<b>You are here</b>`))
-            .addTo(map);
-          bounds.extend(userCoords);
-          hasUserLocation = true;
-        }
-
-        // Render business markers
-        console.log('Total businesses found:', <%= businesses ? businesses.length : 0 %>);
-        <% if (businesses && businesses.length > 0) { %>
-          <% businesses.forEach((b, index) => { %>
-            console.log('Processing business <%= index + 1 %>: <%= b.Name %>');
-            console.log('  - Has geometry:', <%= b.geometry ? 'true' : 'false' %>);
-            console.log('  - Coordinates:', <%= b.geometry && b.geometry.coordinates ? JSON.stringify(b.geometry.coordinates) : 'null' %>);
-            <% if (b.geometry && b.geometry.coordinates) { %>
-              const coords<%= index %> = <%= JSON.stringify(b.geometry.coordinates) %>;
-              console.log('  - Creating marker for:', '<%= b.Name %>', 'at', coords<%= index %>);
-              new mapboxgl.Marker({ color: 'red' })
-                .setLngLat(coords<%= index %>)
-                .setPopup(new mapboxgl.Popup().setHTML(`
-                  <h6><%= b.Name %></h6>
-                  <p><%= b.address %></p>
-                  <a href="/show/<%= b._id %>">View Details</a>
-                `))
-                .addTo(map);
-              bounds.extend(coords<%= index %>);
-              hasBusinesses = true;
-            <% } else { %>
-              console.log('  - Skipping business (no geometry):', '<%= b.Name %>');
-            <% } %>
-          <% }) %>
-        <% } else { %>
-          console.log('No businesses found or businesses array is empty');
-        <% } %>
-
-        // Fit map to show all markers
-        if (hasUserLocation || hasBusinesses) {
-          map.fitBounds(bounds, { padding: 50 });
-        } else {
-          // Fallback to Delhi if no location data
-          map.setCenter([77.2090, 28.6139]);
-          map.setZoom(10);
-        }
-      });
-
-      // Ask for user location if not already in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      if (!urlParams.has("lat")) {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(position => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set("lat", lat);
-            currentUrl.searchParams.set("lng", lng);
-            window.location.href = currentUrl.toString();
-          }, () => {
-            alert("Location access denied. Cannot show nearby businesses.");
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error initializing map:', error);
+  // Add business markers from server data
+  const businesses = <%- JSON.stringify(businesses) %>;
+  businesses.forEach(b => {
+    if (b.geometry && b.geometry.coordinates && b.geometry.coordinates.length === 2) {
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+        '<div style="color:#000;padding:4px;">' +
+        '<strong>' + b.Name + '</strong><br>' +
+        '<span style="font-size:0.8rem;">' + b.Category + '</span><br>' +
+        '<a href="/show/' + b._id + '" style="font-size:0.8rem;">View Details</a>' +
+        '</div>'
+      );
+      new mapboxgl.Marker({ color: '#635bff' })
+        .setLngLat(b.geometry.coordinates)
+        .setPopup(popup)
+        .addTo(map);
     }
   });
-</script>
 
-<style>
-  .footer-link {
-    text-decoration: none;
-    color: #555;
-    transition: color 0.2s ease-in-out;
+  // Check if coordinates are in URL (already located)
+  const urlParams = new URLSearchParams(window.location.search);
+  const lat = urlParams.get('lat');
+  const lng = urlParams.get('lng');
+  if (lat && lng) {
+    // Show user location marker
+    new mapboxgl.Marker({ color: '#34d399' })
+      .setLngLat([parseFloat(lng), parseFloat(lat)])
+      .setPopup(new mapboxgl.Popup().setHTML('<div style="color:#000;padding:4px;"><strong>📍 Your Location</strong></div>'))
+      .addTo(map);
+    map.flyTo({ center: [parseFloat(lng), parseFloat(lat)], zoom: 12 });
+  } else {
+    // Auto-detect location on first visit (without URL params)
+    autoDetectLocation();
   }
-  .footer-link:hover {
-    color: #007bff;
+
+  function getMyLocation() {
+    const btn = document.getElementById('locateBtn');
+    const status = document.getElementById('locationStatus');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Locating...';
+    status.textContent = 'Getting your location...';
+
+    if (!navigator.geolocation) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa fa-crosshairs me-2"></i>Use My Location';
+      status.textContent = 'Geolocation is not supported by your browser';
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        // Redirect to discover with coordinates — this triggers the backend $near query
+        window.location.href = '/discover?lat=' + latitude + '&lng=' + longitude;
+      },
+      (err) => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-crosshairs me-2"></i>Use My Location';
+        status.textContent = 'Location access denied. Please allow location access and try again.';
+        console.error('Geolocation error:', err);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
   }
-</style>
-<script>lucide.createIcons();</script>
+
+  function autoDetectLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          // Auto-redirect to fetch nearby businesses
+          window.location.href = '/discover?lat=' + latitude + '&lng=' + longitude;
+        },
+        (err) => {
+          // Silently fail — user can click the button manually
+          console.log('Auto-detect location not available:', err.message);
+        },
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 }
+      );
+    }
+  }
+
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+</script>

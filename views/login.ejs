@@ -1,396 +1,44 @@
 <%= layout("layouts/boilerplate") %>
 
-<style>
-  .login-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
-  }
-
-  .login-card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    width: 100%;
-    max-width: 450px;
-    animation: slideUp 0.6s ease-out;
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .login-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 3rem 2rem 2rem;
-    text-align: center;
-    position: relative;
-  }
-
-  .login-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
-    opacity: 0.3;
-  }
-
-  .login-header h2 {
-    position: relative;
-    z-index: 1;
-    margin: 0;
-    font-size: 2rem;
-    font-weight: 700;
-  }
-
-  .login-header p {
-    position: relative;
-    z-index: 1;
-    margin: 0.5rem 0 0;
-    opacity: 0.9;
-  }
-
-  .login-body {
-    padding: 2rem;
-  }
-
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-
-  .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #333;
-    font-size: 0.9rem;
-  }
-
-  .form-control {
-    width: 100%;
-    padding: 1rem;
-    border: 2px solid #e1e5e9;
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
-    color: #333;
-    font-weight: 500;
-  }
-
-  .form-control:focus {
-    outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-2px);
-  }
-
-  .form-control::placeholder {
-    color: #6c757d;
-    font-weight: 400;
-  }
-
-  .input-group {
-    position: relative;
-  }
-
-  .input-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6c757d;
-    z-index: 2;
-  }
-
-  .input-group .form-control {
-    padding-left: 3rem;
-  }
-
-  .input-group .form-control:focus + .input-icon {
-    color: #667eea;
-  }
-
-  .login-btn {
-    width: 100%;
-    padding: 1rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .login-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-  }
-
-  .login-btn:active {
-    transform: translateY(0);
-  }
-
-  .login-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-  }
-
-  .login-btn:hover::before {
-    left: 100%;
-  }
-
-  .login-footer {
-    text-align: center;
-    margin-top: 1.5rem;
-  }
-
-  .login-link {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-
-  .login-link:hover {
-    color: #764ba2;
-    text-decoration: none;
-  }
-
-  .forgot-password-link {
-    display: block;
-    text-align: right;
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
-  }
-
-  .forgot-password-link a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-
-  .forgot-password-link a:hover {
-    color: #764ba2;
-    text-decoration: underline;
-  }
-
-  .divider {
-    display: flex;
-    align-items: center;
-    margin: 2rem 0;
-    color: #999;
-    font-size: 0.9rem;
-  }
-
-  .divider::before,
-  .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #e1e5e9;
-  }
-
-  .divider span {
-    margin: 0 1rem;
-  }
-
-  .oauth-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .oauth-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    border: 2px solid #e1e5e9;
-    border-radius: 10px;
-    background: white;
-    color: #333;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    font-size: 0.9rem;
-  }
-
-  .oauth-btn:hover {
-    border-color: #667eea;
-    color: #667eea;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-  }
-
-  .oauth-btn.google:hover {
-    border-color: #4285f4;
-    color: #4285f4;
-  }
-
-  .oauth-btn.github:hover {
-    border-color: #333;
-    color: #333;
-  }
-
-  .floating-elements {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .floating-circle {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(102, 126, 234, 0.1);
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .floating-circle:nth-child(1) {
-    width: 80px;
-    height: 80px;
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-  }
-
-  .floating-circle:nth-child(2) {
-    width: 120px;
-    height: 120px;
-    top: 60%;
-    right: 10%;
-    animation-delay: 2s;
-  }
-
-  .floating-circle:nth-child(3) {
-    width: 60px;
-    height: 60px;
-    bottom: 20%;
-    left: 20%;
-    animation-delay: 4s;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(180deg); }
-  }
-</style>
-
-<div class="login-container">
-  <div class="floating-elements">
-    <div class="floating-circle"></div>
-    <div class="floating-circle"></div>
-    <div class="floating-circle"></div>
-  </div>
-  
-  <div class="login-card">
-    <div class="login-header">
-      <h2>Welcome Back</h2>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Welcome back</h1>
       <p>Sign in to your account</p>
     </div>
-    
-    <div class="login-body">
-      <% if (errors && errors.length > 0) { %>
-        <div class="alert alert-danger">
-          <% errors.forEach(error => { %>
-            <p><%= error.msg %></p>
-          <% }); %>
-        </div>
-      <% } %>
 
-      <div class="oauth-buttons">
-        <a href="/auth/google" class="oauth-btn google">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-          </svg>
-          Google
-        </a>
-        <a href="/auth/github" class="oauth-btn github">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-          </svg>
-          GitHub
-        </a>
+    <% if (errors && errors.length > 0) { %>
+      <div class="error-list">
+        <% errors.forEach(error => { %>
+          <p><i class="fa fa-exclamation-circle me-1"></i><%= error.msg %></p>
+        <% }) %>
       </div>
+    <% } %>
 
-      <div class="divider">
-        <span>OR</span>
+    <div class="oauth-buttons">
+      <a href="/auth/google" class="oauth-btn"><i class="fab fa-google"></i> Continue with Google</a>
+      <a href="/auth/github" class="oauth-btn"><i class="fab fa-github"></i> Continue with GitHub</a>
+    </div>
+
+    <div class="auth-divider">or</div>
+
+    <form action="/login" method="POST" id="loginForm" class="auth-form">
+      <div class="form-group">
+        <label for="username" class="form-label">Username or Email</label>
+        <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username" required>
       </div>
-
-      <form action="/login" method="POST" id="loginForm">
-        <div class="form-group">
-          <label for="username" class="form-label">Username or Email</label>
-          <div class="input-group">
-            <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username or email" required>
-            <i data-lucide="user" class="input-icon" style="width: 20px; height: 20px;"></i>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="password" class="form-label">Password</label>
-          <div class="input-group">
-            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
-            <i data-lucide="lock" class="input-icon" style="width: 20px; height: 20px;"></i>
-          </div>
-          <div class="forgot-password-link">
-            <a href="/forgot-password">Forgot password?</a>
-          </div>
-        </div>
-
-        <button type="submit" class="login-btn">
-          <i data-lucide="log-in" class="me-2" style="width: 20px; height: 20px;"></i>
-          Sign In
-        </button>
-      </form>
-
-      <div class="login-footer">
-        <p class="mb-0">
-          Don't have an account? 
-          <a href="/register" class="login-link">Create Account</a>
-        </p>
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
       </div>
+      <a href="/forgot-password" class="forgot-password-link">Forgot password?</a>
+      <button type="submit" class="auth-btn">Sign In</button>
+    </form>
+
+    <div class="auth-footer">
+      Don't have an account? <a href="/register">Create one</a>
     </div>
   </div>
 </div>
 
-<script>
-  // Initialize Lucide icons
-  lucide.createIcons();
-</script>
+<script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>
