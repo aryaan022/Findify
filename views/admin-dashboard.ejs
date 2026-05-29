@@ -73,7 +73,7 @@
                 <td><%= u.email %></td>
                 <td><span class="badge bg-<%= u.role === 'admin' ? 'danger' : u.role === 'Vendor' ? 'primary' : 'secondary' %>"><%= u.role %></span></td>
                 <td><span class="badge bg-<%= u.status === 'active' ? 'success' : 'warning' %>"><%= u.status || 'active' %></span></td>
-                <td style="color:var(--text-muted);font-size:0.8rem;"><%= new Date(u.createdAt).toLocaleDateString() %></td>
+                <td style="color:var(--text-muted);font-size:0.8rem;"><%= u.createdAt ? new Date(u.createdAt).toLocaleDateString() : (u._id && u._id.getTimestamp ? new Date(u._id.getTimestamp()).toLocaleDateString() : 'N/A') %></td>
               </tr>
             <% }) %>
           </tbody>
